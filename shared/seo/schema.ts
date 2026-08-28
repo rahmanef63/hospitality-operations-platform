@@ -15,6 +15,9 @@ const organizationId = `${SITE_URL}/#organization`;
 const websiteId = `${SITE_URL}/#website`;
 const brandId = `${SITE_URL}/#brand`;
 const dateModified = CONTENT_UPDATED_AT.toISOString();
+const officialProfileUrls = [
+  "https://www.google.com/maps/place/RUMA+KAMYNA/data=!4m2!3m1!1s0x0:0x970747a93434dce9",
+] as const;
 
 function imageObject(image: { src: string; width: number; height: number; alt: string }) {
   return {
@@ -41,6 +44,7 @@ export function buildGlobalSchema() {
         image: absolute(socialImages.kamynaLiving),
         description: SITE_DESCRIPTION,
         slogan: SITE_SLOGAN,
+        sameAs: officialProfileUrls,
       },
       {
         "@type": "WebSite",
@@ -146,6 +150,7 @@ export function buildPropertySchema(property: PropertyContent) {
         slogan: property.tagline,
         email: property.contact.email,
         address,
+        sameAs: officialProfileUrls,
         parentOrganization: { "@id": organizationId },
         brand: { "@id": brandId },
         mainEntityOfPage: { "@id": `${url}/#webpage` },

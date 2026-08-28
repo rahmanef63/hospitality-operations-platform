@@ -86,10 +86,16 @@ describe("search and sharing surfaces", () => {
     const lodging = nodeByType(stay, "LodgingBusiness")!;
     const address = lodging.address as Record<string, unknown>;
 
-    expect(nodeByType(global, "Organization")).toBeTruthy();
+    const organization = nodeByType(global, "Organization")!;
+    const officialGoogleMapsProfile =
+      "https://www.google.com/maps/place/RUMA+KAMYNA/data=!4m2!3m1!1s0x0:0x970747a93434dce9";
+
+    expect(organization).toBeTruthy();
+    expect(organization.sameAs).toEqual([officialGoogleMapsProfile]);
     expect(nodeByType(global, "WebSite")).toBeTruthy();
     expect(nodeByType(home, "CollectionPage")).toBeTruthy();
     expect(lodging.name).toBe("Ruma Kamyna");
+    expect(lodging.sameAs).toEqual([officialGoogleMapsProfile]);
     expect(lodging.parentOrganization).toEqual({ "@id": `${SITE_URL}/#organization` });
     expect(address).toEqual({
       "@type": "PostalAddress",
