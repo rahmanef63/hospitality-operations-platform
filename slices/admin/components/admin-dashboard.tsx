@@ -1,4 +1,4 @@
-import { Cloud, ExternalLink, Globe2, LogOut, ShieldCheck } from "lucide-react";
+import { Cloud, ExternalLink, Globe2, ShieldCheck } from "lucide-react";
 import { ActivityPanel } from "./activity-panel";
 import { WelcomeEditor } from "./welcome-editor";
 import type { AdminDashboardProps } from "../types";
@@ -15,7 +15,6 @@ const errorMessages: Record<string, string> = {
 };
 
 export function AdminDashboard({
-  sessionEmail,
   overview,
   endpointUrl,
   previewUrl,
@@ -27,25 +26,7 @@ export function AdminDashboard({
 }: AdminDashboardProps) {
   const publishedCount = Object.values(overview.configs).filter((config) => config.publishedAt).length;
   return (
-    <main id="main-content" className="min-h-screen pb-20">
-      <header className="border-b border-charcoal/12 bg-charcoal text-ivory">
-        <div className="mx-auto flex max-w-[96rem] flex-wrap items-center justify-between gap-5 px-4 py-5 sm:px-8 lg:px-12">
-          <div>
-            <p className="kicker text-warm-sand">Kamyna Living</p>
-            <p className="mt-1 text-xs text-ivory/65">Guest experience administration</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <p className="hidden text-xs text-ivory/65 sm:block">{sessionEmail}</p>
-            <form action="/api/admin/session" method="post">
-              <input type="hidden" name="intent" value="logout" />
-              <button type="submit" className="inline-flex min-h-11 items-center gap-2 border border-ivory/25 px-4 text-xs font-semibold tracking-[.12em] uppercase hover:bg-ivory hover:text-charcoal">
-                <LogOut className="size-4" aria-hidden="true" /> Logout
-              </button>
-            </form>
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen pb-20">
       <div className="mx-auto max-w-[96rem] px-4 pt-12 sm:px-8 lg:px-12 lg:pt-16">
         <div className="grid gap-10 xl:grid-cols-[1fr_auto] xl:items-end">
           <div>
@@ -108,6 +89,6 @@ export function AdminDashboard({
           <ActivityPanel events={overview.events} />
         </div>
       </div>
-    </main>
+    </div>
   );
 }

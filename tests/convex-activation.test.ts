@@ -23,9 +23,13 @@ describe("Convex Cloud activation", () => {
     for (const file of ["api.d.ts", "api.js", "dataModel.d.ts", "server.d.ts", "server.js"]) {
       expect(existsSync(path.join(root, "convex/_generated", file))).toBe(true);
     }
+    expect(existsSync(path.join(root, "convex/tsconfig.json"))).toBe(true);
     expect(read("convex/welcome.ts")).toContain("internalMutation");
     expect(read("convex/adminSecurity.ts")).toContain("internalMutation");
     expect(read("convex/http.ts")).toContain("authorizeAdminRequest");
+    expect(read("convex/http.ts")).toContain('path: "/admin/pms"');
+    expect(read("convex/pms/catalog.ts")).toContain("internalMutation");
+    expect(read("convex/pms/public.ts")).toContain("export const getProperty = query");
     expect(read("proxy.ts")).toContain("verifyAdminSessionToken");
   });
 
@@ -42,5 +46,6 @@ describe("Convex Cloud activation", () => {
     expect(clientSource).not.toContain("process.env");
     expect(clientSource).not.toContain("CONVEX_DEPLOY_KEY");
     expect(clientSource).not.toContain("KAMYNA_ADMIN_PASSWORD");
+    expect(read("slices/pms/components/property-manager.tsx")).not.toContain("process.env");
   });
 });

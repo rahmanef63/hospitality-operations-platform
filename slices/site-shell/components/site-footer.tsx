@@ -6,7 +6,7 @@ import type { SiteFooterProps } from "../types";
 
 export function SiteFooter({ footer }: SiteFooterProps) {
   return (
-    <footer className="border-t border-ivory/10 bg-charcoal text-ivory">
+    <footer className="border-t border-ivory/10 bg-charcoal pb-[calc(4.75rem+env(safe-area-inset-bottom))] text-ivory md:pb-0">
       <div className="page-shell content-inset grid gap-16 py-16 lg:grid-cols-[1.3fr_.7fr] lg:gap-24 lg:py-24">
         <div className="scroll-reveal scroll-reveal-left">
           <BrandLockup compact inverse />

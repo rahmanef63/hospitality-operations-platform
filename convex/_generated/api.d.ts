@@ -11,6 +11,20 @@
 import type * as adminSecurity from "../adminSecurity.js";
 import type * as http from "../http.js";
 import type * as lib_admin from "../lib/admin.js";
+import type * as pms_availability from "../pms/availability.js";
+import type * as pms_availabilityRules from "../pms/availabilityRules.js";
+import type * as pms_catalog from "../pms/catalog.js";
+import type * as pms_dashboard from "../pms/dashboard.js";
+import type * as pms_dispatch from "../pms/dispatch.js";
+import type * as pms_finance from "../pms/finance.js";
+import type * as pms_guests from "../pms/guests.js";
+import type * as pms_lib from "../pms/lib.js";
+import type * as pms_public from "../pms/public.js";
+import type * as pms_readModels from "../pms/readModels.js";
+import type * as pms_reservations from "../pms/reservations.js";
+import type * as pms_seed from "../pms/seed.js";
+import type * as pms_tasks from "../pms/tasks.js";
+import type * as pms_validators from "../pms/validators.js";
 import type * as welcome from "../welcome.js";
 
 import type {
@@ -23,6 +37,20 @@ declare const fullApi: ApiFromModules<{
   adminSecurity: typeof adminSecurity;
   http: typeof http;
   "lib/admin": typeof lib_admin;
+  "pms/availability": typeof pms_availability;
+  "pms/availabilityRules": typeof pms_availabilityRules;
+  "pms/catalog": typeof pms_catalog;
+  "pms/dashboard": typeof pms_dashboard;
+  "pms/dispatch": typeof pms_dispatch;
+  "pms/finance": typeof pms_finance;
+  "pms/guests": typeof pms_guests;
+  "pms/lib": typeof pms_lib;
+  "pms/public": typeof pms_public;
+  "pms/readModels": typeof pms_readModels;
+  "pms/reservations": typeof pms_reservations;
+  "pms/seed": typeof pms_seed;
+  "pms/tasks": typeof pms_tasks;
+  "pms/validators": typeof pms_validators;
   welcome: typeof welcome;
 }>;
 

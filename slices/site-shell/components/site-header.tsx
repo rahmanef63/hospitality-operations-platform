@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
 import { BrandLockup } from "@/shared/brand";
 import type { NavigationItem } from "@/shared/content";
 
@@ -26,30 +25,6 @@ export function SiteHeader({ navigation }: SiteHeaderProps) {
           ))}
         </nav>
 
-        <details className="group md:hidden">
-          <summary className="flex size-12 cursor-pointer list-none items-center justify-center border border-charcoal/16 bg-ivory text-charcoal transition-colors hover:bg-warm-sand/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-olive focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden">
-            <span className="sr-only">Toggle navigation</span>
-            <Menu className="size-5 group-open:hidden" aria-hidden="true" />
-            <X className="hidden size-5 group-open:block" aria-hidden="true" />
-          </summary>
-          <nav
-            className="fixed inset-x-0 top-[calc(4.5rem+env(safe-area-inset-top))] z-50 hidden w-full border-y border-charcoal/12 bg-paper shadow-[0_24px_70px_rgba(45,43,39,0.16)] group-open:block"
-            aria-label="Mobile navigation"
-          >
-            <div className="content-inset divide-y divide-charcoal/12">
-              {navigation.map((item) => (
-                <Link
-                  prefetch={false}
-                  key={item.href}
-                  href={item.href}
-                  className="flex min-h-14 w-full items-center text-sm font-semibold"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </nav>
-        </details>
       </div>
       <span className="scroll-progress" aria-hidden="true" />
     </header>

@@ -1,29 +1,35 @@
 # Ruma Kamyna verified-content checklist
 
-The following values are intentionally absent or visibly marked as provisional. They must not be inferred from maps, photographs, nearby listings, or competitor properties.
+Public facts must come from the owner or another explicitly verified source. They must not be inferred from maps, generated imagery, nearby listings, or competitors.
 
-## Public contact and location
+## Confirmed and active
 
-| Field | Required source | Code or deployment destination |
-|---|---|---|
-| Official street address | Property owner or verified Google Business Profile | `RUMA_KAMYNA_STREET_ADDRESS` |
-| WhatsApp number | Property owner | `RUMA_KAMYNA_WHATSAPP_NUMBER`, using country-code digits only |
-| Official Google Maps embed URL | Verified Google Business Profile share/embed action | `RUMA_KAMYNA_GOOGLE_MAPS_EMBED_URL` |
-| Latitude | Verified Google Business Profile coordinates | `RUMA_KAMYNA_LATITUDE` |
-| Longitude | Verified Google Business Profile coordinates | `RUMA_KAMYNA_LONGITUDE` |
+The following owner-supplied facts are stored in the Convex property-management system and published on the Ruma Kamyna page and verified-information concierge:
 
-The confirmed address currently published is limited to Kecamatan Megamendung, Kabupaten Bogor, Jawa Barat 16770, Indonesia. The application does not generate a street address, Plus Code, or coordinate.
+- 3 bedrooms;
+- swimming pool;
+- gym;
+- jacuzzi;
+- mountain view.
+
+The official street address, WhatsApp number, Google Maps embed URL, latitude, and longitude remain supplied through the verified Dokploy environment configuration and are connected to the public page and `LodgingBusiness` schema. Public surfaces expose only active, published records.
 
 ## Property facts still pending
 
-- Number of bedrooms and bathrooms.
+- Number of bathrooms.
 - Maximum guest capacity.
-- Confirmed facilities and amenities.
-- Price range, taxes, deposits, and minimum stay.
+- Whether any bedroom is separately bookable as a unit.
+- Base rate, seasonal rates, taxes, deposits, extra-person charges, and minimum stay.
 - Check-in and check-out times.
-- Booking availability and cancellation policy.
-- Vehicle access, parking, arrival landmarks, and route guidance.
+- Booking, cancellation, refund, damage, smoking, pet, visitor, and quiet-hours policies.
+- Vehicle access, parking, arrival landmarks, and verified route guidance.
 - Named local recommendations, distances, and travel times.
+
+These values remain optional in the management system. Leaving a field empty is the correct state until it is confirmed. The concierge must hand these topics to the host rather than invent an answer.
+
+## Operational data starts empty
+
+The system does not create example guests, reservations, payments, expenses, availability blocks, tasks, or revenue. The administrator creates those records only from real operations.
 
 ## Media still provisional
 

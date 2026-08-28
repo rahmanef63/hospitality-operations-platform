@@ -11,13 +11,13 @@ export const properties: PropertyContent[] = [
     tagline: "return to stillness",
     status: "Stay enquiries are open",
     shortDescription:
-      "A private villa in Megamendung, Puncak Bogor, created for slower mornings, long meals, deep rest, and quiet time.",
+      "A private three-bedroom villa in Megamendung, Puncak Bogor, with a swimming pool, gym, jacuzzi, and mountain view.",
     heroStatement: "A private home for slower days.",
     visualNote: "Visual concept. Final property details may evolve.",
     seo: {
       title: "Ruma Kamyna | Private Villa in Megamendung, Puncak Bogor",
       description:
-        "Ruma Kamyna is a private villa in Megamendung, Puncak, Bogor, Jawa Barat, shaped for slower mornings, long meals, and quiet stays.",
+        "Ruma Kamyna is a private three-bedroom villa in Megamendung, Puncak Bogor, Jawa Barat, with a pool, gym, jacuzzi, and mountain view.",
       keywords: [
         "Ruma Kamyna",
         "private villa Megamendung",

@@ -40,6 +40,9 @@ const latitude = coordinate(process.env.RUMA_KAMYNA_LATITUDE, -90, 90);
 const longitude = coordinate(process.env.RUMA_KAMYNA_LONGITUDE, -180, 180);
 const geo = latitude !== undefined && longitude !== undefined ? { latitude, longitude } : undefined;
 
+export const RUMA_KAMYNA_MAPS_PROFILE_URL =
+  "https://www.google.com/maps/place/RUMA+KAMYNA/data=!4m2!3m1!1s0x0:0x970747a93434dce9";
+
 export const RUMA_KAMYNA_LOCATION = {
   addressLocality: "Megamendung",
   destination: "Puncak",

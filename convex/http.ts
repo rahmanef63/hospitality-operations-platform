@@ -2,9 +2,10 @@ import { httpRouter } from "convex/server";
 import { httpAction, type ActionCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { authorizeAdminRequest } from "./lib/admin";
+import { handlePmsAdmin } from "./pms/dispatch";
 
 const http = httpRouter();
-const MAX_BODY_BYTES = 32_768;
+const MAX_BODY_BYTES = 65_536;
 
 function json(payload: unknown, status = 200) {
   return new Response(JSON.stringify(payload), {
@@ -85,6 +86,12 @@ http.route({
   handler: adminAction((ctx, body) => ctx.runMutation(internal.welcome.ensureDefaults, {
     actorEmailHash: String(body.actorEmailHash ?? ""),
   })),
+});
+
+http.route({
+  path: "/admin/pms",
+  method: "POST",
+  handler: adminAction(handlePmsAdmin),
 });
 
 export default http;

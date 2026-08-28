@@ -1,0 +1,7 @@
+{
+  "slug": "concierge",
+  "version": "1.0.0",
+  "entry": "index.ts",
+  "exports": ["GuestConcierge"],
+  "dependencies": ["shared/concierge", "shared/content"]
+}

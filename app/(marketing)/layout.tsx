@@ -1,3 +1,4 @@
+import { GuestConcierge } from "@/features/concierge";
 import { SiteFooter, SiteHeader } from "@/features/site-shell";
 import { getSiteContent } from "@/shared/content";
 
@@ -8,6 +9,7 @@ export default async function MarketingLayout({ children }: Readonly<{ children:
       <SiteHeader navigation={content.navigation} />
       {children}
       <SiteFooter footer={content.footer} />
+      <GuestConcierge navigation={content.navigation} />
     </div>
   );
 }

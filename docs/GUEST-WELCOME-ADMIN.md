@@ -5,9 +5,10 @@
 | Surface | Purpose | Indexing |
 |---|---|---|
 | `/api/welcome` | Guest welcome JSON endpoint. Accepts GET query parameters or POST JSON. | API and `noindex` response header |
+| `/api/concierge` | Sanitized verified-information question/answer endpoint. | API and `noindex` response header |
 | `/welcome` | Private guest-facing welcome page with optional personalization. | `noindex, nofollow` |
 | `/admin/login` | Admin credential entry. | `noindex, nofollow` |
-| `/admin` | Draft, preview, publish, and activity dashboard. | Authenticated and `noindex, nofollow` |
+| `/admin/welcome` | Draft, preview, publish, and welcome activity dashboard. | Authenticated and `noindex, nofollow` |
 
 ## Public endpoint contract
 
@@ -28,9 +29,13 @@ POST:
 
 `locale` accepts `id` or `en`; unsupported values fall back to Indonesian. `name` is optional, normalized, stripped of markup, and capped at 80 characters. The response always uses `Cache-Control: no-store`. When Convex Cloud is temporarily unavailable, the endpoint serves the reviewed static welcome copy and identifies the source as `fallback`.
 
+## Public concierge boundary
+
+Kamyna Concierge is a deterministic information surface, not a live host or open-ended model. It reads the same active, published property facts used by the public stay page, combines them with verified Maps/contact configuration, and explicitly declines to invent rates, availability, capacity, check-in/out, or policies. It does not store conversations. Questions requiring current operational confirmation are handed to WhatsApp or email.
+
 ## Data model
 
-Convex Cloud owns three bounded tables:
+The welcome subsystem owns three bounded tables alongside the separate PMS tables:
 
 - `welcomeConfigs`: one document per property and locale, with separate draft and published fields.
 - `adminLoginAttempts`: distributed login throttling by HMAC request fingerprint.
@@ -55,13 +60,13 @@ Next.js calls protected Convex HTTP actions with `KAMYNA_CONVEX_ADMIN_SECRET` in
 
 ## Publishing flow
 
-1. Sign in at `/admin/login`.
+1. Sign in at `/admin/login`, then open `/admin/welcome`.
 2. Edit Indonesian or English copy. Use `{{guest}}` where the optional guest name should appear.
 3. **Save draft** updates only the private draft.
 4. **Publish** copies the validated draft into public fields and increments its version.
 5. `/api/welcome` and `/welcome` read only the published fields.
 
-Room counts, capacity, facilities, prices, policies, and all other property facts remain outside this feature and continue to follow `RUMA-KAMYNA-CONTENT-TODO.md`.
+Property facts and homestay operations are managed separately by the PMS described in `docs/PMS.md`. The welcome editor never changes reservation or property data.
 
 ## Deployment
 

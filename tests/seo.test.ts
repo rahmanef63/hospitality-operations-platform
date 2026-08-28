@@ -12,6 +12,7 @@ import {
 } from "@/shared/config/site";
 import { areaGuides } from "@/shared/content/config/guides";
 import { properties } from "@/shared/content/config/properties";
+import { RUMA_KAMYNA_PUBLIC_FALLBACK } from "@/shared/pms";
 import { media, socialImages, type MediaAsset } from "@/shared/media";
 import {
   buildAreaGuideSchema,
@@ -82,7 +83,7 @@ describe("search and sharing surfaces", () => {
     const property = properties[0]!;
     const global = buildGlobalSchema();
     const home = buildHomeSchema(properties);
-    const stay = buildPropertySchema(property);
+    const stay = buildPropertySchema(property, RUMA_KAMYNA_PUBLIC_FALLBACK);
     const lodging = nodeByType(stay, "LodgingBusiness")!;
     const address = lodging.address as Record<string, unknown>;
 
@@ -107,6 +108,10 @@ describe("search and sharing surfaces", () => {
     expect(lodging).not.toHaveProperty("geo");
     expect(lodging).not.toHaveProperty("hasMap");
     expect(lodging).not.toHaveProperty("telephone");
+    expect(lodging.numberOfRooms).toBe(3);
+    expect((lodging.amenityFeature as Array<Record<string, unknown>>).map((item) => item.name)).toEqual([
+      "Kolam renang", "Gym", "Jacuzzi", "Pemandangan gunung",
+    ]);
     expect(JSON.stringify(stay)).not.toContain("Accommodation");
   });
 

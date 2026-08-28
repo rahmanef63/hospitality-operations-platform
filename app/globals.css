@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./scroll-effects.css";
+@import "./shell-navigation.css";
 @theme {
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-cormorant), Georgia, serif;

@@ -10,13 +10,13 @@ export async function updateWelcomeAction(formData: FormData) {
   const session = await requireAdminSession();
   const localeValue = formData.get("locale");
   const intent = formData.get("intent") === "publish" ? "publish" : "save";
-  if (!isWelcomeLocale(localeValue)) redirect("/admin?error=locale");
+  if (!isWelcomeLocale(localeValue)) redirect("/admin/welcome?error=locale");
   const parsed = validateWelcomeContent({
     headline: String(formData.get("headline") ?? ""),
     body: String(formData.get("body") ?? ""),
     signature: String(formData.get("signature") ?? ""),
   });
-  if (!parsed.ok) redirect(`/admin?error=validation&locale=${localeValue}`);
+  if (!parsed.ok) redirect(`/admin/welcome?error=validation&locale=${localeValue}`);
   try {
     await upsertWelcome({
       locale: localeValue,
@@ -25,9 +25,9 @@ export async function updateWelcomeAction(formData: FormData) {
       actorEmailHash: hashAdminIdentity(session.email),
     });
   } catch {
-    redirect(`/admin?error=service&locale=${localeValue}`);
+    redirect(`/admin/welcome?error=service&locale=${localeValue}`);
   }
-  revalidatePath("/admin");
+  revalidatePath("/admin/welcome");
   revalidatePath("/welcome");
-  redirect(`/admin?status=${intent === "publish" ? "published" : "saved"}&locale=${localeValue}`);
+  redirect(`/admin/welcome?status=${intent === "publish" ? "published" : "saved"}&locale=${localeValue}`);
 }

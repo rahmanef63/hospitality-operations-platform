@@ -1,4 +1,6 @@
 import type { AreaGuideContent, PropertyContent } from "@/shared/content";
+import { RUMA_KAMYNA_MAPS_PROFILE_URL } from "@/shared/config/ruma-kamyna";
+import type { PublicPropertyFacts } from "@/shared/pms";
 import {
   CONTENT_UPDATED_AT,
   HOME_SEO_DESCRIPTION,
@@ -15,9 +17,7 @@ const organizationId = `${SITE_URL}/#organization`;
 const websiteId = `${SITE_URL}/#website`;
 const brandId = `${SITE_URL}/#brand`;
 const dateModified = CONTENT_UPDATED_AT.toISOString();
-const officialProfileUrls = [
-  "https://www.google.com/maps/place/RUMA+KAMYNA/data=!4m2!3m1!1s0x0:0x970747a93434dce9",
-] as const;
+const officialProfileUrls = [RUMA_KAMYNA_MAPS_PROFILE_URL] as const;
 
 function imageObject(image: { src: string; width: number; height: number; alt: string }) {
   return {
@@ -101,7 +101,7 @@ export function buildHomeSchema(properties: PropertyContent[]) {
   };
 }
 
-export function buildPropertySchema(property: PropertyContent) {
+export function buildPropertySchema(property: PropertyContent, facts?: PublicPropertyFacts) {
   const url = `${SITE_URL}/stays/${property.slug}`;
   const address = {
     "@type": "PostalAddress",
@@ -123,6 +123,16 @@ export function buildPropertySchema(property: PropertyContent) {
       : {}),
     ...(property.location.mapEmbedUrl ? { hasMap: property.location.mapEmbedUrl } : {}),
     ...(property.contact.whatsappNumber ? { telephone: `+${property.contact.whatsappNumber}` } : {}),
+    ...(facts?.bedroomCount !== undefined ? { numberOfRooms: facts.bedroomCount } : {}),
+    ...(facts?.amenities.length
+      ? {
+          amenityFeature: facts.amenities.map((amenity) => ({
+            "@type": "LocationFeatureSpecification",
+            name: amenity.name,
+            value: true,
+          })),
+        }
+      : {}),
   };
 
   return {
