@@ -7,6 +7,7 @@ import { PhilosophySection } from "./philosophy-section";
 import { RitualsSection } from "./rituals-section";
 
 export function HomePage({ content, properties }: HomePageProps) {
+  const primaryProperty = properties[0];
   return (
     <main id="main-content">
       <HeroSection content={content.hero} />
@@ -14,7 +15,7 @@ export function HomePage({ content, properties }: HomePageProps) {
       <CollectionSection content={content.collection} properties={properties} />
       <RitualsSection content={content.rituals} />
       <PhilosophySection content={content.philosophy} />
-      <ContactSection content={content.contact} />
+      <ContactSection content={content.contact} property={primaryProperty} />
     </main>
   );
 }

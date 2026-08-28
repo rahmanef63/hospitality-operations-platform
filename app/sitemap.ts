@@ -1,12 +1,12 @@
 import type { MetadataRoute } from "next";
 import { CONTENT_UPDATED_AT, SITE_URL } from "@/shared/config/site";
-import { listProperties } from "@/shared/content";
+import { listAreaGuides, listProperties } from "@/shared/content";
 import { media, socialImages } from "@/shared/media";
 
 const absolute = (path: string) => `${SITE_URL}${path}`;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const properties = await listProperties();
+  const [properties, guides] = await Promise.all([listProperties(), listAreaGuides()]);
   return [
     {
       url: SITE_URL,
@@ -26,11 +26,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${SITE_URL}/stays/${property.slug}`,
       lastModified: CONTENT_UPDATED_AT,
       changeFrequency: "monthly" as const,
-      priority: 0.85,
+      priority: 0.9,
       images: [
         absolute(property.heroImage.src),
         ...property.gallery.map((item) => absolute(item.image.src)),
       ],
+    })),
+    ...guides.filter((guide) => guide.indexable).map((guide) => ({
+      url: `${SITE_URL}/guides/${guide.slug}`,
+      lastModified: CONTENT_UPDATED_AT,
+      changeFrequency: "monthly" as const,
+      priority: 0.55,
     })),
   ];
 }

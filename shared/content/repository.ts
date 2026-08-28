@@ -1,6 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { StaticContentRepository } from "./repositories/static-content-repository";
-import type { PropertyContent, SiteContent } from "./types";
+import type { AreaGuideContent, PropertyContent, SiteContent } from "./types";
 
 const repository = new StaticContentRepository();
 
@@ -23,4 +23,18 @@ export async function getPropertyBySlug(slug: string): Promise<PropertyContent |
   cacheLife("days");
   cacheTag("properties", `property:${slug}`);
   return repository.getPropertyBySlug(slug);
+}
+
+export async function listAreaGuides(): Promise<AreaGuideContent[]> {
+  "use cache";
+  cacheLife("days");
+  cacheTag("area-guides");
+  return repository.listAreaGuides();
+}
+
+export async function getAreaGuideBySlug(slug: string): Promise<AreaGuideContent | null> {
+  "use cache";
+  cacheLife("days");
+  cacheTag("area-guides", `area-guide:${slug}`);
+  return repository.getAreaGuideBySlug(slug);
 }

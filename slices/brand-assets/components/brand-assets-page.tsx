@@ -35,7 +35,7 @@ export function BrandAssetsPage() {
 
           <figure className="scroll-media">
             <div className="image-frame min-h-[30rem] h-full lg:min-h-[46rem]">
-              <ResponsiveHeroImage asset={media.brandSerenity} />
+              <ResponsiveHeroImage asset={media.brandSerenity} alt="Kamyna Living identity setting with ceramics, linen, and botanical shadows" />
             </div>
             <figcaption className="content-inset image-caption mt-3">{media.brandSerenity.caption}</figcaption>
           </figure>

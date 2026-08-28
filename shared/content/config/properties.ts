@@ -1,3 +1,4 @@
+import { RUMA_KAMYNA_CONTACT, RUMA_KAMYNA_LOCATION } from "@/shared/config/ruma-kamyna";
 import { CONTACT_EMAIL } from "@/shared/config/site";
 import { media, socialImages } from "@/shared/media";
 import type { PropertyContent } from "../types";
@@ -6,17 +7,33 @@ export const properties: PropertyContent[] = [
   {
     slug: "ruma-kamyna",
     name: "Ruma Kamyna",
-    collectionLabel: "A Kamyna Living private stay",
+    collectionLabel: "Megamendung, Puncak Bogor",
     tagline: "return to stillness",
     status: "Stay enquiries are open",
     shortDescription:
-      "A private home created for slower mornings, long meals, deep rest, and the quiet moments between them.",
+      "A private villa in Megamendung, Puncak Bogor, created for slower mornings, long meals, deep rest, and quiet time.",
     heroStatement: "A private home for slower days.",
     visualNote: "Visual concept. Final property details may evolve.",
+    seo: {
+      title: "Ruma Kamyna | Private Villa in Megamendung, Puncak Bogor",
+      description:
+        "Ruma Kamyna is a private villa in Megamendung, Puncak, Bogor, Jawa Barat, shaped for slower mornings, long meals, and quiet stays.",
+      keywords: [
+        "Ruma Kamyna",
+        "private villa Megamendung",
+        "villa Puncak Bogor",
+        "private stay Bogor",
+        "villa Jawa Barat",
+      ],
+    },
+    // TODO(owner): add streetAddress only after the official street name is confirmed.
+    // TODO(owner): add geo only from the verified Google Business Profile coordinates.
+    location: RUMA_KAMYNA_LOCATION,
+    contact: RUMA_KAMYNA_CONTACT,
     heroImage: media.poolCourtyard,
     socialImage: socialImages.rumaKamyna,
     story: [
-      "Ruma Kamyna began with a simple idea: that a home can change the way we move through time.",
+      "Ruma Kamyna in Megamendung began with a simple idea: that a home in the Puncak area can change the way we move through time.",
       "Warm materials, soft light, thoughtful objects, and visual restraint create a place that feels refined without becoming formal. Nothing asks for attention. Instead, the home gives it back to you.",
       "Come without an agenda. Wake slowly. Stay at the table. Change your plans. Make none at all.",
     ],
@@ -63,7 +80,7 @@ export const properties: PropertyContent[] = [
     ],
     enquiryImage: media.livingCourtyard,
     primaryAction: {
-      label: "Enquire about your stay",
+      label: "Email about a stay",
       href: `mailto:${CONTACT_EMAIL}?subject=Ruma%20Kamyna%20stay%20enquiry`,
       external: true,
     },

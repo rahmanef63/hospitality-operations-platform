@@ -1,0 +1,13 @@
+{
+  "slug": "guides",
+  "name": "Kamyna local guides",
+  "version": "1.0.0",
+  "category": "editorial",
+  "description": "Location-aware guide pages driven by verified or explicitly pending AreaGuideContent.",
+  "contract": {
+    "inputs": ["AreaGuideContent", "PropertyContent"],
+    "outputs": ["GuidePage"],
+    "portable": true,
+    "hardcodedUrls": []
+  }
+}

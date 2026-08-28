@@ -8,7 +8,7 @@ export const navigation: NavigationItem[] = [
 ];
 
 export const footerLinks: NavigationItem[] = [
-  { label: "Ruma Kamyna", href: "/stays/ruma-kamyna" },
+  { label: "Ruma Kamyna, Megamendung", href: "/stays/ruma-kamyna" },
   { label: "Brand assets", href: "/brand-assets" },
   { label: "Contact", href: "/#contact" },
 ];

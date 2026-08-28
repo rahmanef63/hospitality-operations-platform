@@ -2,7 +2,7 @@
 
 ## Non-negotiable
 
-- Keep core brand assets and collection copy location-neutral.
+- Keep core brand assets and collection identity copy location-neutral. Property pages and route SEO may use only owner-verified location facts.
 - Do not add Convex, auth, CMS, forms, or a booking backend until explicitly requested.
 - Never place secrets in `NEXT_PUBLIC_*`, source files, logs, or git history.
 - Do not use compatibility placeholders, re-export-only legacy files, or duplicate SSOTs.
@@ -28,12 +28,12 @@
 
 - Mobile-first, keyboard-accessible, reduced-motion safe, and semantic.
 - Use `next/link` for internal navigation and `next/image` for non-critical raster/SVG elements. A pre-generated responsive `<img srcset>` is allowed only for a measured LCP hero and must remain typed through `shared/media/`.
-- Do not invent property photography, amenities, addresses, or booking availability.
+- Do not invent property photography, amenities, addresses, coordinates, map URLs, phone numbers, travel times, or booking availability.
 - Preserve the quiet editorial system: ivory, warm sand, taupe, muted brown, olive, charcoal.
 - Keep mobile section shells edge-to-edge. Apply `content-inset` only to readable copy, controls, and captions rather than restoring a global mobile gutter.
 - Scroll effects must use CSS scroll timelines or an isolated, cleaned-up motion leaf; never React state, `scrollY`, or an unbounded scroll listener. Every motion path must honor `prefers-reduced-motion`.
 - Avoid decorative section numbering, numbered mobile navigation, scroll cues, and em-dash-heavy microcopy.
-- Preserve route-level metadata, canonical URLs, structured data, sitemap image discovery, and exact Google verification coverage when adding pages.
+- Preserve route-level metadata, canonical URLs, structured data, sitemap image discovery, exact Google verification coverage, and draft-guide noindex rules when adding pages.
 
 ## Verification
 

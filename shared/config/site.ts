@@ -5,6 +5,9 @@ export const SITE_NAME = "Kamyna Living";
 export const SITE_SLOGAN = "Homes for slower living";
 export const SITE_DESCRIPTION =
   "A growing collection of private stays shaped by quiet design, thoughtful hospitality, and unhurried time.";
+export const HOME_SEO_TITLE = "Kamyna Living | Private Villa Stays in Puncak, Bogor";
+export const HOME_SEO_DESCRIPTION =
+  "Discover Kamyna Living, a quiet collection of private villa stays beginning with Ruma Kamyna in Megamendung, Puncak, Bogor, Jawa Barat.";
 export const CONTACT_EMAIL = "hello@kamynaliving.com";
 export const GOOGLE_SITE_VERIFICATION = "E6-55-Sl0x-BwAAgBwYg8MTz4HBUVlc3ZlFkKmtFVBs";
 export const COPYRIGHT_YEAR = 2026;

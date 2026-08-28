@@ -32,6 +32,37 @@ export type GalleryItem = {
   image: MediaAsset;
 };
 
+export type PropertyGeo = {
+  latitude: number;
+  longitude: number;
+};
+
+export type PropertyLocation = {
+  addressLocality: string;
+  destination: string;
+  administrativeArea: string;
+  addressRegion: string;
+  postalCode: string;
+  addressCountry: string;
+  countryName: string;
+  displayAddress: string;
+  streetAddress?: string;
+  mapEmbedUrl?: string;
+  geo?: PropertyGeo;
+};
+
+export type PropertyContact = {
+  email: string;
+  whatsappNumber?: string;
+  whatsappHref?: string;
+};
+
+export type PropertySeo = {
+  title: string;
+  description: string;
+  keywords: string[];
+};
+
 export type PropertyContent = {
   slug: string;
   name: string;
@@ -41,6 +72,9 @@ export type PropertyContent = {
   shortDescription: string;
   heroStatement: string;
   visualNote: string;
+  seo: PropertySeo;
+  location: PropertyLocation;
+  contact: PropertyContact;
   heroImage: MediaAsset;
   socialImage: string;
   story: string[];
@@ -50,6 +84,25 @@ export type PropertyContent = {
   rhythm: DayRhythm[];
   enquiryImage: MediaAsset;
   primaryAction: ActionLink;
+};
+
+export type AreaGuideSection = {
+  title: string;
+  paragraphs: string[];
+};
+
+export type AreaGuideContent = {
+  slug: string;
+  title: string;
+  seoTitle: string;
+  seoDescription: string;
+  eyebrow: string;
+  summary: string;
+  introduction: string;
+  statusLabel: string;
+  sections: AreaGuideSection[];
+  relatedPropertySlug: string;
+  indexable: boolean;
 };
 
 export type HomeContent = {
@@ -87,6 +140,11 @@ export type HomeContent = {
     description: string;
     action: ActionLink;
     image: MediaAsset;
+    locationLabel: string;
+    mapTitle: string;
+    mapPendingText: string;
+    whatsappLabel: string;
+    whatsappPendingText: string;
   };
 };
 
@@ -105,4 +163,6 @@ export interface ContentRepository {
   getSiteContent(): Promise<SiteContent>;
   listProperties(): Promise<PropertyContent[]>;
   getPropertyBySlug(slug: string): Promise<PropertyContent | null>;
+  listAreaGuides(): Promise<AreaGuideContent[]>;
+  getAreaGuideBySlug(slug: string): Promise<AreaGuideContent | null>;
 }

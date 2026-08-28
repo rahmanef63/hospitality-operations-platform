@@ -11,6 +11,8 @@ No database dependency, schema, auth provider, runtime credentials, or compose s
 - `getSiteContent()`
 - `listProperties()`
 - `getPropertyBySlug(slug)`
+- `listAreaGuides()`
+- `getAreaGuideBySlug(slug)`
 
 `StaticContentRepository` is the only active implementation.
 
@@ -30,7 +32,8 @@ When database-backed editing is requested:
 ## Suggested model
 
 - `siteSettings`: collection-level identity, navigation, and contact channels.
-- `properties`: one record per stay, keyed by unique slug.
+- `properties`: one record per stay, keyed by unique slug, with verified location, contact, and SEO fields.
+- `areaGuides`: draft or published local content linked to a property slug.
 - `propertySections`: ordered modular sections for each property.
 - `brandAssets`: asset metadata and usage status.
 - `enquiries`: optional later phase, protected against spam and abuse.

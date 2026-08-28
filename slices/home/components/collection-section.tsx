@@ -43,7 +43,7 @@ export function CollectionSection({ content, properties }: CollectionSectionProp
               </h3>
               <p className="mt-7 max-w-xl text-sm leading-7 text-ivory/68 sm:text-base">{property.shortDescription}</p>
               <Link prefetch={false} href={`/stays/${property.slug}`} className="editorial-link mt-9 text-ivory">
-                Discover the stay
+                Discover Ruma Kamyna in Puncak, Bogor
                 <ArrowUpRight className="size-4" aria-hidden="true" />
               </Link>
             </div>

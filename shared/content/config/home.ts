@@ -6,11 +6,11 @@ const enquiryHref = `mailto:${CONTACT_EMAIL}?subject=Kamyna%20Living%20enquiry`;
 
 export const homeContent: HomeContent = {
   hero: {
-    eyebrow: "A considered collection of private stays",
+    eyebrow: "Private villa stays in Puncak, Bogor",
     title: "Homes for slower living.",
     description:
-      "Private homes shaped by quiet design, considered comfort, and hospitality that follows your pace.",
-    primaryAction: { label: "Explore Ruma Kamyna", href: "/stays/ruma-kamyna" },
+      "Kamyna Living begins with Ruma Kamyna in Megamendung, a private villa shaped by quiet design and unhurried time.",
+    primaryAction: { label: "Explore Ruma Kamyna in Puncak, Bogor", href: "/stays/ruma-kamyna" },
     secondaryAction: { label: "Our approach", href: "/#about" },
     image: media.livingCourtyard,
   },
@@ -25,7 +25,7 @@ export const homeContent: HomeContent = {
   collection: {
     title: "Each home has its own rhythm.",
     description:
-      "The collection grows thoughtfully. Every property responds to its setting while sharing one calm, recognisable way of welcoming people.",
+      "The collection begins with Ruma Kamyna in Megamendung, Puncak Bogor. Each future home will respond to its setting while sharing one calm way of welcoming people.",
     images: [media.poolCourtyard, media.livingDining],
   },
   rituals: {
@@ -61,8 +61,14 @@ export const homeContent: HomeContent = {
   contact: {
     title: "Whenever you are ready.",
     description:
-      "For stays, private gatherings, partnerships, or future properties, send us a note. We will reply with care and clarity.",
-    action: { label: "Begin an enquiry", href: enquiryHref, external: true },
+      "For stays at Ruma Kamyna in Megamendung, Puncak Bogor, or future Kamyna Living partnerships, send us a note.",
+    action: { label: "Email Kamyna Living", href: enquiryHref, external: true },
     image: media.brandSerenity,
+    locationLabel: "Ruma Kamyna location",
+    mapTitle: "Find Ruma Kamyna in Megamendung",
+    mapPendingText:
+      "The official Google Business Profile map will appear here after its verified embed link is supplied.",
+    whatsappLabel: "WhatsApp Ruma Kamyna",
+    whatsappPendingText: "WhatsApp contact will be added after the verified number is confirmed.",
   },
 };

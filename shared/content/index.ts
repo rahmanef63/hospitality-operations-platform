@@ -1,13 +1,25 @@
-export { getPropertyBySlug, getSiteContent, listProperties } from "./repository";
+export {
+  getAreaGuideBySlug,
+  getPropertyBySlug,
+  getSiteContent,
+  listAreaGuides,
+  listProperties,
+} from "./repository";
 export type {
   ActionLink,
+  AreaGuideContent,
+  AreaGuideSection,
   ContentRepository,
   DayRhythm,
   EditorialItem,
   GalleryItem,
   HomeContent,
   NavigationItem,
+  PropertyContact,
   PropertyContent,
+  PropertyGeo,
+  PropertyLocation,
   PropertyPillar,
+  PropertySeo,
   SiteContent,
 } from "./types";

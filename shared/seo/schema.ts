@@ -1,6 +1,8 @@
-import type { PropertyContent } from "@/shared/content";
+import type { AreaGuideContent, PropertyContent } from "@/shared/content";
 import {
   CONTENT_UPDATED_AT,
+  HOME_SEO_DESCRIPTION,
+  HOME_SEO_TITLE,
   SITE_DESCRIPTION,
   SITE_NAME,
   SITE_SLOGAN,
@@ -70,18 +72,19 @@ export function buildHomeSchema(properties: PropertyContent[]) {
         "@type": "CollectionPage",
         "@id": `${SITE_URL}/#home`,
         url: SITE_URL,
-        name: `${SITE_NAME} | ${SITE_SLOGAN}`,
-        description: SITE_DESCRIPTION,
+        name: HOME_SEO_TITLE,
+        description: HOME_SEO_DESCRIPTION,
         inLanguage: "en",
         dateModified,
         isPartOf: { "@id": websiteId },
         about: { "@id": brandId },
+        publisher: { "@id": organizationId },
         primaryImageOfPage: imageObject(media.livingCourtyard),
       },
       {
         "@type": "ItemList",
         "@id": `${SITE_URL}/#stays`,
-        name: "Kamyna Living stays",
+        name: "Kamyna Living private villa stays",
         numberOfItems: properties.length,
         itemListElement: properties.map((property, index) => ({
           "@type": "ListItem",
@@ -96,6 +99,28 @@ export function buildHomeSchema(properties: PropertyContent[]) {
 
 export function buildPropertySchema(property: PropertyContent) {
   const url = `${SITE_URL}/stays/${property.slug}`;
+  const address = {
+    "@type": "PostalAddress",
+    ...(property.location.streetAddress ? { streetAddress: property.location.streetAddress } : {}),
+    addressLocality: property.location.addressLocality,
+    addressRegion: property.location.addressRegion,
+    postalCode: property.location.postalCode,
+    addressCountry: property.location.addressCountry,
+  };
+  const optionalLodgingFields = {
+    ...(property.location.geo
+      ? {
+          geo: {
+            "@type": "GeoCoordinates",
+            latitude: property.location.geo.latitude,
+            longitude: property.location.geo.longitude,
+          },
+        }
+      : {}),
+    ...(property.location.mapEmbedUrl ? { hasMap: property.location.mapEmbedUrl } : {}),
+    ...(property.contact.whatsappNumber ? { telephone: `+${property.contact.whatsappNumber}` } : {}),
+  };
+
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -103,23 +128,29 @@ export function buildPropertySchema(property: PropertyContent) {
         "@type": "WebPage",
         "@id": `${url}/#webpage`,
         url,
-        name: `${property.name} | ${SITE_NAME}`,
-        description: property.shortDescription,
+        name: property.seo.title,
+        description: property.seo.description,
         inLanguage: "en",
         dateModified,
         isPartOf: { "@id": websiteId },
+        publisher: { "@id": organizationId },
         primaryImageOfPage: imageObject(property.heroImage),
-        about: { "@id": `${url}/#stay` },
+        about: { "@id": `${url}/#lodging-business` },
       },
       {
-        "@type": "Accommodation",
-        "@id": `${url}/#stay`,
+        "@type": "LodgingBusiness",
+        "@id": `${url}/#lodging-business`,
         name: property.name,
         url,
         description: property.shortDescription,
         slogan: property.tagline,
+        email: property.contact.email,
+        address,
+        parentOrganization: { "@id": organizationId },
+        brand: { "@id": brandId },
         mainEntityOfPage: { "@id": `${url}/#webpage` },
         image: [property.heroImage, ...property.gallery.map((item) => item.image)].map(imageObject),
+        ...optionalLodgingFields,
       },
       {
         "@type": "BreadcrumbList",
@@ -128,6 +159,38 @@ export function buildPropertySchema(property: PropertyContent) {
           { "@type": "ListItem", position: 1, name: SITE_NAME, item: SITE_URL },
           { "@type": "ListItem", position: 2, name: "Stays", item: `${SITE_URL}/#stays` },
           { "@type": "ListItem", position: 3, name: property.name, item: url },
+        ],
+      },
+    ],
+  };
+}
+
+export function buildAreaGuideSchema(guide: AreaGuideContent, property: PropertyContent) {
+  const url = `${SITE_URL}/guides/${guide.slug}`;
+  const propertyUrl = `${SITE_URL}/stays/${property.slug}`;
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${url}/#webpage`,
+        url,
+        name: guide.seoTitle,
+        description: guide.seoDescription,
+        inLanguage: "en",
+        dateModified,
+        isPartOf: { "@id": websiteId },
+        publisher: { "@id": organizationId },
+        about: { "@id": `${propertyUrl}/#lodging-business` },
+        primaryImageOfPage: imageObject(property.heroImage),
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${url}/#breadcrumbs`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: SITE_NAME, item: SITE_URL },
+          { "@type": "ListItem", position: 2, name: property.name, item: propertyUrl },
+          { "@type": "ListItem", position: 3, name: guide.title, item: url },
         ],
       },
     ],

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PropertyPage } from "@/features/property";
 import { SITE_NAME, SITE_URL } from "@/shared/config/site";
-import { getPropertyBySlug, listProperties } from "@/shared/content";
+import { getPropertyBySlug, listAreaGuides, listProperties } from "@/shared/content";
 import { buildPropertySchema, JsonLd } from "@/shared/seo";
 
 export async function generateStaticParams() {
@@ -20,23 +20,30 @@ export async function generateMetadata({
   if (!property) return {};
   const url = `/stays/${property.slug}`;
   return {
-    title: property.name,
-    description: property.shortDescription,
+    title: { absolute: property.seo.title },
+    description: property.seo.description,
     alternates: { canonical: url, languages: { en: url, "x-default": url } },
-    keywords: [property.name, "private stay", "design-led retreat", "quiet hospitality"],
+    keywords: property.seo.keywords,
     openGraph: {
       type: "website",
       locale: "en_US",
       siteName: SITE_NAME,
-      title: `${property.name} | ${SITE_NAME}`,
-      description: property.shortDescription,
+      title: property.seo.title,
+      description: property.seo.description,
       url: `${SITE_URL}${url}`,
-      images: [{ url: property.socialImage, width: 1200, height: 630, alt: `${property.name} visual concept` }],
+      images: [
+        {
+          url: property.socialImage,
+          width: 1200,
+          height: 630,
+          alt: `${property.name}, private villa in Megamendung, Puncak Bogor`,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${property.name} | ${SITE_NAME}`,
-      description: property.shortDescription,
+      title: property.seo.title,
+      description: property.seo.description,
       images: [property.socialImage],
     },
   };
@@ -44,12 +51,13 @@ export async function generateMetadata({
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const property = await getPropertyBySlug(slug);
+  const [property, guides] = await Promise.all([getPropertyBySlug(slug), listAreaGuides()]);
   if (!property) notFound();
+  const relatedGuides = guides.filter((guide) => guide.relatedPropertySlug === property.slug);
   return (
     <>
       <JsonLd data={buildPropertySchema(property)} />
-      <PropertyPage property={property} />
+      <PropertyPage property={property} guides={relatedGuides} />
     </>
   );
 }

@@ -47,6 +47,12 @@
       "version": "1.0.0",
       "category": "brand",
       "addedAt": "2026-08-28"
+    },
+    {
+      "slug": "guides",
+      "version": "1.0.0",
+      "category": "editorial",
+      "addedAt": "2026-08-28"
     }
   ],
   "skills": [

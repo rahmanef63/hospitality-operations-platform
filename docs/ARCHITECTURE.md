@@ -34,6 +34,7 @@ Core identity files do not contain addresses or location labels. Property locati
 - `home`: collection homepage sections.
 - `property`: reusable property storytelling route.
 - `brand-assets`: downloadable production identity files.
+- `guides`: location-aware editorial routes that remain noindex until facts are verified.
 
 Cross-slice imports must use each slice barrel. Shared dependencies come from `shared/*` or `components/ui/*`.
 
@@ -57,9 +58,9 @@ Search and sharing surfaces are owned by the App Router rather than duplicated i
 - Google verification through `Metadata.verification`;
 - `robots.txt`, image-aware `sitemap.xml`, and PWA manifest;
 - static social cards;
-- linked Organization, WebSite, Brand, CollectionPage, Accommodation, ItemList, ImageObject, and BreadcrumbList structured data.
+- linked Organization, WebSite, Brand, CollectionPage, LodgingBusiness, ItemList, ImageObject, and BreadcrumbList structured data.
 
-Schema deliberately avoids addresses, amenities, offers, ratings, and availability until those facts are confirmed.
+The Ruma Kamyna LodgingBusiness schema includes only the confirmed Megamendung locality, Jawa Barat region, postal code, and country. Street address, coordinates, telephone, and map URL are conditional and appear only when owner-verified build configuration is supplied. Amenities, offers, ratings, room counts, and availability remain omitted.
 
 
 ## Responsive composition and motion
@@ -67,3 +68,10 @@ Schema deliberately avoids addresses, amenities, offers, ratings, and availabili
 Mobile section shells are intentionally full-bleed. The reusable `content-inset` utility is applied only to copy, controls, and captions that need a readable or safe-area-aware inset; photography, color fields, galleries, and structural borders may reach the viewport edge. Tablet and desktop shells return to the bounded 90rem container.
 
 Motion is progressive enhancement built with native CSS scroll timelines. Key hierarchy blocks reveal through restrained transforms, selected background images use restrained parallax, the mobile ritual sequence forms a true sticky stack, and the header carries a scroll-progress line. No React scroll state, `window.scrollY`, or unbounded scroll listener is used. Every effect collapses to static content under `prefers-reduced-motion`.
+
+
+## Verified property integrations
+
+`shared/config/ruma-kamyna.ts` validates the optional WhatsApp number, official Google Maps embed URL, street address, and coordinates. The static property record consumes that one configuration source for visible contact UI and JSON-LD. Blank or invalid values are omitted rather than replaced with estimates. Because public pages are prerendered, Dokploy must pass these values as Docker build arguments and redeploy.
+
+Area-guide scaffolds are generated from `shared/content/config/guides.ts`. They are linked internally but excluded from the sitemap and marked `noindex` until `indexable` is explicitly enabled after editorial verification.

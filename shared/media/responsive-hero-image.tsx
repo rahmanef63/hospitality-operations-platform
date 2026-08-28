@@ -3,10 +3,11 @@ import type { MediaAsset } from "./types";
 
 type ResponsiveHeroImageProps = {
   asset: MediaAsset;
+  alt?: string;
   className?: string;
 };
 
-export function ResponsiveHeroImage({ asset, className }: ResponsiveHeroImageProps) {
+export function ResponsiveHeroImage({ asset, alt, className }: ResponsiveHeroImageProps) {
   const sources = [...(asset.variants ?? []), { src: asset.src, width: asset.width }];
   const srcSet = sources.map((source) => `${source.src} ${source.width}w`).join(", ");
 
@@ -17,7 +18,7 @@ export function ResponsiveHeroImage({ asset, className }: ResponsiveHeroImagePro
       src={asset.src}
       srcSet={srcSet}
       sizes="100vw"
-      alt={asset.alt}
+      alt={alt ?? asset.alt}
       width={asset.width}
       height={asset.height}
       loading="eager"

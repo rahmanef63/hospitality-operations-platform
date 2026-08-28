@@ -1,6 +1,6 @@
 # Kamyna Living
 
-Location-neutral hospitality website for the Kamyna collection, with **Ruma Kamyna** as the first property experience.
+Multi-property hospitality website for the Kamyna collection, with **Ruma Kamyna** in Megamendung, Puncak Bogor as the first verified property location. Core identity assets remain location-neutral.
 
 ## Current scope
 
@@ -8,8 +8,10 @@ Location-neutral hospitality website for the Kamyna collection, with **Ruma Kamy
 - Static content repository; no database, auth, or booking backend is active.
 - Multi-property data model ready for a future Convex/CMS adapter.
 - Production SVG logos, favicon, Apple touch icon, PWA icons, and an editorial image system with responsive WebP derivatives.
-- Per-route metadata, canonical/hreflang links, XML sitemap with image discovery, robots rules, structured data, social cards, and Google Search Console verification.
-- Taste-skill design guidance installed project-locally for future anti-slop UI reviews.
+- Location-aware route metadata, canonical/hreflang links, image sitemap, robots rules, structured data, social cards, and Google Search Console verification.
+- A truthful Ruma Kamyna `LodgingBusiness` graph connected to the collection `Organization`.
+- Configurable WhatsApp, official Google Maps embed, street address, and coordinates that remain absent until verified values are supplied.
+- Taste-skill design guidance installed project-locally for anti-slop UI reviews.
 - Edge-to-edge mobile composition with safe copy insets, native scroll timelines, a global progress line, sticky ritual storytelling, section parallax, and reduced-motion fallbacks.
 - Docker standalone build for Dokploy.
 - Domain target: `kamynaliving.com`.
@@ -19,8 +21,11 @@ Location-neutral hospitality website for the Kamyna collection, with **Ruma Kamy
 | Route | Purpose |
 |---|---|
 | `/` | Kamyna Living collection homepage |
-| `/stays/ruma-kamyna` | Reusable property detail route |
+| `/stays/ruma-kamyna` | Ruma Kamyna property detail route |
 | `/brand-assets` | Separate production asset downloads |
+| `/guides/getting-to-megamendung-from-jakarta` | Noindex arrival-guide scaffold |
+| `/guides/things-to-do-near-puncak` | Noindex local-guide scaffold |
+| `/guides/planning-a-slow-stay-in-megamendung` | Noindex stay-planning scaffold |
 | `/api/health` | Deployment health probe |
 
 ## Local development
@@ -41,7 +46,7 @@ npm run test
 npm run build
 ```
 
-`npm run verify` runs architecture audits, typecheck, lint, tests, and the production build. The project also enforces a 280-line source-file cap, slice metadata pairs, stack pins, internal navigation rules, and location-neutral core brand copy.
+`npm run verify` runs architecture audits, typecheck, lint, tests, and the production build. The project also enforces a 280-line source-file cap, slice metadata pairs, stack pins, internal navigation rules, and location-neutral core identity assets.
 
 ## Content editing
 
@@ -50,11 +55,26 @@ Static content lives in `shared/content/config/`. Components consume typed props
 To add a property now:
 
 1. Add one `PropertyContent` record to `shared/content/config/properties.ts`.
-2. Add any property-specific brand assets under `public/brand/`.
+2. Add property-specific media and metadata under `shared/media/` and `public/media/`.
 3. Add confirmed location and operational details only when they are factual.
-4. Run `npm run verify`.
+4. Add any local guides in draft mode with `indexable: false`.
+5. Run `npm run verify`.
 
-The route is generated from the property slug automatically.
+The property and guide routes are generated from their slugs automatically.
+
+## Verified property configuration
+
+Ruma Kamyna currently publishes only its confirmed locality-level address. Optional public contact and map values are build-time configuration:
+
+```env
+RUMA_KAMYNA_STREET_ADDRESS=
+RUMA_KAMYNA_WHATSAPP_NUMBER=
+RUMA_KAMYNA_GOOGLE_MAPS_EMBED_URL=
+RUMA_KAMYNA_LATITUDE=
+RUMA_KAMYNA_LONGITUDE=
+```
+
+The WhatsApp value must use country-code digits only. The map value must be an official Google Maps embed URL from the verified Business Profile. Coordinates must come from that same verified profile. Set these values as Docker build arguments in Dokploy and redeploy. See `docs/RUMA-KAMYNA-CONTENT-TODO.md` for every field still awaiting confirmation.
 
 ## Database later
 
