@@ -38,13 +38,15 @@ export const upsert = internalMutation({
   args: {
     id: v.optional(v.id("transactions")), propertyId: v.id("properties"),
     reservationId: v.optional(v.id("reservations")), kind: transactionKindValidator,
-    category: v.string(), amount: v.number(), currency: v.string(), method: transactionMethodValidator,
+    category: v.string(), amount: v.number(), method: transactionMethodValidator,
     status: transactionStatusValidator, occurredOn: v.string(), reference: v.optional(v.string()),
     notes: v.optional(v.string()), actorEmailHash: v.string(),
   },
   handler: async (ctx, args) => {
     const property = await requireProperty(ctx, args.propertyId);
-    if (args.reservationId) await requireReservation(ctx, args.reservationId, args.propertyId);
+    const reservation = args.reservationId
+      ? await requireReservation(ctx, args.reservationId, args.propertyId)
+      : undefined;
     const now = Date.now();
     const fields = {
       propertyId: args.propertyId,
@@ -52,7 +54,7 @@ export const upsert = internalMutation({
       kind: args.kind,
       category: cleanText(args.category, "Transaction category", 2, 80),
       amount: positiveInteger(args.amount, "Transaction amount"),
-      currency: cleanCurrency(args.currency),
+      currency: cleanCurrency(reservation?.currency ?? property.currency),
       method: args.method,
       status: args.status,
       occurredOn: cleanIsoDate(args.occurredOn, "Transaction date"),

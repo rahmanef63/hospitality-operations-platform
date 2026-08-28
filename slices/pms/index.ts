@@ -1,3 +1,6 @@
+export { TransactionForm } from "./components/transaction-form";
+export { ReservationForm } from "./components/reservation-form";
+export { CalendarBoard } from "./components/calendar-board";
 export { FinanceManager } from "./components/finance-manager";
 export { TaskManager } from "./components/task-manager";
 export { CalendarManager } from "./components/calendar-manager";

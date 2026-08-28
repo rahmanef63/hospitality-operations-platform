@@ -28,14 +28,13 @@ const operations = {
   "guest.archive": ["id"],
   "reservation.upsert": [
     "id", "propertyId", "unitId", "guestId", "externalReference", "status", "source", "checkIn",
-    "checkOut", "adults", "children", "nightlyRate", "accommodationAmount", "extraFees",
-    "discountAmount", "totalAmount", "currency", "notes",
+    "checkOut", "adults", "children", "nightlyRate", "extraFees", "discountAmount", "notes",
   ],
   "reservation.archive": ["id"],
   "block.upsert": ["id", "propertyId", "unitId", "title", "reason", "startDate", "endDate", "notes"],
   "block.archive": ["id"],
   "transaction.upsert": [
-    "id", "propertyId", "reservationId", "kind", "category", "amount", "currency", "method", "status",
+    "id", "propertyId", "reservationId", "kind", "category", "amount", "method", "status",
     "occurredOn", "reference", "notes",
   ],
   "transaction.archive": ["id"],
@@ -48,7 +47,7 @@ const operations = {
 
 const numberFields = new Set([
   "bedroomCount", "bathroomCount", "maxGuests", "baseNightlyRate", "adults", "children", "nightlyRate",
-  "accommodationAmount", "extraFees", "discountAmount", "totalAmount", "amount",
+  "extraFees", "discountAmount", "amount",
 ]);
 const booleanFields = new Set(["bookable", "featured", "publicVisible", "active"]);
 type Operation = keyof typeof operations;
@@ -58,7 +57,20 @@ function isOperation(value: string): value is Operation {
 }
 
 function safeReturnTo(value: string) {
-  return /^\/admin(?:\/[^?]*)?$/.test(value) ? value : "/admin";
+  try {
+    if (!value.startsWith("/admin") || value.startsWith("//")) return "/admin";
+    const url = new URL(value, "https://kamyna.internal");
+    if (url.origin !== "https://kamyna.internal" || !url.pathname.startsWith("/admin")) return "/admin";
+    return `${url.pathname}${url.search}`;
+  } catch {
+    return "/admin";
+  }
+}
+
+function resultUrl(returnTo: string, key: "status" | "error", value: string) {
+  const url = new URL(returnTo, "https://kamyna.internal");
+  url.searchParams.set(key, value);
+  return `${url.pathname}${url.search}`;
 }
 
 function payloadFromForm(formData: FormData, operation: Operation) {
@@ -81,16 +93,16 @@ export async function pmsAction(formData: FormData) {
   const session = await requireAdminSession();
   const operationValue = formText(formData, "operation") || formText(formData, "defaultOperation");
   const returnTo = safeReturnTo(formText(formData, "returnTo"));
-  if (!isOperation(operationValue)) redirect(`${returnTo}?error=operation`);
+  if (!isOperation(operationValue)) redirect(resultUrl(returnTo, "error", "operation"));
   try {
     await pmsAdminRequest(operationValue, {
       ...payloadFromForm(formData, operationValue),
       actorEmailHash: hashAdminIdentity(session.email),
     });
   } catch {
-    redirect(`${returnTo}?error=operation`);
+    redirect(resultUrl(returnTo, "error", "operation"));
   }
   revalidatePath("/admin", "layout");
   revalidatePath("/stays/ruma-kamyna");
-  redirect(`${returnTo}?status=saved`);
+  redirect(resultUrl(returnTo, "status", "saved"));
 }

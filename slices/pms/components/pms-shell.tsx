@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, LogOut } from "lucide-react";
+import { ArrowUpRight, LogOut, Plus } from "lucide-react";
 import type { PmsShellProps } from "../types";
 import { PmsDesktopNav, PmsMobileDock } from "./pms-nav";
 
@@ -12,6 +12,11 @@ export function PmsShell({ children, sessionEmail }: PmsShellProps) {
             <p className="font-serif text-3xl leading-none">Kamyna</p>
             <p className="mt-1.5 text-[.58rem] font-semibold tracking-[.2em] text-warm-sand uppercase">Homestay OS</p>
           </div>
+        </div>
+        <div className="px-4 pt-5">
+          <Link href="/admin/reservations?new=1#new-reservation" className="flex min-h-12 items-center justify-center gap-2 rounded-[.35rem] bg-ivory px-4 text-[.65rem] font-bold tracking-[.08em] text-charcoal uppercase transition hover:bg-warm-sand">
+            <Plus className="size-4" aria-hidden="true" /> Reservasi baru
+          </Link>
         </div>
         <PmsDesktopNav />
         <div className="border-t border-ivory/12 p-4">
@@ -42,8 +47,8 @@ export function PmsShell({ children, sessionEmail }: PmsShellProps) {
           <p className="font-serif text-2xl leading-none">Kamyna</p>
           <p className="mt-1 text-[.52rem] font-semibold tracking-[.18em] text-warm-sand uppercase">Homestay OS</p>
         </div>
-        <Link href="/" target="_blank" className="flex min-h-11 items-center gap-2 border border-ivory/18 px-3 text-[.6rem] font-semibold tracking-[.08em] uppercase">
-          Situs <ArrowUpRight className="size-3.5" aria-hidden="true" />
+        <Link href="/admin/reservations?new=1#new-reservation" className="flex min-h-11 items-center gap-2 rounded-[.3rem] border border-ivory/18 px-3 text-[.6rem] font-semibold tracking-[.08em] uppercase">
+          <Plus className="size-3.5" aria-hidden="true" /> Reservasi
         </Link>
       </div>
 

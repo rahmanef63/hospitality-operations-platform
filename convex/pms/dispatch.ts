@@ -139,9 +139,8 @@ export async function handlePmsAdmin(ctx: ActionCtx, body: Record<string, unknow
         source: enumValue(payload, "source", RESERVATION_SOURCES),
         checkIn: text(payload, "checkIn"), checkOut: text(payload, "checkOut"),
         adults: numberValue(payload, "adults"), children: numberValue(payload, "children"),
-        nightlyRate: numberValue(payload, "nightlyRate"), accommodationAmount: numberValue(payload, "accommodationAmount"),
+        nightlyRate: numberValue(payload, "nightlyRate"),
         extraFees: numberValue(payload, "extraFees"), discountAmount: numberValue(payload, "discountAmount"),
-        totalAmount: numberValue(payload, "totalAmount"), currency: text(payload, "currency"),
         notes: optionalText(payload, "notes"), actorEmailHash,
       });
     case "reservation.archive":
@@ -169,7 +168,7 @@ export async function handlePmsAdmin(ctx: ActionCtx, body: Record<string, unknow
         id: optionalId<"transactions">(payload, "id"), propertyId: idValue<"properties">(payload, "propertyId"),
         reservationId: optionalId<"reservations">(payload, "reservationId"), kind: enumValue(payload, "kind", TRANSACTION_KINDS),
         category: text(payload, "category"), amount: numberValue(payload, "amount") ?? 0,
-        currency: text(payload, "currency"), method: enumValue(payload, "method", TRANSACTION_METHODS),
+        method: enumValue(payload, "method", TRANSACTION_METHODS),
         status: enumValue(payload, "status", TRANSACTION_STATUSES), occurredOn: text(payload, "occurredOn"),
         reference: optionalText(payload, "reference"), notes: optionalText(payload, "notes"), actorEmailHash,
       });

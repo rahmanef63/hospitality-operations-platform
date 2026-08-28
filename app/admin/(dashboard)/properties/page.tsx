@@ -5,10 +5,10 @@ import { pmsAction } from "../actions";
 
 const empty: PmsCatalog = { properties: [], units: [], amenities: [] };
 export const instant = false;
-export default async function Page({ searchParams }: { searchParams: Promise<{ status?: string; error?: string }> }) {
+export default async function Page({ searchParams }: { searchParams: Promise<{ status?: string; error?: string; new?: string }> }) {
   const state = await searchParams;
   let catalog = empty;
   let backendError = false;
   try { catalog = await getPmsCatalog(); } catch { backendError = true; }
-  return <PropertyManager catalog={catalog} state={state} backendError={backendError} formAction={pmsAction} />;
+  return <PropertyManager catalog={catalog} openCreate={state.new === "1"} state={state} backendError={backendError} formAction={pmsAction} />;
 }

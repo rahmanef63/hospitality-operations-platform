@@ -1,124 +1,120 @@
+import Link from "next/link";
+import { CalendarPlus, MoveRight, Plus } from "lucide-react";
 import {
-  BLOCK_REASONS,
   formatPmsDate,
-  humanize,
-  type PmsAvailabilityBlock,
   type PmsCalendarData,
   type PmsCatalog,
 } from "@/shared/pms";
 import type { PmsFormAction, PmsPageState } from "../types";
-import { Field, SelectInput, TextArea, TextInput } from "./form-controls";
-import { CreatePanel, EmptyState, FormActions, RecordPanel } from "./manager-primitives";
+import { BlockForm } from "./block-form";
+import { CalendarBoard } from "./calendar-board";
+import { CollectionSearch } from "./collection-search";
+import { Field, TextInput } from "./form-controls";
+import { CreatePanel, EmptyState, RecordPanel } from "./manager-primitives";
 import { PageHeader } from "./page-header";
+import { PmsIcon } from "./pms-icon";
 import { StatusBanner } from "./status-banner";
+import { StatusPill } from "./status-pill";
+import { TagSelect } from "./tag-select";
+import { blockReasonOptions, reservationStatusOptions, type PmsSelectOption } from "./ui-options";
 
-function BlockForm({ block, catalog, action }: { block?: PmsAvailabilityBlock; catalog: PmsCatalog; action: PmsFormAction }) {
-  const propertyId = block?.propertyId ?? catalog.properties[0]?.id ?? "";
-  return (
-    <form action={action}>
-      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        <Field label="Properti">
-          <SelectInput name="propertyId" defaultValue={propertyId} required>
-            {catalog.properties.map((property) => <option key={property.id} value={property.id}>{property.name}</option>)}
-          </SelectInput>
-        </Field>
-        <Field label="Unit (opsional)">
-          <SelectInput name="unitId" defaultValue={block?.unitId ?? ""}>
-            <option value="">Blok seluruh properti</option>
-            {catalog.units.map((unit) => <option key={unit.id} value={unit.id}>{unit.propertyName} · {unit.name}</option>)}
-          </SelectInput>
-        </Field>
-        <Field label="Judul"><TextInput name="title" defaultValue={block?.title} required maxLength={100} placeholder="Perawatan kolam" /></Field>
-        <Field label="Alasan">
-          <SelectInput name="reason" defaultValue={block?.reason ?? "maintenance"}>
-            {BLOCK_REASONS.map((item) => <option key={item} value={item}>{humanize(item)}</option>)}
-          </SelectInput>
-        </Field>
-        <Field label="Mulai"><TextInput name="startDate" type="date" defaultValue={block?.startDate} required /></Field>
-        <Field label="Selesai"><TextInput name="endDate" type="date" defaultValue={block?.endDate} required /></Field>
-        <Field label="Catatan" className="sm:col-span-2 xl:col-span-3"><TextArea name="notes" defaultValue={block?.notes} maxLength={1000} /></Field>
-      </div>
-      <FormActions action={action} operation="block.upsert" archiveOperation="block.archive" returnTo="/admin/calendar" id={block?.id} />
-    </form>
-  );
+function propertyFilterOptions(catalog: PmsCatalog): PmsSelectOption[] {
+  return [
+    { value: "", label: "Semua properti", icon: "building", tone: "neutral" },
+    ...catalog.properties.map((property) => ({ value: property.id, label: property.name, description: property.locationLabel, icon: "house" as const, tone: "olive" as const })),
+  ];
 }
 
 export function CalendarManager({
   catalog,
   calendar,
-  range,
+  month,
   propertyId,
+  today,
+  openCreate,
   state,
   backendError,
   formAction,
 }: {
   catalog: PmsCatalog;
   calendar: PmsCalendarData;
-  range: { start: string; end: string };
+  month: string;
   propertyId?: string;
+  today: string;
+  openCreate: boolean;
   state: PmsPageState;
   backendError: boolean;
   formAction: PmsFormAction;
 }) {
+  const returnParams = new URLSearchParams({ month: month.slice(0, 7) });
+  if (propertyId) returnParams.set("property", propertyId);
+  const returnTo = `/admin/calendar?${returnParams.toString()}`;
   return (
     <div className="pb-20">
       <PageHeader
         eyebrow="Availability"
-        title="Kalender yang mencegah tanggal bertabrakan."
-        description="Reservasi tentatif, terkonfirmasi, dan sedang menginap akan memblokir inventori. Owner use, maintenance, atau penutupan dapat dicatat sebagai availability block."
+        title="Satu kalender untuk semua inventori."
+        description="Lihat reservasi dan blok pada grid bulan yang sama. Whole-property block otomatis menutup unit di bawahnya, dengan overlap tetap divalidasi oleh Convex."
+        action={<Link href="?new=1#new-block" className="cta-solid"><CalendarPlus className="size-4" aria-hidden="true" />Blokir tanggal</Link>}
       />
       <div className="mx-auto max-w-[92rem] space-y-8 px-4 pt-8 sm:px-8 lg:px-12">
         <StatusBanner status={state.status} error={state.error || (backendError ? "service" : undefined)} />
-        <form method="get" className="grid gap-4 border border-charcoal/12 bg-white p-5 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_auto] xl:items-end sm:p-7">
-          <Field label="Properti">
-            <SelectInput name="property" defaultValue={propertyId ?? ""}>
-              <option value="">Semua properti</option>
-              {catalog.properties.map((property) => <option key={property.id} value={property.id}>{property.name}</option>)}
-            </SelectInput>
-          </Field>
-          <Field label="Mulai"><TextInput name="start" type="date" defaultValue={range.start} /></Field>
-          <Field label="Selesai"><TextInput name="end" type="date" defaultValue={range.end} /></Field>
-          <button type="submit" className="cta-solid">Terapkan filter</button>
+
+        <form method="get" className="grid gap-4 rounded-[.55rem] border border-charcoal/12 bg-white p-4 sm:grid-cols-[minmax(0,1fr)_13rem_auto] sm:items-end sm:p-5">
+          <Field label="Properti"><TagSelect name="property" options={propertyFilterOptions(catalog)} defaultValue={propertyId ?? ""} /></Field>
+          <Field label="Bulan"><TextInput name="month" type="month" defaultValue={month.slice(0, 7)} /></Field>
+          <button type="submit" className="cta-solid">Terapkan tampilan</button>
         </form>
 
-        {catalog.properties.length ? <CreatePanel title="Blokir tanggal"><BlockForm catalog={catalog} action={formAction} /></CreatePanel> : null}
+        <CalendarBoard calendar={calendar} month={month} basePath="/admin/calendar" propertyId={propertyId} title="Availability calendar" />
+
+        <div id="new-block">
+          {catalog.properties.length ? (
+            <CreatePanel title="Blokir tanggal" description="Pilih akomodasi dan alasan, lalu tentukan rentang. Sistem mencegah benturan dengan reservasi aktif." icon="calendar" open={openCreate}>
+              <BlockForm catalog={catalog} action={formAction} today={today} returnTo={returnTo} />
+            </CreatePanel>
+          ) : <EmptyState title="Belum ada properti">Tambahkan properti sebelum membuat availability block.</EmptyState>}
+        </div>
 
         <section className="grid gap-6 xl:grid-cols-2">
-          <div className="border border-charcoal/12 bg-white">
-            <header className="border-b border-charcoal/12 px-5 py-5 sm:px-7">
-              <p className="kicker text-umber">Bookings</p>
-              <h2 className="mt-3 font-serif text-3xl">Reservasi pada rentang ini</h2>
-            </header>
-            {calendar.reservations.length ? (
-              <div className="divide-y divide-charcoal/10">
-                {calendar.reservations.map((reservation) => (
-                  <article key={reservation.id} className="px-5 py-5 sm:px-7">
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div>
-                        <p className="font-semibold">{reservation.guestName}</p>
-                        <p className="mt-1 text-xs text-ink-soft">{reservation.propertyName} · {reservation.reference}</p>
-                      </div>
-                      <span className="border border-charcoal/15 px-2 py-1 text-[.62rem] font-semibold tracking-[.08em] uppercase">{humanize(reservation.status)}</span>
-                    </div>
-                    <p className="mt-4 text-sm">{formatPmsDate(reservation.checkIn)} → {formatPmsDate(reservation.checkOut)} · {reservation.nights} malam</p>
-                  </article>
-                ))}
-              </div>
-            ) : <EmptyState>Tidak ada reservasi pada rentang yang dipilih.</EmptyState>}
+          <div className="overflow-hidden rounded-[.55rem] border border-charcoal/12 bg-white">
+            <header className="border-b border-charcoal/10 px-5 py-5 sm:px-7"><p className="kicker text-umber">Bookings</p><h2 className="mt-2 font-serif text-3xl">{calendar.reservations.length} reservasi pada grid</h2></header>
+            <div className="divide-y divide-charcoal/10">
+              {calendar.reservations.length ? calendar.reservations.map((reservation) => (
+                <Link key={reservation.id} href={`/admin/reservations#reservation-${reservation.id}`} className="grid min-h-20 grid-cols-[auto_1fr_auto] items-center gap-3 px-5 py-4 transition hover:bg-charcoal/[.025] sm:px-7">
+                  <span className="flex size-10 items-center justify-center rounded-full bg-olive/10 text-olive"><PmsIcon name="booking" /></span>
+                  <span className="min-w-0"><span className="block truncate text-sm font-bold">{reservation.guestName}</span><span className="mt-1 block truncate text-xs text-ink-soft">{reservation.propertyName} · {formatPmsDate(reservation.checkIn)}–{formatPmsDate(reservation.checkOut)} · {reservation.nights} malam</span></span>
+                  <span className="flex items-center gap-2"><StatusPill value={reservation.status} options={reservationStatusOptions} /><MoveRight className="size-4 text-charcoal/32" aria-hidden="true" /></span>
+                </Link>
+              )) : <div className="p-5"><EmptyState title="Tidak ada reservasi">Tidak ada reservasi dalam rentang grid bulan ini.</EmptyState></div>}
+            </div>
           </div>
 
-          <div className="border border-charcoal/12 bg-white">
-            <header className="border-b border-charcoal/12 px-5 py-5 sm:px-7">
-              <p className="kicker text-umber">Blocked inventory</p>
-              <h2 className="mt-3 font-serif text-3xl">Availability block</h2>
-            </header>
-            {calendar.blocks.length ? calendar.blocks.map((block) => (
-              <RecordPanel key={block.id} title={block.title} meta={`${block.propertyName} · ${formatPmsDate(block.startDate)}–${formatPmsDate(block.endDate)} · ${humanize(block.reason)}`}>
-                <BlockForm block={block} catalog={catalog} action={formAction} />
-              </RecordPanel>
-            )) : <EmptyState>Tidak ada tanggal yang diblokir pada rentang ini.</EmptyState>}
+          <div className="overflow-hidden rounded-[.55rem] border border-charcoal/12 bg-white">
+            <header className="border-b border-charcoal/10 px-5 py-5 sm:px-7"><p className="kicker text-umber">Blocked inventory</p><h2 className="mt-2 font-serif text-3xl">{calendar.blocks.length} availability block</h2></header>
+            <div className="p-3"><CollectionSearch targetId="availability-blocks" placeholder="Cari blok atau properti…" filters={blockReasonOptions} /></div>
+            <div id="availability-blocks" className="border-t border-charcoal/10">
+              {calendar.blocks.length ? calendar.blocks.map((block) => (
+                <RecordPanel
+                  key={block.id}
+                  id={`block-${block.id}`}
+                  title={block.title}
+                  meta={`${block.propertyName}${block.unitName ? ` · ${block.unitName}` : " · whole property"} · ${formatPmsDate(block.startDate)}–${formatPmsDate(block.endDate)}`}
+                  searchText={`${block.title} ${block.propertyName} ${block.unitName ?? ""} ${block.reason}`}
+                  status={block.reason}
+                  leading={<PmsIcon name="calendar" />}
+                  trailing={<StatusPill value={block.reason} options={blockReasonOptions} />}
+                >
+                  <BlockForm block={block} catalog={catalog} action={formAction} today={today} returnTo={returnTo} />
+                </RecordPanel>
+              )) : <div className="p-5"><EmptyState title="Tidak ada blok"><span>Inventori tidak memiliki blok pada rentang ini.</span></EmptyState></div>}
+            </div>
           </div>
         </section>
+
+        <Link href="/admin/reservations?new=1#new-reservation" className="flex min-h-14 items-center justify-between gap-4 rounded-[.45rem] border border-charcoal/12 bg-charcoal px-5 text-sm font-semibold text-ivory transition hover:bg-olive">
+          <span className="flex items-center gap-3"><Plus className="size-4" aria-hidden="true" />Buat reservasi dari tanggal yang sudah diperiksa</span><MoveRight className="size-4" aria-hidden="true" />
+        </Link>
       </div>
     </div>
   );

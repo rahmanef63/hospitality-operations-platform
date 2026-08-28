@@ -93,4 +93,4 @@ The repository enforces strict TypeScript, zero-warning ESLint, in-memory Convex
 
 Use the `/sc-all` hybrid topology: deploy the Convex Cloud backend first through `sc-convex-cloud`, seed verified property facts idempotently, then deploy the exact Git revision to Dokploy without replacing existing environment values.
 
-See `docs/PMS.md`, `docs/GUEST-WELCOME-ADMIN.md`, and `docs/ARCHITECTURE.md`.
+See `docs/PMS.md`, `docs/ADMIN-UX-PLAN.md`, `docs/GUEST-WELCOME-ADMIN.md`, and `docs/ARCHITECTURE.md`.

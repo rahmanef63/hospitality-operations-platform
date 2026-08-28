@@ -31,5 +31,5 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ s
   } catch {
     backendError = true;
   }
-  return <PmsDashboardPage dashboard={dashboard} backendError={backendError} state={state} formAction={pmsAction} />;
+  return <PmsDashboardPage dashboard={dashboard} today={today} backendError={backendError} state={state} formAction={pmsAction} />;
 }

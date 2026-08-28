@@ -76,6 +76,26 @@ describe("multi-property PMS CRUD", () => {
       email: "guest@example.com",
       actorEmailHash,
     });
+    await t.mutation(internal.pms.catalog.upsertProperty, {
+      id: property.id,
+      slug: property.slug,
+      name: property.name,
+      propertyType: property.propertyType,
+      status: property.status,
+      publicationStatus: property.publicationStatus,
+      locationLabel: property.locationLabel,
+      locality: property.locality,
+      region: property.region,
+      postalCode: property.postalCode,
+      countryCode: property.countryCode,
+      timezone: property.timezone,
+      currency: property.currency,
+      bedroomCount: property.bedroomCount,
+      publicSummary: property.publicSummary,
+      publicPath: property.publicPath,
+      baseNightlyRate: 750_000,
+      actorEmailHash,
+    });
     const reservation = await t.mutation(internal.pms.reservations.upsert, {
       propertyId: property.id,
       guestId: guest.id,
@@ -83,7 +103,8 @@ describe("multi-property PMS CRUD", () => {
       source: "direct",
       checkIn: "2026-09-10",
       checkOut: "2026-09-12",
-      currency: "IDR",
+      extraFees: 100_000,
+      discountAmount: 50_000,
       actorEmailHash,
     });
     await t.mutation(internal.pms.reservations.upsert, {
@@ -94,7 +115,8 @@ describe("multi-property PMS CRUD", () => {
       source: "direct",
       checkIn: "2026-09-10",
       checkOut: "2026-09-12",
-      currency: "IDR",
+      extraFees: 100_000,
+      discountAmount: 50_000,
       actorEmailHash,
     });
     await expect(t.mutation(internal.pms.availability.upsertBlock, {
@@ -111,8 +133,14 @@ describe("multi-property PMS CRUD", () => {
       guestName: "Test Guest",
       status: "checked_in",
       nights: 2,
+      nightlyRate: 750_000,
+      accommodationAmount: 1_500_000,
+      extraFees: 100_000,
+      discountAmount: 50_000,
+      totalAmount: 1_550_000,
+      currency: "IDR",
       paidAmount: 0,
-      outstandingAmount: 0,
+      outstandingAmount: 1_550_000,
     });
     await t.mutation(internal.pms.reservations.archive, { id: reservation.id, actorEmailHash });
     await t.mutation(internal.pms.guests.archive, { id: guest.id, actorEmailHash });
@@ -132,7 +160,6 @@ describe("multi-property PMS CRUD", () => {
       kind: "payment",
       category: "Deposit",
       amount: 500_000,
-      currency: "IDR",
       method: "bank_transfer",
       status: "completed",
       occurredOn: "2026-09-01",

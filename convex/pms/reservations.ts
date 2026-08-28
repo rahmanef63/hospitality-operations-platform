@@ -38,16 +38,16 @@ export const upsert = internalMutation({
     id: v.optional(v.id("reservations")), propertyId: v.id("properties"), unitId: v.optional(v.id("units")),
     guestId: v.id("guests"), externalReference: v.optional(v.string()), status: reservationStatusValidator,
     source: reservationSourceValidator, checkIn: v.string(), checkOut: v.string(), adults: v.optional(v.number()),
-    children: v.optional(v.number()), nightlyRate: v.optional(v.number()), accommodationAmount: v.optional(v.number()),
-    extraFees: v.optional(v.number()), discountAmount: v.optional(v.number()), totalAmount: v.optional(v.number()),
-    currency: v.string(), notes: v.optional(v.string()), actorEmailHash: v.string(),
+    children: v.optional(v.number()), nightlyRate: v.optional(v.number()),
+    extraFees: v.optional(v.number()), discountAmount: v.optional(v.number()),
+    notes: v.optional(v.string()), actorEmailHash: v.string(),
   },
   handler: async (ctx, args) => {
     const property = await requireProperty(ctx, args.propertyId);
     await requireGuest(ctx, args.guestId);
-    if (args.unitId) {
-      const unit = await requireUnit(ctx, args.unitId, args.propertyId);
-      if (!unit.bookable || unit.status !== "active") throw new Error("Selected unit is not bookable.");
+    const unit = args.unitId ? await requireUnit(ctx, args.unitId, args.propertyId) : undefined;
+    if (unit && (!unit.bookable || unit.status !== "active")) {
+      throw new Error("Selected unit is not bookable.");
     }
     const range = dateRange(args.checkIn, args.checkOut, "Check-in", "Check-out");
     const nights = nightsBetween(range.start, range.end);
@@ -56,20 +56,19 @@ export const upsert = internalMutation({
         propertyId: args.propertyId, unitId: args.unitId, start: range.start, end: range.end,
       }, args.id);
     }
-    const nightlyRate = optionalInteger(args.nightlyRate, "Nightly rate");
-    const accommodationAmount = optionalInteger(
-      args.accommodationAmount ?? (nightlyRate === undefined ? undefined : nightlyRate * nights),
-      "Accommodation amount",
+    const nightlyRate = optionalInteger(
+      args.nightlyRate ?? unit?.baseNightlyRate ?? property.baseNightlyRate,
+      "Nightly rate",
     );
+    const accommodationAmount = nightlyRate === undefined ? undefined : nightlyRate * nights;
     const extraFees = optionalInteger(args.extraFees, "Extra fees") ?? 0;
     const discountAmount = optionalInteger(args.discountAmount, "Discount amount") ?? 0;
     if (accommodationAmount !== undefined && discountAmount > accommodationAmount + extraFees) {
       throw new Error("Discount cannot exceed accommodation plus extra fees.");
     }
-    const totalAmount = optionalInteger(
-      args.totalAmount ?? (accommodationAmount === undefined ? undefined : accommodationAmount + extraFees - discountAmount),
-      "Total amount",
-    );
+    const totalAmount = accommodationAmount === undefined
+      ? undefined
+      : accommodationAmount + extraFees - discountAmount;
     const now = Date.now();
     const existing = args.id ? await ctx.db.get(args.id) : null;
     if (args.id && (!existing || existing.archived)) throw new Error("Reservation was not found.");
@@ -93,7 +92,7 @@ export const upsert = internalMutation({
       extraFees: args.extraFees === undefined ? undefined : extraFees,
       discountAmount: args.discountAmount === undefined ? undefined : discountAmount,
       totalAmount,
-      currency: cleanCurrency(args.currency),
+      currency: cleanCurrency(property.currency),
       notes: optionalText(args.notes, 2_000),
       cancelledAt: args.status === "cancelled" ? now : undefined,
       updatedAt: now,

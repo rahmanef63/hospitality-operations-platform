@@ -31,6 +31,11 @@ No bathroom count, guest capacity, rate, deposit, minimum stay, check-in time, c
 
 All routes share the existing signed admin session and remain `noindex`. Desktop exposes them in a persistent grouped sidebar; mobile exposes primary modules in a safe-area dock and the remaining modules in a bounded “Lainnya” sheet.
 
+
+## Admin interaction model
+
+The admin UI follows the implementation plan in `docs/ADMIN-UX-PLAN.md`. Relationships and enums use accessible icon tags, list surfaces support local search/filtering, reservations and blocks share a responsive month calendar, and reservation totals are previews of server-authoritative calculations rather than editable ledger fields.
+
 ## Convex data model
 
 - `properties`: property identity, location, currency, optional facts, operational/publication state.
