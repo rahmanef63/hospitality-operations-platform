@@ -32,19 +32,16 @@ export const homeContent: HomeContent = {
     title: "Nothing to complete. More to notice.",
     items: [
       {
-        number: "01",
         title: "Rest",
         description: "Rooms that feel settled, mornings without urgency, and comfort designed to help the body exhale.",
         image: media.bedroomRetreat,
       },
       {
-        number: "02",
         title: "Gather",
         description: "Long meals, familiar spaces, and enough time for conversations to shape the day.",
         image: media.diningTable,
       },
       {
-        number: "03",
         title: "Restore",
         description: "Simple rituals, natural textures, and privacy that returns attention to what matters.",
         image: media.spaBath,
@@ -55,7 +52,7 @@ export const homeContent: HomeContent = {
     eyebrow: "Our philosophy",
     title: "Luxury, in its quietest form.",
     paragraphs: [
-      "For us, luxury is not excess. It is the ease of feeling cared for without being interrupted—thoughtful light, useful objects, generous silence, and freedom from a crowded itinerary.",
+      "For us, luxury is not excess. It is the ease of feeling cared for without being interrupted: thoughtful light, useful objects, generous silence, and freedom from a crowded itinerary.",
       "Kamyna homes are designed with restraint so that life, rather than decoration, remains at the centre of the experience.",
     ],
     quote: "Come for the space. Stay for the stillness. Take a little of it home.",

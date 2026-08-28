@@ -5,13 +5,13 @@ import type { PropertyContent } from "@/shared/content";
 
 export function PropertyEnquiry({ property }: { property: PropertyContent }) {
   return (
-    <section className="relative isolate min-h-[42rem] overflow-hidden bg-charcoal text-ivory">
-      <Image src={property.enquiryImage.src} alt={property.enquiryImage.alt} fill sizes="100vw" className="-z-20 object-cover" />
+    <section className="scroll-parallax-section relative isolate min-h-[42rem] overflow-hidden bg-charcoal text-ivory">
+      <Image src={property.enquiryImage.src} alt={property.enquiryImage.alt} fill sizes="100vw" className="scroll-parallax-bg -z-20 object-cover" />
       <div className="absolute inset-0 -z-10 bg-charcoal/66" />
 
-      <div className="page-shell flex min-h-[42rem] flex-col justify-between py-14 sm:py-18 lg:py-20">
+      <div className="page-shell content-inset flex min-h-[42rem] flex-col justify-between py-14 sm:py-18 lg:py-20">
         <BrandLockup kind="property" compact inverse />
-        <div className="max-w-4xl">
+        <div className="scroll-reveal max-w-4xl">
           <h2 className="text-balance font-serif text-6xl leading-[0.88] tracking-[-0.04em] sm:text-8xl lg:text-9xl">
             Your time remains yours.
           </h2>

@@ -10,7 +10,6 @@ export type ActionLink = NavigationItem & {
 };
 
 export type EditorialItem = {
-  number: string;
   title: string;
   description: string;
   image: MediaAsset;

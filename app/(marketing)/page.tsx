@@ -6,21 +6,21 @@ import { socialImages } from "@/shared/media";
 import { buildHomeSchema, JsonLd } from "@/shared/seo";
 
 export const metadata: Metadata = {
-  title: { absolute: `${SITE_NAME} — ${SITE_SLOGAN}` },
+  title: { absolute: `${SITE_NAME} | ${SITE_SLOGAN}` },
   description: SITE_DESCRIPTION,
   alternates: { canonical: "/", languages: { en: "/", "x-default": "/" } },
   openGraph: {
     type: "website",
     locale: "en_US",
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — ${SITE_SLOGAN}`,
+    title: `${SITE_NAME} | ${SITE_SLOGAN}`,
     description: SITE_DESCRIPTION,
     url: SITE_URL,
     images: [{ url: socialImages.kamynaLiving, width: 1200, height: 630, alt: `${SITE_NAME} visual world` }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} — ${SITE_SLOGAN}`,
+    title: `${SITE_NAME} | ${SITE_SLOGAN}`,
     description: SITE_DESCRIPTION,
     images: [socialImages.kamynaLiving],
   },

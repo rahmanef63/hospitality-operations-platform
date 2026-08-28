@@ -12,9 +12,9 @@ export function BrandAssetsPage() {
     <main id="main-content" className="bg-ivory">
       <section className="section-pad-compact bg-paper">
         <div className="page-shell grid gap-12 lg:grid-cols-[.68fr_1.32fr] lg:items-stretch lg:gap-6">
-          <div className="flex flex-col justify-between border-y border-charcoal/16 py-8 lg:py-10 lg:pr-12">
+          <div className="content-inset scroll-reveal flex flex-col justify-between border-y border-charcoal/16 py-8 lg:py-10 lg:pr-12">
             <div>
-              <Link href="/" className="editorial-link text-charcoal/72">
+              <Link prefetch={false} href="/" className="editorial-link text-charcoal/72">
                 <ArrowLeft className="size-4" aria-hidden="true" />
                 Back to the collection
               </Link>
@@ -33,19 +33,19 @@ export function BrandAssetsPage() {
             </div>
           </div>
 
-          <figure>
+          <figure className="scroll-media">
             <div className="image-frame min-h-[30rem] h-full lg:min-h-[46rem]">
               <ResponsiveHeroImage asset={media.brandSerenity} />
             </div>
-            <figcaption className="image-caption mt-3">{media.brandSerenity.caption}</figcaption>
+            <figcaption className="content-inset image-caption mt-3">{media.brandSerenity.caption}</figcaption>
           </figure>
         </div>
       </section>
 
       <section className="section-pad bg-ivory">
         <div className="page-shell">
-          <div className="grid gap-8 pb-14 lg:grid-cols-[.55fr_1.45fr] lg:items-end">
-            <p className="kicker text-umber">Identity system</p>
+          <div className="content-inset scroll-reveal grid gap-8 pb-14 lg:grid-cols-[.55fr_1.45fr] lg:items-end">
+            <p className="text-sm font-semibold text-umber">Identity system</p>
             <h2 className="text-balance font-serif text-6xl leading-[0.9] tracking-[-0.04em] sm:text-8xl">
               Built to remain clear at every scale.
             </h2>

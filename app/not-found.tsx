@@ -14,6 +14,7 @@ export default function NotFound() {
           The page you were looking for is not here. Return to the collection and continue at your own pace.
         </p>
         <Link
+          prefetch={false}
           href="/"
           className="mt-10 inline-flex items-center gap-2 rounded-full border border-charcoal/20 px-6 py-3 text-sm font-semibold transition-colors hover:bg-charcoal hover:text-ivory"
         >

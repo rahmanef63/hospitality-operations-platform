@@ -60,3 +60,10 @@ Search and sharing surfaces are owned by the App Router rather than duplicated i
 - linked Organization, WebSite, Brand, CollectionPage, Accommodation, ItemList, ImageObject, and BreadcrumbList structured data.
 
 Schema deliberately avoids addresses, amenities, offers, ratings, and availability until those facts are confirmed.
+
+
+## Responsive composition and motion
+
+Mobile section shells are intentionally full-bleed. The reusable `content-inset` utility is applied only to copy, controls, and captions that need a readable or safe-area-aware inset; photography, color fields, galleries, and structural borders may reach the viewport edge. Tablet and desktop shells return to the bounded 90rem container.
+
+Motion is progressive enhancement built with native CSS scroll timelines. Key hierarchy blocks reveal through restrained transforms, selected background images use restrained parallax, the mobile ritual sequence forms a true sticky stack, and the header carries a scroll-progress line. No React scroll state, `window.scrollY`, or unbounded scroll listener is used. Every effect collapses to static content under `prefers-reduced-motion`.

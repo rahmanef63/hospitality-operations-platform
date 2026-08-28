@@ -1,6 +1,6 @@
 import type { MediaAsset } from "./types";
 
-const conceptCaption = "Visual concept — final property details may evolve.";
+const conceptCaption = "Visual concept. Final property details may evolve.";
 
 export const media = {
   livingCourtyard: {

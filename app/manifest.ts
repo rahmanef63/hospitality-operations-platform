@@ -3,7 +3,7 @@ import { SITE_DESCRIPTION, SITE_NAME } from "@/shared/config/site";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${SITE_NAME} — Homes for slower living`,
+    name: `${SITE_NAME} | Homes for slower living`,
     short_name: "Kamyna",
     description: SITE_DESCRIPTION,
     start_url: "/",

@@ -29,8 +29,8 @@ const sans = Manrope({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — ${SITE_SLOGAN}`,
-    template: `%s — ${SITE_NAME}`,
+    default: `${SITE_NAME} | ${SITE_SLOGAN}`,
+    template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — ${SITE_SLOGAN}`,
+    title: `${SITE_NAME} | ${SITE_SLOGAN}`,
     description: SITE_DESCRIPTION,
     url: SITE_URL,
     images: [
@@ -84,13 +84,13 @@ export const metadata: Metadata = {
         url: socialImages.kamynaLiving,
         width: 1200,
         height: 630,
-        alt: `${SITE_NAME} — ${SITE_SLOGAN}`,
+        alt: `${SITE_NAME} | ${SITE_SLOGAN}`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} — ${SITE_SLOGAN}`,
+    title: `${SITE_NAME} | ${SITE_SLOGAN}`,
     description: SITE_DESCRIPTION,
     images: [socialImages.kamynaLiving],
   },

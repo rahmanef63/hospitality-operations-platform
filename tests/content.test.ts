@@ -20,6 +20,13 @@ describe("static content repository", () => {
     expect(flatten(content)).not.toContain(deprecatedLabel);
   });
 
+  it("keeps guest-facing copy free from decorative numbering and em dashes", async () => {
+    const content = await repository.getSiteContent();
+    const serialized = JSON.stringify(content);
+    expect(serialized).not.toContain("—");
+    expect(serialized).not.toContain("Home 01");
+  });
+
   it("resolves known properties and returns null for unknown slugs", async () => {
     await expect(repository.getPropertyBySlug("ruma-kamyna")).resolves.toMatchObject({ name: "Ruma Kamyna" });
     await expect(repository.getPropertyBySlug("unknown")).resolves.toBeNull();

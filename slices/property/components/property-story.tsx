@@ -10,7 +10,7 @@ export function PropertyStory({ property }: { property: PropertyContent }) {
   return (
     <section className="section-pad bg-paper">
       <div className="page-shell">
-        <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
+        <div className="content-inset scroll-reveal grid gap-10 lg:grid-cols-12 lg:items-end">
           <p className="text-balance font-serif text-5xl leading-[1.02] tracking-[-0.03em] sm:text-7xl lg:col-span-9 lg:text-8xl">
             Somewhere between arriving and leaving, time begins to feel different.
           </p>
@@ -18,7 +18,7 @@ export function PropertyStory({ property }: { property: PropertyContent }) {
         </div>
 
         <div className="mt-16 grid gap-12 lg:grid-cols-12 lg:gap-x-8">
-          <figure className="lg:col-span-7">
+          <figure className="scroll-media lg:col-span-7">
             <div className="image-frame aspect-[4/3]">
               <Image
                 src={firstImage.src}
@@ -28,20 +28,20 @@ export function PropertyStory({ property }: { property: PropertyContent }) {
                 className="object-cover"
               />
             </div>
-            <figcaption className="image-caption mt-3">{firstImage.caption}</figcaption>
+            <figcaption className="content-inset image-caption mt-3">{firstImage.caption}</figcaption>
           </figure>
 
           <div className="flex flex-col justify-between gap-12 lg:col-span-5 lg:pl-8">
-            <div className="space-y-8 border-t border-charcoal/18 pt-8 text-base leading-8 text-ink-soft">
+            <div className="content-inset scroll-reveal scroll-reveal-right space-y-8 border-t border-charcoal/18 pt-8 text-base leading-8 text-ink-soft">
               {property.story.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
             </div>
-            <figure className="ml-auto w-[78%]">
+            <figure className="scroll-media w-full lg:ml-auto lg:w-[78%]">
               <div className="image-frame aspect-[4/5]">
                 <Image
                   src={secondImage.src}
                   alt={secondImage.alt}
                   fill
-                  sizes="(min-width: 1024px) 30vw, 80vw"
+                  sizes="(min-width: 1024px) 30vw, 100vw"
                   className="object-cover"
                 />
               </div>

@@ -10,6 +10,7 @@ Location-neutral hospitality website for the Kamyna collection, with **Ruma Kamy
 - Production SVG logos, favicon, Apple touch icon, PWA icons, and an editorial image system with responsive WebP derivatives.
 - Per-route metadata, canonical/hreflang links, XML sitemap with image discovery, robots rules, structured data, social cards, and Google Search Console verification.
 - Taste-skill design guidance installed project-locally for future anti-slop UI reviews.
+- Edge-to-edge mobile composition with safe copy insets, native scroll timelines, a global progress line, sticky ritual storytelling, section parallax, and reduced-motion fallbacks.
 - Docker standalone build for Dokploy.
 - Domain target: `kamynaliving.com`.
 

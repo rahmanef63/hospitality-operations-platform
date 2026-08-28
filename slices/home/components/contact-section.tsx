@@ -5,8 +5,8 @@ import type { HomeContent } from "@/shared/content";
 export function ContactSection({ content }: { content: HomeContent["contact"] }) {
   return (
     <section id="contact" className="section-pad bg-ivory">
-      <div className="page-shell grid overflow-hidden border border-charcoal/12 lg:grid-cols-[1.2fr_.8fr]">
-        <figure className="image-frame min-h-[24rem] lg:min-h-[36rem]">
+      <div className="page-shell grid overflow-hidden border-y border-charcoal/12 lg:grid-cols-[1.2fr_.8fr] lg:border">
+        <figure className="scroll-media image-frame min-h-[24rem] lg:min-h-[36rem]">
           <Image
             src={content.image.src}
             alt={content.image.alt}
@@ -15,7 +15,7 @@ export function ContactSection({ content }: { content: HomeContent["contact"] })
             className="object-cover"
           />
         </figure>
-        <div className="flex flex-col justify-between bg-olive p-8 text-ivory sm:p-12 lg:p-14">
+        <div className="scroll-reveal scroll-reveal-right flex flex-col justify-between bg-[#56604d] p-8 text-ivory sm:p-12 lg:p-14">
           <span className="font-serif text-4xl text-ivory/75">K</span>
           <div className="mt-20 lg:mt-0">
             <h2 className="text-balance font-serif text-6xl leading-[0.88] tracking-[-0.035em] sm:text-7xl">

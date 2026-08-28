@@ -6,13 +6,13 @@ export const properties: PropertyContent[] = [
   {
     slug: "ruma-kamyna",
     name: "Ruma Kamyna",
-    collectionLabel: "Kamyna Living · Home 01",
+    collectionLabel: "A Kamyna Living private stay",
     tagline: "return to stillness",
     status: "Stay enquiries are open",
     shortDescription:
       "A private home created for slower mornings, long meals, deep rest, and the quiet moments between them.",
     heroStatement: "A private home for slower days.",
-    visualNote: "Visual concept — final property details may evolve.",
+    visualNote: "Visual concept. Final property details may evolve.",
     heroImage: media.poolCourtyard,
     socialImage: socialImages.rumaKamyna,
     story: [
