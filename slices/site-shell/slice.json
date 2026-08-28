@@ -1,0 +1,13 @@
+{
+  "slug": "site-shell",
+  "name": "Kamyna site shell",
+  "version": "1.0.0",
+  "category": "navigation",
+  "description": "Location-neutral header and footer for all Kamyna marketing routes.",
+  "contract": {
+    "inputs": ["navigation", "footer"],
+    "outputs": ["SiteHeader", "SiteFooter"],
+    "portable": true,
+    "hardcodedUrls": []
+  }
+}

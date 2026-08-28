@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-labelledby="title">
+  <title id="title">Ruma Kamyna RK monogram</title>
+  <text x="74" y="169" fill="#51463D" font-family="Cormorant Garamond, Georgia, serif" font-size="162">R</text>
+  <text x="151" y="246" fill="#51463D" font-family="Cormorant Garamond, Georgia, serif" font-size="162">K</text>
+  <g transform="translate(90 75) scale(1.15)">
+    <path d="M19 101C38 83 50 66 59 46C65 33 69 21 72 11M44 75C36 68 31 59 30 49M54 56C47 49 44 41 44 32M52 61C63 57 72 50 79 40M59 45C70 42 79 36 86 27" fill="none" stroke="#8C796A" stroke-width="2.4" stroke-linecap="round"/>
+    <g fill="#8C796A"><circle cx="29" cy="45" r="3.8"/><circle cx="39" cy="64" r="3.8"/><circle cx="44" cy="28" r="3.8"/><circle cx="80" cy="38" r="3.8"/><circle cx="69" cy="52" r="3.8"/></g>
+  </g>
+</svg>

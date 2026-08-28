@@ -1,0 +1,7 @@
+{
+  "slug": "property",
+  "version": "1.0.0",
+  "entry": "index.ts",
+  "exports": ["PropertyPage"],
+  "dependencies": ["shared/brand", "shared/content"]
+}

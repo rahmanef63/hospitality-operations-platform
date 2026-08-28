@@ -1,0 +1,7 @@
+{
+  "slug": "site-shell",
+  "version": "1.0.0",
+  "entry": "index.ts",
+  "exports": ["SiteHeader", "SiteFooter"],
+  "dependencies": ["shared/brand", "shared/content"]
+}

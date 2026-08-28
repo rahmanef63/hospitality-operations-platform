@@ -1,0 +1,50 @@
+{
+  "name": "kamyna-living",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Location-neutral hospitality website for Kamyna Living.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "next dev --turbopack --port 3000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint app slices shared components lib scripts tests --max-warnings=0",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "audit:file-size": "node scripts/validation/audit-file-size.mjs",
+    "audit:slices": "node scripts/validation/audit-slices.mjs",
+    "audit:rr-rules": "node scripts/validation/audit-rr-rules.mjs",
+    "audit:brand-copy": "node scripts/validation/audit-brand-copy.mjs",
+    "check:stack-pin": "node scripts/validation/check-stack-pin.mjs",
+    "audit": "npm run check:stack-pin && npm run audit:file-size && npm run audit:slices && npm run audit:manifest && npm run audit:rr-rules && npm run audit:brand-copy",
+    "verify": "npm run audit && npm run typecheck && npm run lint && npm run test && npm run build",
+    "smoke": "node scripts/smoke-test.mjs",
+    "audit:manifest": "node scripts/validation/audit-project-manifest.mjs"
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "^1.2.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.468.0",
+    "next": "^16.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^3.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.0.0",
+    "postcss": "^8.5.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.2.4"
+  }
+}

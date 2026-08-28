@@ -1,0 +1,63 @@
+{
+  "$schema": "https://raw.githubusercontent.com/rahmanef63/resource-site/main/packages/cli/lib/rr-schema.json",
+  "version": 1,
+  "framework": "next-16",
+  "style": "shadcn-new-york",
+  "rsc": true,
+  "tailwind": {
+    "config": "",
+    "css": "app/globals.css"
+  },
+  "aliases": {
+    "components": "@/components",
+    "ui": "@/components/ui",
+    "shared": "@/shared",
+    "templates": "@/slices",
+    "slices": "@/features",
+    "features": "@/features",
+    "lib": "@/lib"
+  },
+  "layout": {
+    "kind": "vertical-slice",
+    "publicRoute": "app/(marketing)",
+    "sliceRoot": "slices"
+  },
+  "features": [],
+  "slices": [
+    {
+      "slug": "site-shell",
+      "version": "1.0.0",
+      "category": "navigation",
+      "addedAt": "2026-08-28"
+    },
+    {
+      "slug": "home",
+      "version": "1.0.0",
+      "category": "marketing",
+      "addedAt": "2026-08-28"
+    },
+    {
+      "slug": "property",
+      "version": "1.0.0",
+      "category": "hospitality",
+      "addedAt": "2026-08-28"
+    },
+    {
+      "slug": "brand-assets",
+      "version": "1.0.0",
+      "category": "brand",
+      "addedAt": "2026-08-28"
+    }
+  ],
+  "skills": [
+    {
+      "slug": "sc-all",
+      "source": "rahman",
+      "version": "main",
+      "addedAt": "2026-08-28"
+    }
+  ],
+  "auth": {
+    "provider": "none"
+  }
+}

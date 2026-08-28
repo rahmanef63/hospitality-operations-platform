@@ -1,0 +1,17 @@
+node_modules
+.next
+.turbo
+out
+dist
+coverage
+.env
+.env*.local
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+.DS_Store
+npm-debug.log*
+
+# Added by si-coder deploy (secret-leak guard)
+.env.*
+!.env.example

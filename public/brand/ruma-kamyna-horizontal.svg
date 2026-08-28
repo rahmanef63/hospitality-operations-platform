@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 260" role="img" aria-labelledby="title">
+  <title id="title">Ruma Kamyna horizontal logo</title>
+  <text x="86" y="146" fill="#51463D" font-family="Cormorant Garamond, Georgia, serif" font-size="92" letter-spacing="24">RUMA KAMYNA</text>
+  <path d="M878 62V198" stroke="#A58F7D" stroke-width="2"/>
+  <text x="945" y="118" fill="#51463D" font-family="Manrope, Arial, sans-serif" font-size="24" letter-spacing="8">RETURN TO</text>
+  <text x="945" y="163" fill="#51463D" font-family="Manrope, Arial, sans-serif" font-size="24" letter-spacing="8">STILLNESS</text>
+  <g transform="translate(1220 74) scale(.72)">
+    <path d="M19 101C38 83 50 66 59 46C65 33 69 21 72 11M44 75C36 68 31 59 30 49M54 56C47 49 44 41 44 32M52 61C63 57 72 50 79 40M59 45C70 42 79 36 86 27" fill="none" stroke="#51463D" stroke-width="2.8" stroke-linecap="round"/>
+    <g fill="#51463D"><circle cx="29" cy="45" r="4"/><circle cx="39" cy="64" r="4"/><circle cx="44" cy="28" r="4"/><circle cx="80" cy="38" r="4"/><circle cx="69" cy="52" r="4"/></g>
+  </g>
+</svg>
