@@ -1,3 +1,5 @@
+import type { MediaAsset } from "@/shared/media";
+
 export type NavigationItem = {
   label: string;
   href: string;
@@ -11,17 +13,24 @@ export type EditorialItem = {
   number: string;
   title: string;
   description: string;
+  image: MediaAsset;
 };
 
 export type PropertyPillar = {
   title: string;
   description: string;
+  image: MediaAsset;
 };
 
 export type DayRhythm = {
   moment: string;
   title: string;
   description: string;
+};
+
+export type GalleryItem = {
+  label: string;
+  image: MediaAsset;
 };
 
 export type PropertyContent = {
@@ -32,9 +41,15 @@ export type PropertyContent = {
   status: string;
   shortDescription: string;
   heroStatement: string;
+  visualNote: string;
+  heroImage: MediaAsset;
+  socialImage: string;
   story: string[];
+  storyImages: MediaAsset[];
+  gallery: GalleryItem[];
   pillars: PropertyPillar[];
   rhythm: DayRhythm[];
+  enquiryImage: MediaAsset;
   primaryAction: ActionLink;
 };
 
@@ -45,20 +60,19 @@ export type HomeContent = {
     description: string;
     primaryAction: ActionLink;
     secondaryAction: ActionLink;
-    note: string;
+    image: MediaAsset;
   };
   introduction: {
-    eyebrow: string;
     title: string;
     paragraphs: string[];
+    image: MediaAsset;
   };
   collection: {
-    eyebrow: string;
     title: string;
     description: string;
+    images: MediaAsset[];
   };
   rituals: {
-    eyebrow: string;
     title: string;
     items: EditorialItem[];
   };
@@ -67,12 +81,13 @@ export type HomeContent = {
     title: string;
     paragraphs: string[];
     quote: string;
+    image: MediaAsset;
   };
   contact: {
-    eyebrow: string;
     title: string;
     description: string;
     action: ActionLink;
+    image: MediaAsset;
   };
 };
 

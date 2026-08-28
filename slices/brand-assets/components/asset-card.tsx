@@ -5,12 +5,35 @@ import { cn } from "@/lib/utils";
 import type { BrandAsset } from "../types";
 
 export function AssetCard({ asset, index }: { asset: BrandAsset; index: number }) {
+  const reversed = index % 2 === 1;
   return (
-    <article className="overflow-hidden rounded-[1.75rem] border border-charcoal/10 bg-paper">
+    <article className="grid border-t border-charcoal/16 lg:grid-cols-12">
       <div
         className={cn(
-          "surface-grain flex min-h-72 items-center justify-center border-b border-charcoal/10 p-8 sm:min-h-96 sm:p-12",
-          asset.darkPreview ? "bg-charcoal" : "bg-ivory",
+          "flex flex-col justify-between py-10 lg:col-span-5 lg:min-h-[34rem] lg:py-14",
+          reversed ? "lg:order-2 lg:pl-14" : "lg:pr-14",
+        )}
+      >
+        <p className="kicker text-umber">Asset {String(index + 1).padStart(2, "0")} · SVG</p>
+        <div className="mt-16 lg:mt-24">
+          <h2 className="text-balance font-serif text-5xl leading-[0.94] tracking-[-0.03em] sm:text-6xl">
+            {asset.name}
+          </h2>
+          <p className="mt-6 max-w-xl text-sm leading-7 text-ink-soft sm:text-base sm:leading-8">
+            {asset.description}
+          </p>
+          <Link href={asset.href} download className="editorial-link mt-9">
+            Download source
+            <Download className="size-4" aria-hidden="true" />
+          </Link>
+        </div>
+      </div>
+
+      <div
+        className={cn(
+          "surface-grain flex min-h-[25rem] items-center justify-center p-8 sm:p-12 lg:col-span-7 lg:min-h-[34rem] lg:p-16",
+          asset.darkPreview ? "bg-charcoal text-ivory" : "bg-warm-sand/42 text-charcoal",
+          reversed && "lg:order-1",
         )}
       >
         <Image
@@ -18,25 +41,10 @@ export function AssetCard({ asset, index }: { asset: BrandAsset; index: number }
           alt={`${asset.name} preview`}
           width={asset.width}
           height={asset.height}
-          className="max-h-64 w-full object-contain"
-          priority={index < 2}
+          sizes="(min-width: 1024px) 58vw, 100vw"
+          className="max-h-72 w-full object-contain lg:max-h-96"
+          unoptimized
         />
-      </div>
-      <div className="grid gap-7 p-7 sm:grid-cols-[1fr_auto] sm:items-end sm:p-9">
-        <div>
-          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-earth-ink">
-            Asset {String(index + 1).padStart(2, "0")}
-          </p>
-          <h2 className="mt-4 font-serif text-3xl leading-none sm:text-4xl">{asset.name}</h2>
-          <p className="mt-5 max-w-2xl text-sm leading-7 text-ink-soft">{asset.description}</p>
-        </div>
-        <Link
-          href={asset.href}
-          download
-          className="inline-flex w-fit items-center gap-2 rounded-full border border-charcoal/20 px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] transition-colors hover:bg-charcoal hover:text-ivory"
-        >
-          <Download className="size-4" aria-hidden="true" /> SVG
-        </Link>
       </div>
     </article>
   );

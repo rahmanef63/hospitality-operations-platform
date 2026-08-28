@@ -4,6 +4,7 @@ export type {
   ContentRepository,
   DayRhythm,
   EditorialItem,
+  GalleryItem,
   HomeContent,
   NavigationItem,
   PropertyContent,

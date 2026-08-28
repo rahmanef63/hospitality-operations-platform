@@ -7,6 +7,17 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     formats: ["image/avif", "image/webp"],
+    qualities: [75],
+  },
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.kamynaliving.com" }],
+        destination: "https://kamynaliving.com/:path*",
+        permanent: true,
+      },
+    ];
   },
   async headers() {
     return [
@@ -19,6 +30,18 @@ const nextConfig = {
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
           { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
           { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" }
+        ]
+      },
+      {
+        source: "/media/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }
+        ]
+      },
+      {
+        source: "/brand/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }
         ]
       }
     ];

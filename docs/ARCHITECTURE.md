@@ -40,3 +40,23 @@ Cross-slice imports must use each slice barrel. Shared dependencies come from `s
 ## Deployment
 
 The Dockerfile uses a dependency, builder, and non-root runtime stage. `/api/health` is used by the container health check and deployment verification.
+
+
+## Media pipeline
+
+Image metadata, alt text, dimensions, captions, and responsive variants have one source of truth in `shared/media/`. Original generated concepts and social cards live under `public/media/kamyna/`; LCP hero surfaces use pre-sized WebP `srcset` variants to avoid runtime transformation latency, while non-critical editorial images remain lazy-loaded through `next/image`.
+
+Generated property visuals are direction-setting concepts, not evidence of a completed property. Every guest-facing concept image is paired with a visible disclosure until verified photography is supplied.
+
+## Search architecture
+
+Search and sharing surfaces are owned by the App Router rather than duplicated in page components:
+
+- root and route-specific metadata, canonical URLs, English plus `x-default` alternates;
+- permanent `www` to apex redirect;
+- Google verification through `Metadata.verification`;
+- `robots.txt`, image-aware `sitemap.xml`, and PWA manifest;
+- static social cards;
+- linked Organization, WebSite, Brand, CollectionPage, Accommodation, ItemList, ImageObject, and BreadcrumbList structured data.
+
+Schema deliberately avoids addresses, amenities, offers, ratings, and availability until those facts are confirmed.

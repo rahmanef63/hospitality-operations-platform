@@ -27,9 +27,10 @@
 ## UI and accessibility
 
 - Mobile-first, keyboard-accessible, reduced-motion safe, and semantic.
-- Use `next/link` for internal navigation and `next/image` for raster/SVG image elements.
+- Use `next/link` for internal navigation and `next/image` for non-critical raster/SVG elements. A pre-generated responsive `<img srcset>` is allowed only for a measured LCP hero and must remain typed through `shared/media/`.
 - Do not invent property photography, amenities, addresses, or booking availability.
 - Preserve the quiet editorial system: ivory, warm sand, taupe, muted brown, olive, charcoal.
+- Preserve route-level metadata, canonical URLs, structured data, sitemap image discovery, and exact Google verification coverage when adding pages.
 
 ## Verification
 

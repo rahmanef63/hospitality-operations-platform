@@ -1,45 +1,38 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
-import { BrandLockup, BotanicalMark } from "@/shared/brand";
+import { BrandLockup } from "@/shared/brand";
 import type { PropertyContent } from "@/shared/content";
+import { ResponsiveHeroImage } from "@/shared/media";
 
 export function PropertyHero({ property }: { property: PropertyContent }) {
   return (
-    <section className="relative overflow-hidden border-b border-charcoal/10 bg-ivory">
-      <div className="page-shell py-10 sm:py-14">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.17em] text-charcoal/75 transition-colors hover:text-charcoal"
-        >
-          <ArrowLeft className="size-4" aria-hidden="true" /> Back to the collection
-        </Link>
-      </div>
-      <div className="page-shell grid min-h-[calc(100svh-10rem)] items-center gap-14 pb-16 lg:grid-cols-[.92fr_1.08fr] lg:gap-24 lg:pb-24">
-        <div>
-          <p className="eyebrow text-earth-ink">{property.collectionLabel}</p>
-          <h1 className="text-balance mt-7 font-serif text-[clamp(4rem,9vw,8.5rem)] leading-[0.83] tracking-[-0.05em]">
-            {property.heroStatement}
-          </h1>
-          <p className="mt-9 max-w-xl text-base leading-8 text-ink-soft">{property.shortDescription}</p>
-          <a
-            href={property.primaryAction.href}
-            className="group mt-10 inline-flex items-center gap-3 rounded-full bg-charcoal px-7 py-4 text-xs font-semibold uppercase tracking-[0.16em] text-ivory transition-colors hover:bg-muted-brown"
-          >
-            {property.primaryAction.label}
-            <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
-          </a>
-        </div>
+    <section className="relative min-h-[calc(100dvh-4.5rem)] overflow-hidden bg-charcoal text-ivory">
+      <ResponsiveHeroImage asset={property.heroImage} />
+      <div className="hero-scrim absolute inset-0" aria-hidden="true" />
 
-        <div className="surface-grain soft-shadow relative mx-auto aspect-[4/5] w-full max-w-2xl overflow-hidden rounded-[2rem] bg-warm-sand">
-          <div className="absolute inset-x-[7%] bottom-[-18%] h-[88%] rounded-t-[50%] border border-charcoal/20 bg-taupe/55" />
-          <div className="absolute inset-x-[18%] bottom-[-8%] h-[69%] rounded-t-[50%] border border-charcoal/15 bg-ivory/75" />
-          <BotanicalMark className="absolute right-8 top-8 size-32 rotate-12 text-earth-ink/20" />
-          <div className="absolute inset-x-8 top-[30%] flex justify-center">
-            <BrandLockup kind="property" />
+      <div className="page-shell relative z-10 flex min-h-[calc(100dvh-4.5rem)] flex-col justify-between py-8 sm:py-10 lg:py-12">
+        <Link href="/" className="w-fit editorial-link text-ivory/82">
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          Back to the collection
+        </Link>
+
+        <div className="grid items-end gap-12 lg:grid-cols-[1.25fr_.75fr]">
+          <div>
+            <p className="kicker text-warm-sand">{property.collectionLabel}</p>
+            <h1 className="text-balance mt-6 max-w-4xl font-serif text-[clamp(4rem,8.5vw,8rem)] leading-[0.83] tracking-[-0.045em]">
+              {property.heroStatement}
+            </h1>
+            <p className="text-pretty mt-8 max-w-xl text-base leading-8 text-ivory/78">{property.shortDescription}</p>
+            <a href={property.primaryAction.href} className="cta-solid cta-solid-light mt-9">
+              {property.primaryAction.label}
+              <ArrowUpRight className="size-4" aria-hidden="true" />
+            </a>
           </div>
-          <div className="absolute inset-x-8 bottom-8 flex items-center justify-between border-t border-charcoal/15 pt-5 text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-charcoal/75 sm:inset-x-12 sm:bottom-12">
-            <span>{property.status}</span>
-            <span>Kamyna 01</span>
+
+          <div className="flex flex-col items-start gap-6 lg:items-end lg:text-right">
+            <BrandLockup kind="property" compact inverse />
+            <p className="text-sm text-ivory/68">{property.status}</p>
+            <p className="image-caption max-w-xs text-ivory/58">{property.visualNote}</p>
           </div>
         </div>
       </div>

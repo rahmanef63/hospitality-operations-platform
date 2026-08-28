@@ -28,3 +28,8 @@ Do not stretch, rotate, outline, recolor arbitrarily, add shadows, or rebuild th
 - `botanical-mark.svg`: supporting emblem.
 - `botanical-pattern.svg`: repeating surface.
 - `favicon.svg` and `icons/*`: digital compact marks.
+
+
+## Photography and concepts
+
+Generated interiors establish material, light, and composition direction only. Do not present them as documentary property photography. Keep the visual-concept disclosure visible until each image is replaced with an approved real photograph, then update the centralized media record rather than hardcoding a replacement inside JSX.

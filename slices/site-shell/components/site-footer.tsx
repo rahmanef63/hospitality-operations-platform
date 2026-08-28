@@ -1,36 +1,41 @@
 import Link from "next/link";
-import { BrandLockup, BotanicalMark } from "@/shared/brand";
+import { ArrowUpRight } from "lucide-react";
+import { BotanicalMark, BrandLockup } from "@/shared/brand";
+import { COPYRIGHT_YEAR } from "@/shared/config/site";
 import type { SiteFooterProps } from "../types";
 
 export function SiteFooter({ footer }: SiteFooterProps) {
   return (
     <footer className="border-t border-ivory/10 bg-charcoal text-ivory">
-      <div className="page-shell grid gap-14 py-16 lg:grid-cols-[1.3fr_.7fr] lg:py-20">
+      <div className="page-shell grid gap-16 py-16 lg:grid-cols-[1.3fr_.7fr] lg:gap-24 lg:py-24">
         <div>
           <BrandLockup compact inverse />
-          <p className="mt-8 max-w-md font-serif text-3xl leading-tight text-ivory/90 sm:text-4xl">
+          <p className="text-balance mt-10 max-w-3xl font-serif text-5xl leading-[0.95] tracking-[-0.025em] text-ivory/95 sm:text-6xl lg:text-7xl">
             {footer.statement}
           </p>
         </div>
-        <div className="grid content-between gap-12 sm:grid-cols-2 lg:grid-cols-1">
-          <nav aria-label="Footer navigation" className="grid gap-3">
+
+        <div className="flex flex-col justify-between gap-14 border-t border-ivory/15 pt-7 lg:border-l lg:border-t-0 lg:pl-12 lg:pt-0">
+          <nav aria-label="Footer navigation" className="grid gap-1">
             {footer.links.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="w-fit text-sm text-ivory/70 transition-colors hover:text-ivory"
+                className="group flex items-center justify-between border-b border-ivory/12 py-4 text-sm text-ivory/72 transition-colors hover:text-ivory"
               >
                 {item.label}
+                <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
               </Link>
             ))}
           </nav>
-          <BotanicalMark className="size-16 text-warm-sand/75" />
+          <BotanicalMark className="size-16 text-warm-sand/70" />
         </div>
       </div>
+
       <div className="border-t border-ivory/10">
-        <div className="page-shell flex flex-col gap-2 py-6 text-xs text-ivory/60 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {footer.legal}</p>
-          <p>return to stillness</p>
+        <div className="page-shell flex flex-col gap-3 py-6 text-xs text-ivory/55 sm:flex-row sm:items-center sm:justify-between">
+          <p>© {COPYRIGHT_YEAR} {footer.legal}</p>
+          <p className="lowercase tracking-[0.18em]">return to stillness</p>
         </div>
       </div>
     </footer>

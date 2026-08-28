@@ -7,7 +7,9 @@ Location-neutral hospitality website for the Kamyna collection, with **Ruma Kamy
 - Next.js 16 App Router, React 19, Tailwind CSS 4, strict TypeScript.
 - Static content repository; no database, auth, or booking backend is active.
 - Multi-property data model ready for a future Convex/CMS adapter.
-- Production SVG logos, favicon, Apple touch icon, and PWA icons.
+- Production SVG logos, favicon, Apple touch icon, PWA icons, and an editorial image system with responsive WebP derivatives.
+- Per-route metadata, canonical/hreflang links, XML sitemap with image discovery, robots rules, structured data, social cards, and Google Search Console verification.
+- Taste-skill design guidance installed project-locally for future anti-slop UI reviews.
 - Docker standalone build for Dokploy.
 - Domain target: `kamynaliving.com`.
 
@@ -42,13 +44,14 @@ npm run build
 
 ## Content editing
 
-Static content lives in `shared/content/config/`. Components consume typed props through `shared/content/repository.ts`; they do not import individual copy files directly.
+Static content lives in `shared/content/config/`. Components consume typed props through `shared/content/repository.ts`; they do not import individual copy files directly. Media metadata is centralized in `shared/media/`, while optimized source files live under `public/media/kamyna/`. Generated property imagery is explicitly labeled as a visual concept until real photography replaces it.
 
 To add a property now:
 
 1. Add one `PropertyContent` record to `shared/content/config/properties.ts`.
 2. Add any property-specific brand assets under `public/brand/`.
-3. Run `npm run verify`.
+3. Add confirmed location and operational details only when they are factual.
+4. Run `npm run verify`.
 
 The route is generated from the property slug automatically.
 

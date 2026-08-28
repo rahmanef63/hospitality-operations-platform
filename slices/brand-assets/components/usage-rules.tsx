@@ -9,20 +9,24 @@ const rules = [
 
 export function UsageRules() {
   return (
-    <section className="mt-20 grid gap-12 rounded-[2rem] bg-charcoal p-8 text-ivory sm:p-12 lg:grid-cols-[.65fr_1.35fr] lg:p-16">
-      <div>
-        <p className="eyebrow text-warm-sand">Identity rule</p>
-        <BotanicalMark className="mt-10 size-20 text-warm-sand/75" />
-      </div>
-      <div>
-        <h2 className="text-balance font-serif text-5xl leading-none sm:text-7xl">One identity. Many places.</h2>
-        <div className="mt-10 divide-y divide-ivory/15 border-y border-ivory/15">
-          {rules.map((rule, index) => (
-            <div key={rule} className="grid gap-4 py-6 sm:grid-cols-[3rem_1fr]">
-              <span className="text-xs text-warm-sand/75">0{index + 1}</span>
-              <p className="text-sm leading-7 text-ivory/65">{rule}</p>
-            </div>
-          ))}
+    <section className="mt-24 border-y border-ivory/12 bg-charcoal text-ivory lg:mt-32">
+      <div className="grid gap-14 p-8 sm:p-12 lg:grid-cols-[.58fr_1.42fr] lg:gap-20 lg:p-16">
+        <div className="flex flex-col justify-between">
+          <p className="kicker text-warm-sand">Identity rule</p>
+          <BotanicalMark className="mt-16 size-20 text-warm-sand/72" />
+        </div>
+        <div>
+          <h2 className="text-balance font-serif text-6xl leading-[0.9] tracking-[-0.04em] sm:text-8xl">
+            One identity. Many places.
+          </h2>
+          <div className="mt-12 border-y border-ivory/15">
+            {rules.map((rule, index) => (
+              <div key={rule} className="grid gap-5 border-b border-ivory/15 py-7 last:border-b-0 sm:grid-cols-[4rem_1fr] sm:py-9">
+                <span className="font-serif text-3xl text-warm-sand/55">0{index + 1}</span>
+                <p className="max-w-2xl text-sm leading-7 text-ivory/68 sm:text-base sm:leading-8">{rule}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -1,56 +1,68 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { BrandLockup, BotanicalMark } from "@/shared/brand";
+import { BrandLockup } from "@/shared/brand";
 import type { CollectionSectionProps } from "../types";
 
 export function CollectionSection({ content, properties }: CollectionSectionProps) {
   const property = properties[0];
-  if (!property) return null;
+  const primaryImage = content.images[0];
+  const secondaryImage = content.images[1];
+  if (!property || !primaryImage || !secondaryImage) return null;
+
   return (
     <section id="stays" className="section-pad bg-ivory">
       <div className="page-shell">
-        <div className="grid gap-8 border-b border-charcoal/15 pb-10 md:grid-cols-[.7fr_1.3fr] md:items-end">
-          <p className="eyebrow text-earth-ink">{content.eyebrow}</p>
-          <div>
-            <h2 className="text-balance font-serif text-5xl leading-none tracking-[-0.03em] sm:text-7xl">{content.title}</h2>
-            <p className="mt-6 max-w-2xl text-sm leading-7 text-ink-soft sm:text-base">{content.description}</p>
-          </div>
+        <div className="max-w-4xl">
+          <h2 className="text-balance font-serif text-6xl leading-[0.9] tracking-[-0.035em] sm:text-8xl">
+            {content.title}
+          </h2>
+          <p className="text-pretty mt-7 max-w-2xl text-base leading-8 text-ink-soft">{content.description}</p>
         </div>
 
-        <article className="mt-12 grid overflow-hidden rounded-[2rem] border border-charcoal/10 bg-paper lg:grid-cols-[1.08fr_.92fr]">
-          <div className="surface-grain relative min-h-[32rem] overflow-hidden bg-warm-sand p-8 sm:p-12 lg:min-h-[44rem]">
-            <div className="absolute inset-x-[10%] bottom-[-22%] h-[78%] rounded-t-[50%] border border-charcoal/20 bg-taupe/30" />
-            <div className="absolute inset-x-[20%] bottom-[-10%] h-[58%] rounded-t-[50%] border border-charcoal/15 bg-ivory/65" />
-            <BotanicalMark className="absolute left-10 top-10 size-24 -rotate-12 text-earth-ink/25" />
-            <div className="absolute inset-x-8 top-[31%] flex justify-center sm:inset-x-12">
-              <BrandLockup kind="property" />
+        <article className="relative mt-14 pb-0 lg:pb-28">
+          <figure>
+            <div className="image-frame aspect-[16/10] lg:aspect-[16/9]">
+              <Image
+                src={primaryImage.src}
+                alt={primaryImage.alt}
+                fill
+                sizes="(min-width: 1024px) 90vw, 100vw"
+                className="object-cover"
+              />
             </div>
-            <span className="absolute bottom-8 left-8 text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-charcoal/75 sm:bottom-12 sm:left-12">
-              Collection 01
-            </span>
-          </div>
+            <figcaption className="image-caption mt-3 lg:w-1/2">{primaryImage.caption}</figcaption>
+          </figure>
 
-          <div className="flex flex-col justify-between p-8 sm:p-12 lg:p-16">
-            <div>
-              <div className="flex items-center justify-between gap-6">
-                <p className="eyebrow text-earth-ink">{property.status}</p>
-                <span className="font-serif text-4xl text-charcoal/60">01</span>
-              </div>
-              <h3 className="mt-12 font-serif text-5xl leading-none sm:text-7xl">{property.name}</h3>
-              <p className="mt-8 max-w-xl text-base leading-8 text-ink-soft">{property.shortDescription}</p>
+          <div className="relative z-10 mt-6 bg-charcoal p-7 text-ivory sm:p-10 lg:absolute lg:bottom-0 lg:left-[5%] lg:mt-0 lg:w-[54%] lg:p-12">
+            <div className="flex flex-wrap items-start justify-between gap-6">
+              <p className="text-sm text-warm-sand">{property.status}</p>
+              <span className="font-serif text-4xl text-ivory/50">01</span>
             </div>
-            <div className="mt-16 border-t border-charcoal/15 pt-8">
-              <Link
-                href={`/stays/${property.slug}`}
-                className="group inline-flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.18em]"
-              >
+            <div className="mt-10">
+              <BrandLockup kind="property" compact inverse />
+              <h3 className="text-balance mt-8 font-serif text-5xl leading-[0.92] tracking-[-0.025em] sm:text-6xl">
+                {property.heroStatement}
+              </h3>
+              <p className="mt-7 max-w-xl text-sm leading-7 text-ivory/68 sm:text-base">{property.shortDescription}</p>
+              <Link href={`/stays/${property.slug}`} className="editorial-link mt-9 text-ivory">
                 Discover the stay
-                <span className="flex size-10 items-center justify-center rounded-full border border-charcoal/20 transition-colors group-hover:bg-charcoal group-hover:text-ivory">
-                  <ArrowUpRight className="size-4" aria-hidden="true" />
-                </span>
+                <ArrowUpRight className="size-4" aria-hidden="true" />
               </Link>
             </div>
           </div>
+
+          <figure className="mt-6 lg:absolute lg:bottom-0 lg:right-[4%] lg:z-20 lg:mt-0 lg:w-[27%]">
+            <div className="image-frame aspect-[4/5] border-[0.6rem] border-ivory lg:border-[0.8rem]">
+              <Image
+                src={secondaryImage.src}
+                alt={secondaryImage.alt}
+                fill
+                sizes="(min-width: 1024px) 28vw, 100vw"
+                className="object-cover"
+              />
+            </div>
+          </figure>
         </article>
       </div>
     </section>
