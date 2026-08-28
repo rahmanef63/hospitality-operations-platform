@@ -43,7 +43,7 @@ export function WelcomePage({ locale, content, contactHref, contactLabel }: Welc
 
         <footer className="flex flex-wrap items-end justify-between gap-6 border-t border-ivory/15 pt-7">
           <p className="font-serif text-2xl italic text-warm-sand">{content.signature}</p>
-          <p className="text-xs leading-6 text-ivory/45">Private guest page · not indexed</p>
+          <p className="text-xs leading-6 text-ivory/65">Private guest page · not indexed</p>
         </footer>
       </div>
     </main>
