@@ -22,7 +22,10 @@ function sameOrigin(request: NextRequest): boolean {
 }
 
 function redirectTo(request: NextRequest, path: string) {
-  return NextResponse.redirect(new URL(path, request.nextUrl.origin), 303);
+  const origin = process.env.NODE_ENV === "production"
+    ? getAdminRuntimeConfig().siteOrigin
+    : request.nextUrl.origin;
+  return NextResponse.redirect(new URL(path, origin), 303);
 }
 
 export async function POST(request: NextRequest) {
