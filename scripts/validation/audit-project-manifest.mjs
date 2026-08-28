@@ -12,7 +12,7 @@ const expected = {
   framework: "next-16",
   sliceRoot: "slices",
   publicRoute: "app/(marketing)",
-  auth: "none",
+  auth: "env-cookie",
 };
 
 if (manifest.framework !== expected.framework) errors.push(`framework must be ${expected.framework}`);
@@ -20,7 +20,14 @@ if (manifest.layout?.kind !== "vertical-slice") errors.push("layout.kind must be
 if (manifest.layout?.sliceRoot !== expected.sliceRoot) errors.push(`sliceRoot must be ${expected.sliceRoot}`);
 if (manifest.layout?.publicRoute !== expected.publicRoute) errors.push(`publicRoute must be ${expected.publicRoute}`);
 if (manifest.auth?.provider !== expected.auth) errors.push(`auth.provider must be ${expected.auth}`);
-if ("convex" in manifest) errors.push("convex metadata must be absent until database activation");
+if (manifest.convex?.mode !== "cloud") errors.push("convex.mode must be cloud");
+if (manifest.convex?.urlEnv !== "NEXT_PUBLIC_CONVEX_URL") errors.push("convex.urlEnv must be NEXT_PUBLIC_CONVEX_URL");
+if (manifest.convex?.generatedDir !== "convex/_generated") errors.push("convex.generatedDir must be convex/_generated");
+for (const file of ["api.d.ts", "api.js", "dataModel.d.ts", "server.d.ts", "server.js"]) {
+  if (!existsSync(path.join(repo, "convex/_generated", file))) errors.push(`missing Convex generated file ${file}`);
+}
+if (manifest.auth?.session !== "signed-http-only-cookie") errors.push("auth.session must be signed-http-only-cookie");
+if (manifest.auth?.loginRateLimit !== "convex-cloud") errors.push("auth.loginRateLimit must be convex-cloud");
 
 const aliases = {
   components: "@/components",
@@ -52,4 +59,4 @@ if (errors.length) {
   errors.forEach((error) => console.error(`  · ${error}`));
   process.exit(1);
 }
-console.log(`✓ audit-project-manifest: ${folders.length} slices, static auth/data metadata aligned`);
+console.log(`✓ audit-project-manifest: ${folders.length} slices, Convex Cloud and env-cookie auth metadata aligned`);

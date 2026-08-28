@@ -26,3 +26,4 @@ jobs:
       - run: npm run build
         env:
           NEXT_PUBLIC_SITE_URL: https://kamynaliving.com
+          NEXT_PUBLIC_CONVEX_URL: https://example.convex.cloud

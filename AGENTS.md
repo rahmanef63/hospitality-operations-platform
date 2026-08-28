@@ -2,38 +2,37 @@
 
 ## Non-negotiable
 
-- Keep core brand assets and collection identity copy location-neutral. Property pages and route SEO may use only owner-verified location facts.
-- Do not add Convex, auth, CMS, forms, or a booking backend until explicitly requested.
-- Never place secrets in `NEXT_PUBLIC_*`, source files, logs, or git history.
-- Do not use compatibility placeholders, re-export-only legacy files, or duplicate SSOTs.
+- Keep core brand assets and collection identity copy location-neutral. Property pages and route SEO may use only owner-verified facts.
+- Never place credentials, deploy keys, session secrets, or Convex admin secrets in `NEXT_PUBLIC_*`, browser components, logs, command arguments, Docker build arguments, or git history.
+- Do not invent property photography, amenities, room counts, capacity, addresses, coordinates, prices, travel times, policies, or availability.
+- Do not use compatibility placeholders, re-export-only legacy files, or duplicate sources of truth.
 - Do not deep-import another slice. Import only through its `index.ts` barrel.
 
 ## Architecture
 
-- Next.js 16 + React 19 + Tailwind 4.
-- Consumer vertical slices live at `slices/<slug>/`.
-- Every slice owns `slice.json`, `slice.manifest.json`, `types.ts`, and `index.ts`.
-- Shared brand primitives live in `shared/brand/`.
-- Shared content types and repository adapters live in `shared/content/`.
-- Static copy belongs in `shared/content/config/`, never inside JSX.
-- Portable components receive URLs and copy through props.
+- Next.js 16 + React 19 + Tailwind 4 frontend on Dokploy.
+- Convex Cloud is active only for guest welcome content, admin rate limiting, and audit history.
+- Consumer vertical slices live at `slices/<slug>/`; every slice owns `slice.json`, `slice.manifest.json`, `types.ts`, and `index.ts`.
+- Static public copy remains in `shared/content/config/` and is consumed through the repository boundary.
+- Welcome validation and defaults live in `shared/welcome/`; server authentication lives in `shared/admin/`; Next-to-Convex access lives in `shared/convex/`.
+- Commit `convex/_generated/`. Regenerate it whenever Convex functions or schema change.
 
-## Modularity
+## Security
 
-- Keep source files at or below 280 lines; aim for 200 lines or less.
-- Extract meaningful components, config, utilities, and types instead of creating forwarding files.
-- Delete obsolete files and update all imports when refactoring.
+- Public Convex functions must be read-only and intentionally exposed. Admin reads and mutations must remain internal.
+- Protected Convex HTTP actions must authorize inside the handler before calling internal functions.
+- Every admin mutation also requires the signed Next.js session.
+- Admin cookies stay HttpOnly, Secure in production, SameSite=Lax, path `/`, and bounded in lifetime.
+- Login failure counters must remain atomic and distributed in Convex; never replace them with process memory.
+- Sanitize guest names and validate all welcome content before storage and rendering.
 
-## UI and accessibility
+## Modularity and UI
 
-- Mobile-first, keyboard-accessible, reduced-motion safe, and semantic.
-- Use `next/link` for internal navigation and `next/image` for non-critical raster/SVG elements. A pre-generated responsive `<img srcset>` is allowed only for a measured LCP hero and must remain typed through `shared/media/`.
-- Do not invent property photography, amenities, addresses, coordinates, map URLs, phone numbers, travel times, or booking availability.
-- Preserve the quiet editorial system: ivory, warm sand, taupe, muted brown, olive, charcoal.
-- Keep mobile section shells edge-to-edge. Apply `content-inset` only to readable copy, controls, and captions rather than restoring a global mobile gutter.
-- Scroll effects must use CSS scroll timelines or an isolated, cleaned-up motion leaf; never React state, `scrollY`, or an unbounded scroll listener. Every motion path must honor `prefers-reduced-motion`.
-- Avoid decorative section numbering, numbered mobile navigation, scroll cues, and em-dash-heavy microcopy.
-- Preserve route-level metadata, canonical URLs, structured data, sitemap image discovery, exact Google verification coverage, and draft-guide noindex rules when adding pages.
+- Keep source files at or below 280 lines; aim for 200 or fewer.
+- Mobile-first, keyboard-accessible, semantic, and reduced-motion safe.
+- Preserve the quiet editorial palette and typography without applying marketing scroll effects to operational forms.
+- Use `next/link` for internal navigation and `next/image` for non-critical editorial media.
+- Keep route metadata, canonical URLs, structured data, sitemap image discovery, Google verification, and guide noindex behavior intact.
 
 ## Verification
 
@@ -47,4 +46,4 @@ npm run test
 npm run build
 ```
 
-A task is not complete until the live domain, HTTPS, health endpoint, responsive layout, and exact deployed revision are independently verified.
+For Convex changes, deploy the backend first, verify Cloud health and protected actions, then deploy the exact frontend revision. Completion requires production authentication, endpoint, draft/publish, responsive UI, health, and exact revision verification.

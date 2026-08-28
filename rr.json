@@ -53,6 +53,18 @@
       "version": "1.0.0",
       "category": "editorial",
       "addedAt": "2026-08-28"
+    },
+    {
+      "slug": "welcome",
+      "version": "1.0.0",
+      "category": "guest-experience",
+      "addedAt": "2026-08-28"
+    },
+    {
+      "slug": "admin",
+      "version": "1.0.0",
+      "category": "operations",
+      "addedAt": "2026-08-28"
     }
   ],
   "skills": [
@@ -64,6 +76,17 @@
     }
   ],
   "auth": {
-    "provider": "none"
+    "provider": "env-cookie",
+    "session": "signed-http-only-cookie",
+    "loginRateLimit": "convex-cloud"
+  },
+  "convex": {
+    "mode": "cloud",
+    "urlEnv": "NEXT_PUBLIC_CONVEX_URL",
+    "generatedDir": "convex/_generated",
+    "domains": [
+      "welcome",
+      "adminSecurity"
+    ]
   }
 }

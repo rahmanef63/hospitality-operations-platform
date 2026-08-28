@@ -1,31 +1,28 @@
 # Kamyna Living
 
-Multi-property hospitality website for the Kamyna collection, with **Ruma Kamyna** in Megamendung, Puncak Bogor as the first verified property location. Core identity assets remain location-neutral.
+Multi-property hospitality website for the Kamyna collection, with **Ruma Kamyna** in Megamendung, Puncak Bogor as the first verified property. Core identity assets remain location-neutral.
 
-## Current scope
+## Runtime
 
 - Next.js 16 App Router, React 19, Tailwind CSS 4, strict TypeScript.
-- Static content repository; no database, auth, or booking backend is active.
-- Multi-property data model ready for a future Convex/CMS adapter.
-- Production SVG logos, favicon, Apple touch icon, PWA icons, and an editorial image system with responsive WebP derivatives.
-- Location-aware route metadata, canonical/hreflang links, image sitemap, robots rules, structured data, social cards, and Google Search Console verification.
-- A truthful Ruma Kamyna `LodgingBusiness` graph connected to the collection `Organization`.
-- Configurable WhatsApp, official Google Maps embed, street address, and coordinates that remain absent until verified values are supplied.
-- Taste-skill design guidance installed project-locally for anti-slop UI reviews.
-- Edge-to-edge mobile composition with safe copy insets, native scroll timelines, a global progress line, sticky ritual storytelling, section parallax, and reduced-motion fallbacks.
-- Docker standalone build for Dokploy.
-- Domain target: `kamynaliving.com`.
+- Static content repository for the public marketing and property pages.
+- Convex Cloud for localized guest-welcome publishing, login throttling, and admin audit events.
+- Signed server-only admin session using an HttpOnly cookie.
+- Docker standalone frontend on Dokploy; managed Convex Cloud backend.
+- Location-aware SEO, canonical/hreflang links, image sitemap, structured data, social cards, and Google verification.
 
 ## Routes
 
 | Route | Purpose |
 |---|---|
 | `/` | Kamyna Living collection homepage |
-| `/stays/ruma-kamyna` | Ruma Kamyna property detail route |
-| `/brand-assets` | Separate production asset downloads |
-| `/guides/getting-to-megamendung-from-jakarta` | Noindex arrival-guide scaffold |
-| `/guides/things-to-do-near-puncak` | Noindex local-guide scaffold |
-| `/guides/planning-a-slow-stay-in-megamendung` | Noindex stay-planning scaffold |
+| `/stays/ruma-kamyna` | Ruma Kamyna property detail |
+| `/brand-assets` | Production identity downloads |
+| `/guides/*` | Noindex local-guide scaffolds |
+| `/welcome` | Personalized, private guest welcome page |
+| `/api/welcome` | GET/POST JSON welcome endpoint |
+| `/admin/login` | Admin sign-in |
+| `/admin` | Draft, preview, publish, and activity dashboard |
 | `/api/health` | Deployment health probe |
 
 ## Local development
@@ -35,6 +32,24 @@ npm install --legacy-peer-deps
 cp .env.example .env.local
 npm run dev
 ```
+
+Required public runtime variables:
+
+```env
+NEXT_PUBLIC_SITE_URL=https://kamynaliving.com
+NEXT_PUBLIC_CONVEX_URL=https://<deployment>.convex.cloud
+```
+
+Admin credentials and inter-service authorization are server-only:
+
+```env
+KAMYNA_ADMIN_EMAIL=
+KAMYNA_ADMIN_PASSWORD=
+KAMYNA_ADMIN_SESSION_SECRET=
+KAMYNA_CONVEX_ADMIN_SECRET=
+```
+
+`CONVEX_DEPLOY_KEY` is used only by deployment tooling. It must never be placed in browser code or Docker build arguments.
 
 ## Quality gates
 
@@ -46,50 +61,20 @@ npm run test
 npm run build
 ```
 
-`npm run verify` runs architecture audits, typecheck, lint, tests, and the production build. The project also enforces a 280-line source-file cap, slice metadata pairs, stack pins, internal navigation rules, and location-neutral core identity assets.
+`npm run verify` runs all gates. The repository enforces a 280-line source-file cap, complete slice metadata, committed Convex bindings, stack pins, internal navigation rules, and location-neutral core identity assets.
 
-## Content editing
+## Content authority
 
-Static content lives in `shared/content/config/`. Components consume typed props through `shared/content/repository.ts`; they do not import individual copy files directly. Media metadata is centralized in `shared/media/`, while optimized source files live under `public/media/kamyna/`. Generated property imagery is explicitly labeled as a visual concept until real photography replaces it.
+- `shared/content/config/`: public static marketing, property, and draft-guide content.
+- `shared/media/`: all editorial image metadata and responsive variants.
+- `convex/`: welcome drafts/publication, admin rate limiting, and audit events.
+- `shared/welcome/`: framework-independent validation, defaults, and personalization.
+- `shared/admin/`: server-only credentials and signed session helpers.
 
-To add a property now:
-
-1. Add one `PropertyContent` record to `shared/content/config/properties.ts`.
-2. Add property-specific media and metadata under `shared/media/` and `public/media/`.
-3. Add confirmed location and operational details only when they are factual.
-4. Add any local guides in draft mode with `indexable: false`.
-5. Run `npm run verify`.
-
-The property and guide routes are generated from their slugs automatically.
-
-## Verified property configuration
-
-Ruma Kamyna currently publishes only its confirmed locality-level address. Optional public contact and map values are build-time configuration:
-
-```env
-RUMA_KAMYNA_STREET_ADDRESS=
-RUMA_KAMYNA_WHATSAPP_NUMBER=
-RUMA_KAMYNA_GOOGLE_MAPS_EMBED_URL=
-RUMA_KAMYNA_LATITUDE=
-RUMA_KAMYNA_LONGITUDE=
-```
-
-The WhatsApp value must use country-code digits only. The map value must be an official Google Maps embed URL from the verified Business Profile. Coordinates must come from that same verified profile. Set these values as Docker build arguments in Dokploy and redeploy. See `docs/RUMA-KAMYNA-CONTENT-TODO.md` for every field still awaiting confirmation.
-
-## Database later
-
-The `ContentRepository` interface is the stable boundary. A future database adapter can implement the same methods and replace `StaticContentRepository` without changing page or slice components. See `docs/DATABASE-READINESS.md`.
+Generated property imagery remains explicitly labeled as a visual concept. Unverified room, capacity, facility, pricing, and policy facts remain listed in `docs/RUMA-KAMYNA-CONTENT-TODO.md`.
 
 ## Deployment
 
-Deployment is orchestrated through the trusted `/sc-all` workflow:
+Use the `/sc-all` hybrid topology: Convex Cloud backend plus Dokploy frontend. The backend is deployed through `sc-convex-cloud`; the frontend deployment must preserve every existing Dokploy environment value and copy only public/build-time values into Docker build arguments.
 
-```bash
-node ~/projects/opensource/si-coder-agent/scripts/deploy.js \
-  --project "Kamyna Living" \
-  --app "kamyna-living" \
-  --domain "kamynaliving.com" \
-  --target dokploy
-```
-
-Secrets are read from the managed environment and must never be added to the repository or command arguments.
+See `docs/GUEST-WELCOME-ADMIN.md` and `docs/ARCHITECTURE.md` for the security and publishing model.

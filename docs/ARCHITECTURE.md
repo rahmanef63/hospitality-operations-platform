@@ -2,23 +2,18 @@
 
 ## Runtime
 
-Kamyna Living is currently a static-first Next.js application deployed as a standalone Node service. It intentionally has no active database or authentication surface.
-
-## Data flow
+Kamyna Living is a Next.js 16 standalone application on Dokploy with a managed Convex Cloud backend. The public marketing site remains static-first; only the guest-welcome and admin operational surfaces use Convex.
 
 ```text
-shared/content/config/*
-        ↓
-StaticContentRepository
-        ↓
-cache-aware repository functions
-        ↓
-App Router pages
-        ↓
-vertical slices receiving typed props
+shared/content/config/*              convex/*
+        ↓                               ↓
+StaticContentRepository       Convex Cloud functions/tables
+        ↓                               ↓
+marketing/property pages       server-only admin + welcome adapter
+        └────────────── Next.js App Router ──────────────┘
 ```
 
-JSX components never reach into individual content files. This keeps presentation independent from the future storage provider.
+This split preserves the reliable static public site while allowing one narrowly scoped operational feature to be edited without a code deployment.
 
 ## Brand hierarchy
 
@@ -26,52 +21,42 @@ JSX components never reach into individual content files. This keeps presentatio
 - **Ruma Kamyna**: first property identity.
 - **return to stillness**: shared brand idea.
 
-Core identity files do not contain addresses or location labels. Property location data can later live in property records and appear only where context requires it.
+Core identity assets remain location-neutral. Verified location and contact facts live only in the Ruma Kamyna property configuration.
 
 ## Slice boundaries
 
-- `site-shell`: global navigation and footer.
+- `site-shell`: public navigation and footer.
 - `home`: collection homepage sections.
 - `property`: reusable property storytelling route.
 - `brand-assets`: downloadable production identity files.
-- `guides`: location-aware editorial routes that remain noindex until facts are verified.
+- `guides`: location-aware drafts that remain noindex until verified.
+- `welcome`: private guest-facing welcome experience.
+- `admin`: authenticated guest-experience editor and activity view.
 
-Cross-slice imports must use each slice barrel. Shared dependencies come from `shared/*` or `components/ui/*`.
+Cross-slice imports use each slice barrel. Shared authentication, Convex adapters, and welcome-domain validation live under `shared/*`.
 
-## Deployment
+## Convex Cloud boundary
 
-The Dockerfile uses a dependency, builder, and non-root runtime stage. `/api/health` is used by the container health check and deployment verification.
+The active backend owns:
 
+- localized welcome drafts and published messages;
+- atomic login-failure windows and lockouts;
+- bounded admin publishing history.
 
-## Media pipeline
+Public clients can call only `welcome.getPublished`. Admin functions are declared `internalQuery` or `internalMutation` and are invoked by Convex HTTP actions after an Authorization-header check against a server-only deployment secret. Next.js never sends the deploy key or admin password to Convex or the browser.
 
-Image metadata, alt text, dimensions, captions, and responsive variants have one source of truth in `shared/media/`. Original generated concepts and social cards live under `public/media/kamyna/`; LCP hero surfaces use pre-sized WebP `srcset` variants to avoid runtime transformation latency, while non-critical editorial images remain lazy-loaded through `next/image`.
+Generated bindings in `convex/_generated/` are committed. Docker builds receive only `NEXT_PUBLIC_CONVEX_URL`; `CONVEX_DEPLOY_KEY` stays outside the image.
 
-Generated property visuals are direction-setting concepts, not evidence of a completed property. Every guest-facing concept image is paired with a visible disclosure until verified photography is supplied.
+## Admin session boundary
 
-## Search architecture
+Admin credentials are read only by Next.js server code. Credentials are compared using fixed-length SHA-256 digests and timing-safe equality. A successful login produces a signed 12-hour HttpOnly cookie. Mutating Server Actions require that session and Convex independently authorizes the downstream HTTP action.
 
-Search and sharing surfaces are owned by the App Router rather than duplicated in page components:
+## Media and search
 
-- root and route-specific metadata, canonical URLs, English plus `x-default` alternates;
-- permanent `www` to apex redirect;
-- Google verification through `Metadata.verification`;
-- `robots.txt`, image-aware `sitemap.xml`, and PWA manifest;
-- static social cards;
-- linked Organization, WebSite, Brand, CollectionPage, LodgingBusiness, ItemList, ImageObject, and BreadcrumbList structured data.
+Image metadata, dimensions, captions, responsive variants, and alt text have one source of truth in `shared/media/`. Generated property visuals keep their visible concept disclosure until verified photography is supplied.
 
-The Ruma Kamyna LodgingBusiness schema includes only the confirmed Megamendung locality, Jawa Barat region, postal code, and country. Street address, coordinates, telephone, and map URL are conditional and appear only when owner-verified build configuration is supplied. Amenities, offers, ratings, room counts, and availability remain omitted.
-
+Search surfaces remain route-owned: canonical metadata, Google verification, image sitemap, robots rules, social cards, and the linked Organization/WebSite/Brand/LodgingBusiness graph. Admin and guest-welcome routes are deliberately excluded from the sitemap and marked noindex.
 
 ## Responsive composition and motion
 
-Mobile section shells are intentionally full-bleed. The reusable `content-inset` utility is applied only to copy, controls, and captions that need a readable or safe-area-aware inset; photography, color fields, galleries, and structural borders may reach the viewport edge. Tablet and desktop shells return to the bounded 90rem container.
-
-Motion is progressive enhancement built with native CSS scroll timelines. Key hierarchy blocks reveal through restrained transforms, selected background images use restrained parallax, the mobile ritual sequence forms a true sticky stack, and the header carries a scroll-progress line. No React scroll state, `window.scrollY`, or unbounded scroll listener is used. Every effect collapses to static content under `prefers-reduced-motion`.
-
-
-## Verified property integrations
-
-`shared/config/ruma-kamyna.ts` validates the optional WhatsApp number, official Google Maps embed URL, street address, and coordinates. The static property record consumes that one configuration source for visible contact UI and JSON-LD. Blank or invalid values are omitted rather than replaced with estimates. Because public pages are prerendered, Dokploy must pass these values as Docker build arguments and redeploy.
-
-Area-guide scaffolds are generated from `shared/content/config/guides.ts`. They are linked internally but excluded from the sitemap and marked `noindex` until `indexable` is explicitly enabled after editorial verification.
+Marketing pages remain full-bleed on mobile with restrained native CSS scroll timelines and reduced-motion fallbacks. Admin and welcome slices use the same brand tokens but avoid decorative motion that could interfere with editing, authentication, or guest readability.

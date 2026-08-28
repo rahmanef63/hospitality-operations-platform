@@ -4,14 +4,14 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const roots = ["app", "slices", "shared"];
+const roots = ["app", "convex", "slices", "shared"];
 const errors = [];
 
 function walk(directory) {
   if (!existsSync(directory)) return [];
   return readdirSync(directory).flatMap((name) => {
     const entry = path.join(directory, name);
-    if (name.startsWith(".") || name === "node_modules") return [];
+    if (name.startsWith(".") || name === "node_modules" || name === "_generated") return [];
     return statSync(entry).isDirectory() ? walk(entry) : [entry];
   });
 }

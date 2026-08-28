@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const cap = 280;
-const roots = ["app", "slices", "shared", "components", "lib", "scripts", "tests"];
+const roots = ["app", "convex", "slices", "shared", "components", "lib", "scripts", "tests"];
 const extensions = /\.(ts|tsx|mjs|css)$/;
 const errors = [];
 let scanned = 0;
@@ -13,7 +13,7 @@ let scanned = 0;
 function walk(directory) {
   if (!existsSync(directory)) return [];
   return readdirSync(directory).flatMap((name) => {
-    if (["node_modules", ".next", "coverage"].includes(name) || name.startsWith(".")) return [];
+    if (["node_modules", ".next", "coverage", "_generated"].includes(name) || name.startsWith(".")) return [];
     const entry = path.join(directory, name);
     return statSync(entry).isDirectory() ? walk(entry) : [entry];
   });

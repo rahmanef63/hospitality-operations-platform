@@ -1,0 +1,13 @@
+{
+  "slug": "admin",
+  "name": "Kamyna guest experience admin",
+  "version": "1.0.0",
+  "category": "operations",
+  "description": "Authenticated dashboard for drafting and publishing guest welcome content.",
+  "contract": {
+    "inputs": ["WelcomeAdminOverview", "Admin session", "Server action"],
+    "outputs": ["AdminLoginPage", "AdminDashboard"],
+    "portable": true,
+    "hardcodedUrls": []
+  }
+}
