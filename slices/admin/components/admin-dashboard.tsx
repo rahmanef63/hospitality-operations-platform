@@ -85,7 +85,7 @@ export function AdminDashboard({
           <div className="bg-paper p-6 sm:p-8">
             <ExternalLink className="size-5 text-olive" aria-hidden="true" />
             <p className="kicker mt-7 text-umber">Public endpoint</p>
-            <a href={endpointUrl} target="_blank" rel="noreferrer" className="mt-2 block break-all font-mono text-sm underline underline-offset-4">
+            <a href={endpointUrl} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-11 items-center break-all font-mono text-sm underline underline-offset-4">
               {endpointUrl}
             </a>
             <p className="mt-3 text-xs leading-6 text-ink-soft">GET or POST JSON with optional name and locale.</p>
