@@ -60,7 +60,7 @@ describe("search and sharing surfaces", () => {
   it("ships complete PWA and social image metadata", () => {
     const webManifest = manifest();
     expect(webManifest.start_url).toBe("/");
-    expect(webManifest.icons).toHaveLength(3);
+    expect(webManifest.icons).toHaveLength(5);
     for (const src of Object.values(socialImages)) expect(existsSync(absolutePath(src))).toBe(true);
   });
 

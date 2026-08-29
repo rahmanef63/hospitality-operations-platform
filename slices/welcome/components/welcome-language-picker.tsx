@@ -4,11 +4,12 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { WELCOME_LOCALE_OPTIONS, getWelcomeLocaleMeta, type WelcomeLocale } from "@/shared/welcome";
 
-export function WelcomeLanguagePicker({ locale, token, guestName, propertySlug }: {
+export function WelcomeLanguagePicker({ locale, token, guestName, propertySlug, tvMode }: {
   locale: WelcomeLocale;
   token?: string;
   guestName?: string;
   propertySlug?: string;
+  tvMode?: boolean;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -19,6 +20,7 @@ export function WelcomeLanguagePicker({ locale, token, guestName, propertySlug }
     if (token) params.set("token", token);
     else if (guestName) params.set("name", guestName);
     if (!token && propertySlug) params.set("property", propertySlug);
+    if (tvMode) params.set("tv", "1");
     startTransition(() => router.replace(`/welcome?${params}`));
   }
 

@@ -8,8 +8,10 @@ import {
   SITE_URL,
 } from "@/shared/config/site";
 import { socialImages } from "@/shared/media";
+import { PwaManager } from "@/features/site-shell";
 import { buildGlobalSchema, JsonLd } from "@/shared/seo";
 import "./globals.css";
+import "./welcome-presentation.css";
 
 const serif = Cormorant_Garamond({
   subsets: ["latin"],
@@ -99,6 +101,10 @@ export const metadata: Metadata = {
     title: SITE_NAME,
     statusBarStyle: "black-translucent",
   },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "msapplication-TileColor": "#2D2B27",
+  },
 };
 
 export const viewport: Viewport = {
@@ -119,6 +125,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           Skip to content
         </a>
         <JsonLd data={buildGlobalSchema()} />
+        <PwaManager />
         {children}
       </body>
     </html>

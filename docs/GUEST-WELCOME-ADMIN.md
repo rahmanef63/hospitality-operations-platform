@@ -78,3 +78,9 @@ KAMYNA_AI_ENCRYPTION_KEY=
 ```
 
 Both values must be strong random secrets of at least 32 characters. They belong only in the Dokploy runtime environment, never in Docker build arguments, client bundles, Git, or Convex documents. Rotating the guest-link secret invalidates previously shared links. Rotating the AI encryption key requires re-entering the BYOK API key.
+
+## TV presentation
+
+Every reservation-linked welcome row includes a TV mode action. It preserves the encrypted token and appends `tv=1`, which starts the slideshow while keeping the guest context server-authoritative. Fullscreen remains an explicit browser gesture. The presentation never adds unverified property facts and keeps the visual-concept disclosure visible.
+
+The same page exposes install guidance for compatible phone, desktop, and TV browsers. Details are documented in `docs/PWA-TV.md`.

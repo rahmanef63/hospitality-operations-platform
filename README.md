@@ -9,6 +9,7 @@ Multi-property hospitality website and homestay-management system for the Kamyna
 - Convex Cloud for properties, units, amenities, guests, reservations, availability, finance, tasks, 20-language welcome publishing, encrypted BYOK AI metadata, login throttling, and audit history.
 - Signed server-only single-admin session using an HttpOnly cookie.
 - Docker standalone frontend on Dokploy; managed Convex Cloud backend.
+- Installable PWA with a bounded service worker, offline fallback, TV welcome slideshow, fullscreen controls, and explicit version-restart flow.
 - Location-aware SEO, canonical/hreflang links, image sitemap, structured data, social cards, and Google verification.
 
 ## Routes
@@ -19,7 +20,7 @@ Multi-property hospitality website and homestay-management system for the Kamyna
 | `/stays/ruma-kamyna` | Dynamic Ruma Kamyna property detail |
 | `/brand-assets` | Production identity downloads |
 | `/guides/*` | Noindex local-guide scaffolds |
-| `/welcome` | Personalized private guest welcome page |
+| `/welcome` | Personalized private guest welcome page and TV slideshow (`?tv=1`) |
 | `/api/welcome` | GET/POST welcome endpoint |
 | `/api/concierge` | Verified-information guest concierge endpoint |
 | `/admin/login` | Admin sign-in |
@@ -34,6 +35,8 @@ Multi-property hospitality website and homestay-management system for the Kamyna
 | `/admin/tasks` | Housekeeping and operations tasks |
 | `/admin/welcome` | Reservation-linked 20-language welcome workflow |
 | `/admin/ai` | Encrypted BYOK provider settings and draft translation |
+| `/offline` | Public offline fallback cached by the PWA |
+| `/sw.js` | Versioned service worker with app-owned cache cleanup |
 | `/api/health` | Deployment health probe |
 
 ## Local development
@@ -63,6 +66,16 @@ KAMYNA_AI_ENCRYPTION_KEY=
 ```
 
 `CONVEX_DEPLOY_KEY` is deployment-only and must never enter browser code or Docker build arguments.
+
+## PWA and TV presentation
+
+- The manifest uses a stable app identity, fullscreen-to-standalone fallback, phone/TV-safe orientation, 1024 px launcher assets, screenshots, and shortcuts.
+- Private welcome links expose **TV mode** from the admin. The slideshow supports fullscreen, remote/keyboard navigation, wake lock, safe-area layout, and reduced-motion fallback.
+- The service worker never caches admin, API, or tokenized private welcome responses. It caches only public shell/media assets and `/offline`.
+- A waiting worker triggers a persistent restart toast. Restart activates the new worker, removes only obsolete `kamyna-pwa-*` caches, then reloads once under the new controller.
+- Browser and TV operating-system install support varies. Compatible browsers receive a native Install action; unsupported browsers receive manual Add to Home screen guidance.
+
+See `docs/PWA-TV.md` for the complete lifecycle and verification contract.
 
 ## Navigation and concierge
 

@@ -22,11 +22,17 @@
     "publicRoute": "app/(marketing)",
     "sliceRoot": "slices"
   },
-  "features": [],
+  "features": [
+    {
+      "slug": "tv-pwa",
+      "version": "1.0.0",
+      "description": "Fullscreen guest slideshow, install lifecycle, offline fallback, and version restart."
+    }
+  ],
   "slices": [
     {
       "slug": "site-shell",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "category": "navigation",
       "addedAt": "2026-08-28"
     },
@@ -62,7 +68,7 @@
     },
     {
       "slug": "welcome",
-      "version": "2.0.0",
+      "version": "1.2.0",
       "category": "guest-experience",
       "addedAt": "2026-08-28"
     },

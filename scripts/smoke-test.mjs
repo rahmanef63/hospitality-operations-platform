@@ -8,8 +8,13 @@ const pages = [
   "/guides/planning-a-slow-stay-in-megamendung",
   "/welcome?locale=id&name=Smoke",
   "/welcome?locale=ar&name=Smoke",
+  "/welcome?locale=id&name=Smoke&tv=1",
   "/admin/login",
   "/api/health",
+  "/offline",
+  "/sw.js",
+  "/manifest.webmanifest",
+  "/tv-manifest.webmanifest",
 ];
 
 for (const route of pages) {
@@ -17,6 +22,41 @@ for (const route of pages) {
   if (!response.ok) throw new Error(`${route} returned ${response.status}`);
   console.log(`✓ ${route} ${response.status}`);
 }
+
+const serviceWorkerResponse = await fetch(`${target}/sw.js`, { cache: "no-store" });
+const serviceWorkerSource = await serviceWorkerResponse.text();
+if (!serviceWorkerResponse.ok || !serviceWorkerSource.includes("KAMYNA_SKIP_WAITING")) {
+  throw new Error("/sw.js did not expose the expected update lifecycle.");
+}
+if (!serviceWorkerResponse.headers.get("service-worker-allowed")?.includes("/")) {
+  throw new Error("/sw.js is missing root scope permission.");
+}
+console.log(`✓ /sw.js update lifecycle ${serviceWorkerResponse.status}`);
+
+const manifestResponse = await fetch(`${target}/manifest.webmanifest`, { cache: "no-store" });
+const webManifest = await manifestResponse.json();
+if (!manifestResponse.ok || webManifest.id !== "/" || !webManifest.display_override?.includes("fullscreen")) {
+  throw new Error("/manifest.webmanifest is missing fullscreen PWA metadata.");
+}
+for (const asset of [...(webManifest.icons ?? []), ...(webManifest.screenshots ?? [])]) {
+  const response = await fetch(`${target}${asset.src}`);
+  if (!response.ok) throw new Error(`PWA asset ${asset.src} returned ${response.status}`);
+}
+console.log(`✓ /manifest.webmanifest install metadata ${manifestResponse.status}`);
+
+const tvManifestResponse = await fetch(`${target}/tv-manifest.webmanifest`, { cache: "no-store" });
+const tvManifest = await tvManifestResponse.json();
+if (!tvManifestResponse.ok || tvManifest.id !== "/welcome-tv" || tvManifest.start_url !== "/welcome?tv=1" || tvManifest.display !== "fullscreen") {
+  throw new Error("/tv-manifest.webmanifest is missing TV install metadata.");
+}
+console.log(`✓ /tv-manifest.webmanifest TV identity ${tvManifestResponse.status}`);
+
+const tvWelcomeResponse = await fetch(`${target}/welcome?locale=id&name=Smoke&tv=1`);
+const tvWelcomeHtml = await tvWelcomeResponse.text();
+for (const marker of ["TV slideshow controls", "Fullscreen", "Pause"]) {
+  if (!tvWelcomeHtml.includes(marker)) throw new Error(`TV welcome is missing ${marker}`);
+}
+console.log(`✓ /welcome TV slideshow ${tvWelcomeResponse.status}`);
 
 const propertyResponse = await fetch(`${target}/stays/ruma-kamyna`);
 const propertyHtml = await propertyResponse.text();

@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Eye, History, LoaderCircle, RotateCcw, Save, UserRound } from "lucide-react";
+import { Check, Eye, History, LoaderCircle, MonitorPlay, RotateCcw, Save, UserRound } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import {
@@ -125,7 +125,13 @@ export function WelcomeEditor({ config, propertySlug, propertyName, formAction, 
             <p className="mt-12 font-serif text-5xl leading-[.92] tracking-[-.03em]">{preview.headline}</p>
             <p className="mt-7 max-w-md whitespace-pre-line text-sm leading-8 text-ivory/75">{preview.body}</p>
           </div>
-          <div><p className="font-serif text-xl italic text-warm-sand">{preview.signature}</p><a href={`${previewUrl}?locale=${config.locale}&name=${encodeURIComponent(sampleName)}&property=${encodeURIComponent(propertySlug)}`} target="_blank" rel="noreferrer" className="editorial-link mt-7 text-ivory">Buka guest view</a></div>
+          <div>
+            <p className="font-serif text-xl italic text-warm-sand">{preview.signature}</p>
+            <div className="mt-7 flex flex-wrap gap-5">
+              <a href={`${previewUrl}?locale=${config.locale}&name=${encodeURIComponent(sampleName)}&property=${encodeURIComponent(propertySlug)}`} target="_blank" rel="noreferrer" className="editorial-link text-ivory">Buka guest view</a>
+              <a href={`${previewUrl}?locale=${config.locale}&name=${encodeURIComponent(sampleName)}&property=${encodeURIComponent(propertySlug)}&tv=1`} target="_blank" rel="noreferrer" className="editorial-link text-ivory"><MonitorPlay className="size-4" aria-hidden="true" />TV mode</a>
+            </div>
+          </div>
         </aside>
       </form>
     </article>

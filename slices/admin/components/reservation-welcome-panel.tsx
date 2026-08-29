@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Check, Copy, ExternalLink, MessageCircle } from "lucide-react";
+import { Check, Copy, ExternalLink, MessageCircle, MonitorPlay } from "lucide-react";
 import { useState } from "react";
 import { WELCOME_LOCALE_META, type ReservationWelcomeLink } from "@/shared/welcome";
 
@@ -10,6 +10,12 @@ function whatsappHref(phone: string | undefined, link: ReservationWelcomeLink) {
   if (!/^\d{8,15}$/.test(digits)) return undefined;
   const message = `Halo ${link.guestName}, berikut sambutan privat untuk masa inap Anda di ${link.propertyName}: ${link.url}`;
   return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+}
+
+function tvHref(value: string) {
+  const url = new URL(value);
+  url.searchParams.set("tv", "1");
+  return url.toString();
 }
 
 export function ReservationWelcomePanel({ links, linkError }: {
@@ -46,6 +52,7 @@ export function ReservationWelcomePanel({ links, linkError }: {
                   <Link href={`/admin/reservations#reservation-${link.reservationId}`} className="inline-flex min-h-11 items-center rounded-[.35rem] border border-charcoal/12 px-3 text-xs font-semibold hover:border-olive">Reservasi</Link>
                   <button type="button" onClick={() => copy(link)} className="inline-flex min-h-11 items-center gap-2 rounded-[.35rem] border border-charcoal/12 px-3 text-xs font-semibold hover:border-olive">{copied === link.reservationId ? <Check className="size-4 text-olive" aria-hidden="true" /> : <Copy className="size-4" aria-hidden="true" />}{copied === link.reservationId ? "Tersalin" : "Salin link"}</button>
                   {whatsapp ? <a href={whatsapp} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-[.35rem] border border-charcoal/12 px-3 text-xs font-semibold hover:border-olive"><MessageCircle className="size-4" aria-hidden="true" />WhatsApp</a> : null}
+                  <a href={tvHref(link.url)} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-[.35rem] border border-charcoal/12 px-3 text-xs font-semibold hover:border-olive"><MonitorPlay className="size-4" aria-hidden="true" />TV mode</a>
                   <a href={link.url} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-[.35rem] bg-charcoal px-3 text-xs font-semibold text-ivory"><ExternalLink className="size-4" aria-hidden="true" />Buka</a>
                 </div>
               </article>
