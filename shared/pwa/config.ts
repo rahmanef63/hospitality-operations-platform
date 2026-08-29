@@ -1,11 +1,13 @@
 export const PWA_BUILD_VERSION = process.env.NEXT_PUBLIC_BUILD_VERSION ?? "development";
 export const PWA_CACHE_PREFIX = "kamyna-pwa";
 export const PWA_OFFLINE_URL = "/offline";
+export const PWA_PRESENTATION_URL = "/presentation?tv=1";
 
 export const PWA_PRECACHE_URLS = [
   PWA_OFFLINE_URL,
+  PWA_PRESENTATION_URL,
   "/manifest.webmanifest",
-  "/tv-manifest.webmanifest",
+  "/presentation.webmanifest",
   "/favicon.svg",
   "/icons/icon-192.png",
   "/icons/icon-512.png",

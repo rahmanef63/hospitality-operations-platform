@@ -47,7 +47,7 @@ const nextConfig = {
         ],
       },
       {
-        source: "/:manifest(manifest|tv-manifest).webmanifest",
+        source: "/:manifest(manifest|presentation).webmanifest",
         headers: [{ key: "Cache-Control", value: "no-cache, max-age=0, must-revalidate" }],
       },
       {
@@ -58,7 +58,7 @@ const nextConfig = {
         ],
       },
       {
-        source: "/welcome",
+        source: "/:privatePage(welcome|presentation)",
         headers: [
           { key: "Cache-Control", value: "private, no-store" },
           { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },

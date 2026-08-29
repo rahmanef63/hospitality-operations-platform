@@ -81,6 +81,6 @@ Both values must be strong random secrets of at least 32 characters. They belong
 
 ## TV presentation
 
-Every reservation-linked welcome row includes a TV mode action. It preserves the encrypted token and appends `tv=1`, which starts the slideshow while keeping the guest context server-authoritative. Fullscreen remains an explicit browser gesture. The presentation never adds unverified property facts and keeps the visual-concept disclosure visible.
+Every reservation-linked welcome row includes a TV mode action. It preserves the encrypted token but opens the dedicated `/presentation` endpoint, which starts the slideshow while keeping the guest context server-authoritative. The standard `/welcome` page remains unchanged. Fullscreen remains an explicit browser gesture. The presentation never adds unverified property facts and keeps the visual-concept disclosure visible.
 
 The same page exposes install guidance for compatible phone, desktop, and TV browsers. Details are documented in `docs/PWA-TV.md`.

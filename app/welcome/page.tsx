@@ -8,14 +8,13 @@ import { resolveGuestWelcomeRequest } from "@/shared/welcome/resolve";
 
 export const metadata: Metadata = {
   title: "Welcome to Kamyna Living",
-  manifest: "/tv-manifest.webmanifest",
   description: "A private welcome for guests of Kamyna Living.",
   robots: { index: false, follow: false, noarchive: true, googleBot: { index: false, follow: false } },
 };
 export const instant = false;
 
 export default async function Page({ searchParams }: {
-  searchParams: Promise<{ locale?: string; name?: string; token?: string; property?: string; tv?: string }>;
+  searchParams: Promise<{ locale?: string; name?: string; token?: string; property?: string }>;
 }) {
   const params = await searchParams;
   const resolved = await resolveGuestWelcomeRequest(params);
@@ -42,7 +41,6 @@ export default async function Page({ searchParams }: {
       token={resolved.token}
       contactHref={contactHref}
       contactLabel={meta.contactLabel}
-      tvMode={params.tv === "1"}
     />
   );
 }

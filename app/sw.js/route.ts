@@ -3,6 +3,7 @@ import {
   PWA_CACHE_PREFIX,
   PWA_OFFLINE_URL,
   PWA_PRECACHE_URLS,
+  PWA_PRESENTATION_URL,
 } from "@/shared/pwa/config";
 
 
@@ -11,6 +12,7 @@ function serviceWorkerSource() {
     version: PWA_BUILD_VERSION,
     cachePrefix: PWA_CACHE_PREFIX,
     offlineUrl: PWA_OFFLINE_URL,
+    presentationUrl: PWA_PRESENTATION_URL,
     precacheUrls: PWA_PRECACHE_URLS,
   });
 
@@ -67,7 +69,7 @@ self.addEventListener("message", (event) => {
 function isPrivateRequest(url) {
   return url.pathname.startsWith("/admin")
     || url.pathname.startsWith("/api")
-    || (url.pathname === "/welcome" && url.searchParams.has("token"));
+    || (["/welcome", "/presentation"].includes(url.pathname) && url.searchParams.has("token"));
 }
 
 function isCacheableAsset(pathname) {
@@ -79,13 +81,19 @@ function isCacheableAsset(pathname) {
     || pathname === "/favicon.svg"
     || pathname === "/favicon.ico"
     || pathname === "/apple-touch-icon.png"
-    || pathname === "/manifest.webmanifest";
+    || pathname === "/manifest.webmanifest"
+    || pathname === "/presentation.webmanifest";
 }
 
 async function networkFirstNavigation(request) {
   try {
     return await fetch(request);
   } catch {
+    const url = new URL(request.url);
+    if (url.pathname === "/presentation" && !url.searchParams.has("token")) {
+      const presentation = await caches.match(CONFIG.presentationUrl);
+      if (presentation) return presentation;
+    }
     return (await caches.match(CONFIG.offlineUrl)) || Response.error();
   }
 }

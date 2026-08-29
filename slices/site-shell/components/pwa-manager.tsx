@@ -71,7 +71,7 @@ export function PwaManager() {
       event.preventDefault();
       if (!isInstalledMode()) {
         installPromptRef.current = event as InstallPromptEvent;
-        const autoPromptAllowed = window.location.pathname !== "/welcome"
+        const autoPromptAllowed = !["/welcome", "/presentation"].includes(window.location.pathname)
           && !window.location.pathname.startsWith("/admin")
           && !document.querySelector("[data-kamyna-offline]");
         if (autoPromptAllowed) setInstallPrompt(event as InstallPromptEvent);

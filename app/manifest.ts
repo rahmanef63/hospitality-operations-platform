@@ -4,7 +4,7 @@ import { PWA_ICONS, PWA_SCREENSHOTS } from "@/shared/pwa/manifest-assets";
 
 type ExtendedManifest = MetadataRoute.Manifest & {
   id: string;
-  display_override: Array<"fullscreen" | "standalone" | "minimal-ui">;
+  display_override: Array<"standalone" | "minimal-ui">;
   handle_links: "preferred";
   launch_handler: { client_mode: Array<"navigate-existing" | "auto"> };
   screenshots: Array<{
@@ -27,9 +27,9 @@ export default function manifest(): ExtendedManifest {
     start_url: "/",
     scope: "/",
     display: "standalone",
-    display_override: ["fullscreen", "standalone", "minimal-ui"],
-    orientation: "any",
-    background_color: "#2D2B27",
+    display_override: ["standalone", "minimal-ui"],
+    orientation: "portrait-primary",
+    background_color: "#F3EFE8",
     theme_color: "#2D2B27",
     categories: ["travel", "lifestyle", "hospitality"],
     handle_links: "preferred",
@@ -39,10 +39,10 @@ export default function manifest(): ExtendedManifest {
     screenshots: [...PWA_SCREENSHOTS],
     shortcuts: [
       {
-        name: "Guest welcome · TV mode",
-        short_name: "TV Welcome",
-        description: "Open the fullscreen guest welcome slideshow.",
-        url: "/welcome?tv=1",
+        name: "Guest presentation · TV mode",
+        short_name: "Presentation",
+        description: "Open the fullscreen guest presentation.",
+        url: "/presentation?tv=1",
         icons: [{ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
       },
       {

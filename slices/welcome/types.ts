@@ -25,11 +25,14 @@ export type WelcomePageProps = {
   token?: string;
   contactHref: string;
   contactLabel: string;
+};
+
+export type WelcomePresentationProps = WelcomePageProps & {
   tvMode: boolean;
   slides: readonly WelcomePresentationSlide[];
 };
 
-export type WelcomeSlideProps = WelcomePageProps & {
+export type WelcomeSlideProps = WelcomePresentationProps & {
   slide: WelcomePresentationSlide;
   index: number;
   active: boolean;

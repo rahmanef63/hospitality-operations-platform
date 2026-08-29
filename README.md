@@ -20,7 +20,8 @@ Multi-property hospitality website and homestay-management system for the Kamyna
 | `/stays/ruma-kamyna` | Dynamic Ruma Kamyna property detail |
 | `/brand-assets` | Production identity downloads |
 | `/guides/*` | Noindex local-guide scaffolds |
-| `/welcome` | Personalized private guest welcome page and TV slideshow (`?tv=1`) |
+| `/welcome` | Personalized private guest welcome page |
+| `/presentation` | Dedicated fullscreen TV slideshow with reservation-aware guest context |
 | `/api/welcome` | GET/POST welcome endpoint |
 | `/api/concierge` | Verified-information guest concierge endpoint |
 | `/admin/login` | Admin sign-in |
@@ -70,7 +71,7 @@ KAMYNA_AI_ENCRYPTION_KEY=
 ## PWA and TV presentation
 
 - The manifest uses a stable app identity, fullscreen-to-standalone fallback, phone/TV-safe orientation, 1024 px launcher assets, screenshots, and shortcuts.
-- Private welcome links expose **TV mode** from the admin. The slideshow supports fullscreen, remote/keyboard navigation, wake lock, safe-area layout, and reduced-motion fallback.
+- Private welcome links expose **TV mode** from the admin, which opens the dedicated `/presentation` route. The regular `/welcome` page remains unchanged. The presentation supports fullscreen, remote/keyboard navigation, wake lock, safe-area layout, and reduced-motion fallback.
 - The service worker never caches admin, API, or tokenized private welcome responses. It caches only public shell/media assets and `/offline`.
 - A waiting worker triggers a persistent restart toast. Restart activates the new worker, removes only obsolete `kamyna-pwa-*` caches, then reloads once under the new controller.
 - Browser and TV operating-system install support varies. Compatible browsers receive a native Install action; unsupported browsers receive manual Add to Home screen guidance.

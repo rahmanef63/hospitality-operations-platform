@@ -3,7 +3,7 @@
 import { ChevronLeft, ChevronRight, Download, Maximize, Minimize, MonitorPlay, Pause } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getWelcomeLocaleMeta } from "@/shared/welcome";
-import type { WelcomePageProps } from "../types";
+import type { WelcomePresentationProps } from "../types";
 import { WelcomeLanguagePicker } from "./welcome-language-picker";
 import { WelcomeSlide } from "./welcome-slide";
 
@@ -21,7 +21,7 @@ function installedDisplayMode() {
     || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
 }
 
-export function WelcomePresentation(props: WelcomePageProps) {
+export function WelcomePresentation(props: WelcomePresentationProps) {
   const { locale, slides, tvMode } = props;
   const meta = getWelcomeLocaleMeta(locale);
   const rootRef = useRef<HTMLElement>(null);
@@ -171,7 +171,7 @@ export function WelcomePresentation(props: WelcomePageProps) {
 
       <header className="welcome-tv-topbar">
         <div><p className="kicker text-warm-sand">{props.propertyName}</p><p className="mt-2 text-[.62rem] tracking-[.16em] text-ivory/52 uppercase">return to stillness.</p></div>
-        <WelcomeLanguagePicker locale={locale} token={props.token} guestName={props.content.guestName} propertySlug={props.propertySlug} tvMode={tvMode} />
+        <WelcomeLanguagePicker locale={locale} token={props.token} guestName={props.content.guestName} propertySlug={props.propertySlug} tvMode={tvMode} routePath="/presentation" />
       </header>
 
       <div className="sr-only" aria-live="polite">Slide {active + 1} of {slides.length}</div>

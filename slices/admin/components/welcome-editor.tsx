@@ -53,6 +53,7 @@ export function WelcomeEditor({ config, propertySlug, propertyName, formAction, 
   const publishable = dirty || !sameContent(config.published, draft);
   const preview = useMemo(() => renderWelcomeContent(draft, config.locale, sampleName, propertyName), [config.locale, draft, propertyName, sampleName]);
   const localeLabel = meta.nativeLabel;
+  const presentationUrl = previewUrl.replace(/\/welcome$/, "/presentation");
 
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => {
@@ -129,7 +130,7 @@ export function WelcomeEditor({ config, propertySlug, propertyName, formAction, 
             <p className="font-serif text-xl italic text-warm-sand">{preview.signature}</p>
             <div className="mt-7 flex flex-wrap gap-5">
               <a href={`${previewUrl}?locale=${config.locale}&name=${encodeURIComponent(sampleName)}&property=${encodeURIComponent(propertySlug)}`} target="_blank" rel="noreferrer" className="editorial-link text-ivory">Buka guest view</a>
-              <a href={`${previewUrl}?locale=${config.locale}&name=${encodeURIComponent(sampleName)}&property=${encodeURIComponent(propertySlug)}&tv=1`} target="_blank" rel="noreferrer" className="editorial-link text-ivory"><MonitorPlay className="size-4" aria-hidden="true" />TV mode</a>
+              <a href={`${presentationUrl}?locale=${config.locale}&name=${encodeURIComponent(sampleName)}&property=${encodeURIComponent(propertySlug)}&tv=1`} target="_blank" rel="noreferrer" className="editorial-link text-ivory"><MonitorPlay className="size-4" aria-hidden="true" />TV mode</a>
             </div>
           </div>
         </aside>

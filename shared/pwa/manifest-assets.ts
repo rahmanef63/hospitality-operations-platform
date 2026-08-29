@@ -12,7 +12,7 @@ export const PWA_SCREENSHOTS = [
     sizes: "1280x720",
     type: "image/png",
     form_factor: "wide" as const,
-    label: "Kamyna guest welcome on a TV display",
+    label: "Kamyna Living collection on a wide display",
   },
   {
     src: "/pwa/screenshots/kamyna-narrow.png",
@@ -22,3 +22,11 @@ export const PWA_SCREENSHOTS = [
     label: "Kamyna Living on mobile",
   },
 ] as const;
+
+export const PWA_PRESENTATION_SCREENSHOT = {
+  src: "/pwa/screenshots/kamyna-presentation-wide.png",
+  sizes: "1280x720",
+  type: "image/png",
+  form_factor: "wide" as const,
+  label: "Ruma Kamyna guest presentation on a TV display",
+} as const;

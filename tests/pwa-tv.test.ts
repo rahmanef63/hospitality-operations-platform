@@ -2,43 +2,44 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import manifest from "@/app/manifest";
+import { GET as presentationManifestResponse } from "@/app/presentation.webmanifest/route";
 import { GET as serviceWorker } from "@/app/sw.js/route";
-import { GET as tvManifestResponse } from "@/app/tv-manifest.webmanifest/route";
 
 const root = process.cwd();
 const read = (file: string) => readFileSync(path.join(root, file), "utf8");
 
 describe("TV presentation and PWA lifecycle", () => {
-  it("publishes a fullscreen-capable install manifest with rich launcher metadata", () => {
+  it("keeps the main app mobile-oriented while publishing richer install metadata", () => {
     const value = manifest();
     expect(value.id).toBe("/");
     expect(value.start_url).toBe("/");
     expect(value.display).toBe("standalone");
-    expect(value.display_override).toEqual(["fullscreen", "standalone", "minimal-ui"]);
-    expect(value.orientation).toBe("any");
+    expect(value.display_override).toEqual(["standalone", "minimal-ui"]);
+    expect(value.orientation).toBe("portrait-primary");
     expect(value.icons).toHaveLength(5);
     expect(value.screenshots).toHaveLength(2);
-    expect(value.shortcuts?.some((shortcut) => shortcut.url === "/welcome?tv=1")).toBe(true);
+    expect(value.shortcuts?.some((shortcut) => shortcut.url === "/presentation?tv=1")).toBe(true);
     for (const screenshot of value.screenshots) {
       expect(existsSync(path.join(root, "public", screenshot.src.replace(/^\//, "")))).toBe(true);
     }
   });
 
-
-  it("publishes a dedicated landscape TV install identity from the welcome page", async () => {
-    const response = tvManifestResponse();
+  it("publishes the TV experience only at /presentation with its own landscape manifest", async () => {
+    const response = presentationManifestResponse();
     const value = await response.json();
     expect(response.headers.get("content-type")).toContain("application/manifest+json");
     expect(value).toMatchObject({
-      id: "/welcome-tv",
-      start_url: "/welcome?tv=1",
+      id: "/presentation",
+      start_url: "/presentation?tv=1",
       display: "fullscreen",
       orientation: "landscape",
     });
-    expect(read("app/welcome/page.tsx")).toContain('manifest: "/tv-manifest.webmanifest"');
+    expect(read("app/presentation/page.tsx")).toContain('manifest: "/presentation.webmanifest"');
+    expect(read("app/welcome/page.tsx")).not.toContain("PresentationPage");
+    expect(read("slices/welcome/components/welcome-page.tsx")).not.toContain("WelcomePresentation");
   });
 
-  it("serves a no-cache service worker with bounded app-owned cache cleanup", async () => {
+  it("serves a no-cache worker with bounded cleanup and private-route exclusions", async () => {
     const response = serviceWorker();
     const source = await response.text();
     expect(response.headers.get("cache-control")).toContain("no-store");
@@ -48,11 +49,13 @@ describe("TV presentation and PWA lifecycle", () => {
     expect(source).toContain('key.startsWith(CONFIG.cachePrefix + "-")');
     expect(source).toContain('url.pathname.startsWith("/admin")');
     expect(source).toContain('url.pathname.startsWith("/api")');
+    expect(source).toContain('["/welcome", "/presentation"].includes(url.pathname)');
     expect(source).toContain('url.searchParams.has("token")');
+    expect(source).toContain("CONFIG.presentationUrl");
     expect(source).not.toContain("localStorage.clear");
   });
 
-  it("prompts for a restart instead of silently mixing old and new builds", () => {
+  it("prompts before activating a new build and cleaning obsolete Kamyna caches", () => {
     const manager = read("slices/site-shell/components/pwa-manager.tsx");
     expect(manager).toContain("beforeinstallprompt");
     expect(manager).toContain("updatefound");
@@ -66,9 +69,9 @@ describe("TV presentation and PWA lifecycle", () => {
     expect(read("app/offline/page.tsx")).toContain("data-kamyna-offline");
   });
 
-  it("ships a remote-friendly slideshow with fullscreen, wake lock, and reduced-motion handling", () => {
+  it("ships /presentation with fullscreen, remote keys, wake lock, and reduced motion", () => {
     const presentation = read("slices/welcome/components/welcome-presentation.tsx");
-    const styles = read("app/welcome-presentation.css");
+    const styles = read("app/presentation.css");
     expect(presentation).toContain("requestFullscreen");
     expect(presentation).toContain("wakeLock");
     expect(presentation).toContain('"ArrowRight"');
@@ -76,9 +79,10 @@ describe("TV presentation and PWA lifecycle", () => {
     expect(presentation).toContain('event.key.toLowerCase() === "f"');
     expect(presentation).toContain("prefers-reduced-motion: reduce");
     expect(presentation).toContain("SLIDE_INTERVAL");
+    expect(presentation).toContain('routePath="/presentation"');
     expect(styles).toContain(".welcome-tv-root:fullscreen");
     expect(styles).toContain("min-aspect-ratio: 16/10");
-    expect(read("slices/admin/components/reservation-welcome-panel.tsx")).toContain("TV mode");
-    expect(read("slices/admin/components/welcome-editor.tsx")).toContain("TV mode");
+    expect(read("slices/admin/components/reservation-welcome-panel.tsx")).toContain('url.pathname = "/presentation"');
+    expect(read("slices/admin/components/welcome-editor.tsx")).toContain("presentationUrl");
   });
 });

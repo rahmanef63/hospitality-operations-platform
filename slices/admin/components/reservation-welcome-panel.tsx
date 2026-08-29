@@ -14,6 +14,7 @@ function whatsappHref(phone: string | undefined, link: ReservationWelcomeLink) {
 
 function tvHref(value: string) {
   const url = new URL(value);
+  url.pathname = "/presentation";
   url.searchParams.set("tv", "1");
   return url.toString();
 }

@@ -8,13 +8,13 @@ const pages = [
   "/guides/planning-a-slow-stay-in-megamendung",
   "/welcome?locale=id&name=Smoke",
   "/welcome?locale=ar&name=Smoke",
-  "/welcome?locale=id&name=Smoke&tv=1",
+  "/presentation?locale=id&name=Smoke&tv=1",
   "/admin/login",
   "/api/health",
   "/offline",
   "/sw.js",
   "/manifest.webmanifest",
-  "/tv-manifest.webmanifest",
+  "/presentation.webmanifest",
 ];
 
 for (const route of pages) {
@@ -35,8 +35,8 @@ console.log(`✓ /sw.js update lifecycle ${serviceWorkerResponse.status}`);
 
 const manifestResponse = await fetch(`${target}/manifest.webmanifest`, { cache: "no-store" });
 const webManifest = await manifestResponse.json();
-if (!manifestResponse.ok || webManifest.id !== "/" || !webManifest.display_override?.includes("fullscreen")) {
-  throw new Error("/manifest.webmanifest is missing fullscreen PWA metadata.");
+if (!manifestResponse.ok || webManifest.id !== "/" || webManifest.display !== "standalone" || !webManifest.shortcuts?.some((item) => item.url === "/presentation?tv=1")) {
+  throw new Error("/manifest.webmanifest is missing install metadata.");
 }
 for (const asset of [...(webManifest.icons ?? []), ...(webManifest.screenshots ?? [])]) {
   const response = await fetch(`${target}${asset.src}`);
@@ -44,19 +44,24 @@ for (const asset of [...(webManifest.icons ?? []), ...(webManifest.screenshots ?
 }
 console.log(`✓ /manifest.webmanifest install metadata ${manifestResponse.status}`);
 
-const tvManifestResponse = await fetch(`${target}/tv-manifest.webmanifest`, { cache: "no-store" });
-const tvManifest = await tvManifestResponse.json();
-if (!tvManifestResponse.ok || tvManifest.id !== "/welcome-tv" || tvManifest.start_url !== "/welcome?tv=1" || tvManifest.display !== "fullscreen") {
-  throw new Error("/tv-manifest.webmanifest is missing TV install metadata.");
+const presentationManifestResponse = await fetch(`${target}/presentation.webmanifest`, { cache: "no-store" });
+const presentationManifest = await presentationManifestResponse.json();
+if (!presentationManifestResponse.ok || presentationManifest.id !== "/presentation" || presentationManifest.start_url !== "/presentation?tv=1" || presentationManifest.display !== "fullscreen") {
+  throw new Error("/presentation.webmanifest is missing TV install metadata.");
 }
-console.log(`✓ /tv-manifest.webmanifest TV identity ${tvManifestResponse.status}`);
+console.log(`✓ /presentation.webmanifest TV identity ${presentationManifestResponse.status}`);
 
-const tvWelcomeResponse = await fetch(`${target}/welcome?locale=id&name=Smoke&tv=1`);
-const tvWelcomeHtml = await tvWelcomeResponse.text();
+const presentationResponse = await fetch(`${target}/presentation?locale=id&name=Smoke&tv=1`);
+const presentationHtml = await presentationResponse.text();
 for (const marker of ["TV slideshow controls", "Fullscreen", "Pause"]) {
-  if (!tvWelcomeHtml.includes(marker)) throw new Error(`TV welcome is missing ${marker}`);
+  if (!presentationHtml.includes(marker)) throw new Error(`/presentation is missing ${marker}`);
 }
-console.log(`✓ /welcome TV slideshow ${tvWelcomeResponse.status}`);
+console.log(`✓ /presentation TV slideshow ${presentationResponse.status}`);
+
+const regularWelcomeResponse = await fetch(`${target}/welcome?locale=id&name=Smoke`);
+const regularWelcomeHtml = await regularWelcomeResponse.text();
+if (regularWelcomeHtml.includes("TV slideshow controls")) throw new Error("/welcome unexpectedly renders the TV presentation.");
+console.log(`✓ /welcome remains the standard guest page ${regularWelcomeResponse.status}`);
 
 const propertyResponse = await fetch(`${target}/stays/ruma-kamyna`);
 const propertyHtml = await propertyResponse.text();

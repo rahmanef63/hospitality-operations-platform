@@ -11,7 +11,7 @@ import { socialImages } from "@/shared/media";
 import { PwaManager } from "@/features/site-shell";
 import { buildGlobalSchema, JsonLd } from "@/shared/seo";
 import "./globals.css";
-import "./welcome-presentation.css";
+import "./presentation.css";
 
 const serif = Cormorant_Garamond({
   subsets: ["latin"],

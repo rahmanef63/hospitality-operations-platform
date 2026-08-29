@@ -1,20 +1,12 @@
 {
   "slug": "welcome",
   "name": "Ruma Kamyna guest welcome",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "category": "guest-experience",
-  "description": "Private multilingual guest welcome with reservation context, TV slideshow, fullscreen, and remote-friendly controls.",
+  "description": "Private multilingual guest welcome plus a separate reservation-aware TV presentation endpoint.",
   "contract": {
-    "inputs": [
-      "RenderedWelcome",
-      "Contact link",
-      "TV presentation media",
-      "PWA install lifecycle"
-    ],
-    "outputs": [
-      "WelcomePage",
-      "WelcomePresentation"
-    ],
+    "inputs": ["RenderedWelcome", "Contact link", "TV presentation media", "PWA install lifecycle"],
+    "outputs": ["WelcomePage", "PresentationPage", "WelcomePresentation"],
     "portable": true,
     "hardcodedUrls": []
   }
