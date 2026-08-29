@@ -74,6 +74,7 @@ describe("multi-property PMS CRUD", () => {
     const guest = await t.mutation(internal.pms.guests.upsert, {
       fullName: "Test Guest",
       email: "guest@example.com",
+      preferredLocale: "ja",
       actorEmailHash,
     });
     await t.mutation(internal.pms.catalog.upsertProperty, {
@@ -141,7 +142,13 @@ describe("multi-property PMS CRUD", () => {
       currency: "IDR",
       paidAmount: 0,
       outstandingAmount: 1_550_000,
+      welcomeLocale: "ja",
+      guestPreferredLocale: "ja",
     });
+    const context = await t.query(internal.welcomeReservations.getContext, { reservationId: reservation.id });
+    expect(context).toMatchObject({ guestName: "Test Guest", propertyName: "Ruma Kamyna", locale: "ja" });
+    expect(context).not.toHaveProperty("totalAmount");
+    expect(context).not.toHaveProperty("notes");
     await t.mutation(internal.pms.reservations.archive, { id: reservation.id, actorEmailHash });
     await t.mutation(internal.pms.guests.archive, { id: guest.id, actorEmailHash });
     await expect(t.query(internal.pms.reservations.list, {})).resolves.toHaveLength(0);

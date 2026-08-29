@@ -18,8 +18,10 @@ import {
   unitStatusValidator,
   unitTypeValidator,
 } from "./pms/validators";
+import { welcomeLocaleValidator } from "./welcomeLocale";
+import { aiProviderValidator } from "./aiValidators";
 
-const locale = v.union(v.literal("id"), v.literal("en"));
+const locale = welcomeLocaleValidator;
 const timestamps = { createdAt: v.number(), updatedAt: v.number(), archived: v.boolean() };
 
 export default defineSchema({
@@ -30,13 +32,24 @@ export default defineSchema({
     publishedSignature: v.optional(v.string()), version: v.number(),
     updatedAt: v.number(), publishedAt: v.optional(v.number()),
   }).index("by_property_locale", ["propertySlug", "locale"]),
+  aiProviderSettings: defineTable({
+    scope: v.string(), provider: aiProviderValidator, model: v.string(), enabled: v.boolean(),
+    encryptedApiKey: v.optional(v.string()), keyFingerprint: v.optional(v.string()),
+    createdAt: v.number(), updatedAt: v.number(),
+  }).index("by_scope", ["scope"]),
+  aiAuditEvents: defineTable({
+    action: v.union(v.literal("save"), v.literal("test"), v.literal("translate")),
+    provider: v.optional(aiProviderValidator), targetCount: v.optional(v.number()),
+    actorEmailHash: v.string(), createdAt: v.number(),
+  }).index("by_created", ["createdAt"]),
+
   adminLoginAttempts: defineTable({
     fingerprint: v.string(), failures: v.number(), windowStartedAt: v.number(),
     lockedUntil: v.optional(v.number()), updatedAt: v.number(),
   }).index("by_fingerprint", ["fingerprint"]),
   adminAuditEvents: defineTable({
     propertySlug: v.string(), locale,
-    action: v.union(v.literal("seed"), v.literal("save"), v.literal("publish")),
+    action: v.union(v.literal("seed"), v.literal("save"), v.literal("publish"), v.literal("translate")),
     actorEmailHash: v.string(), version: v.number(), createdAt: v.number(),
   }).index("by_property_created", ["propertySlug", "createdAt"]),
 
@@ -69,7 +82,8 @@ export default defineSchema({
 
   guests: defineTable({
     fullName: v.string(), email: v.optional(v.string()), phone: v.optional(v.string()),
-    nationality: v.optional(v.string()), notes: v.optional(v.string()), ...timestamps,
+    nationality: v.optional(v.string()), preferredLocale: v.optional(locale),
+    notes: v.optional(v.string()), ...timestamps,
   }).index("by_archived", ["archived"]).index("by_email", ["email"]),
 
   reservations: defineTable({
@@ -79,7 +93,8 @@ export default defineSchema({
     adults: v.optional(v.number()), children: v.optional(v.number()), nightlyRate: v.optional(v.number()),
     accommodationAmount: v.optional(v.number()), extraFees: v.optional(v.number()),
     discountAmount: v.optional(v.number()), totalAmount: v.optional(v.number()),
-    currency: v.string(), notes: v.optional(v.string()), cancelledAt: v.optional(v.number()), ...timestamps,
+    currency: v.string(), welcomeLocale: v.optional(locale), notes: v.optional(v.string()),
+    cancelledAt: v.optional(v.number()), ...timestamps,
   }).index("by_reference", ["reference"]).index("by_property_checkin", ["propertyId", "checkIn"])
     .index("by_unit_checkin", ["unitId", "checkIn"]).index("by_guest_checkin", ["guestId", "checkIn"])
     .index("by_archived_checkin", ["archived", "checkIn"]),

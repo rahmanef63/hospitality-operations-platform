@@ -27,7 +27,8 @@ No bathroom count, guest capacity, rate, deposit, minimum stay, check-in time, c
 | `/admin/amenities` | Property facilities and public visibility |
 | `/admin/finance` | Payments, refunds, expenses, and reservation balances |
 | `/admin/tasks` | Housekeeping, maintenance, inspection, and guest requests |
-| `/admin/welcome` | Localized private welcome-message publishing |
+| `/admin/welcome` | Reservation-linked welcome links and 20-language publishing |
+| `/admin/ai` | Encrypted BYOK provider and draft-only auto-translation |
 
 All routes share the existing signed admin session and remain `noindex`. Desktop exposes them in a persistent grouped sidebar; mobile exposes primary modules in a safe-area dock and the remaining modules in a bounded “Lainnya” sheet.
 
@@ -41,8 +42,8 @@ The admin UI follows the implementation plan in `docs/ADMIN-UX-PLAN.md`. Relatio
 - `properties`: property identity, location, currency, optional facts, operational/publication state.
 - `units`: optional bookable inventory under a property. Bedroom count does not imply separate room inventory.
 - `amenities`: facilities with active, featured, and public-visible flags.
-- `guests`: private contact and service notes.
-- `reservations`: source, lifecycle status, dates, optional counts and amounts.
+- `guests`: private contact, preferred welcome language, and service notes.
+- `reservations`: source, lifecycle status, dates, selected welcome language, optional counts and amounts.
 - `availabilityBlocks`: owner use, maintenance, closure, or other blocked inventory.
 - `transactions`: payments, refunds, and expenses.
 - `tasks`: operational work linked to property, unit, or reservation.
@@ -81,3 +82,11 @@ The Convex admin secret is server-only, the deploy key is deployment-only, and n
 ## Public property facts
 
 The property page reads only active, published facts and amenities through the public read-only `pms.public.getProperty` query. If Convex is temporarily unavailable, the page uses a reviewed Ruma Kamyna fallback containing the same five owner-confirmed facts. Public JSON-LD adds `numberOfRooms` and `amenityFeature`, but omits pricing, capacity, bathrooms, ratings, availability, and policies until confirmed.
+
+## Cross-module integrations
+
+- Guest preferred language becomes the default on a new reservation; a reservation may override it without changing the guest profile.
+- Reservation welcome links use authenticated encryption and expire 30 days after checkout. The public token resolves only a bounded context: guest name, property/unit, stay dates, status, and locale.
+- `/admin/welcome` reads live reservations and contacts, while `/welcome` resolves its property and published template from the reservation.
+- Finance derives currency from the linked reservation/property; tasks derive property/unit from linked reservations; calendar and reservations share one availability projection.
+- No module auto-creates payments, tasks, reservations, units, or property facts without an explicit admin action.

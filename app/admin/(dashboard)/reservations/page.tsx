@@ -8,6 +8,7 @@ import {
   type PmsCalendarData,
   type PmsCatalog,
 } from "@/shared/pms";
+import { buildReservationWelcomeLinks } from "@/shared/welcome/server";
 import { pmsAction } from "../actions";
 
 const emptyCatalog: PmsCatalog = { properties: [], units: [], amenities: [] };
@@ -28,6 +29,7 @@ export default async function Page({
   let booking = emptyBooking;
   let calendar = emptyCalendar;
   let backendError = false;
+  let welcomeLinks: Record<string, string> = {};
   try {
     catalog = await getPmsCatalog();
     const propertyId = catalog.properties.some((property) => property.id === params.property) ? params.property : undefined;
@@ -35,6 +37,7 @@ export default async function Page({
       getPmsBookingData(propertyId ? { propertyId } : {}),
       getPmsCalendar({ propertyId, startDate: range.start, endDate: range.end }),
     ]);
+    try { welcomeLinks = Object.fromEntries(buildReservationWelcomeLinks(booking, catalog).map((link) => [link.reservationId, link.url])); } catch { /* Links remain unavailable until the runtime secret is configured. */ }
   } catch { backendError = true; }
   const propertyId = catalog.properties.some((property) => property.id === params.property) ? params.property : undefined;
   return (
@@ -49,6 +52,7 @@ export default async function Page({
       state={params}
       backendError={backendError}
       formAction={pmsAction}
+      welcomeLinks={welcomeLinks}
     />
   );
 }

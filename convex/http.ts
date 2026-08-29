@@ -1,8 +1,10 @@
 import { httpRouter } from "convex/server";
 import { httpAction, type ActionCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
 import { authorizeAdminRequest } from "./lib/admin";
 import { handlePmsAdmin } from "./pms/dispatch";
+import { welcomeLocaleValue } from "./welcomeLocale";
 
 const http = httpRouter();
 const MAX_BODY_BYTES = 65_536;
@@ -30,10 +32,7 @@ async function readJson(request: Request): Promise<Record<string, unknown>> {
   return body as Record<string, unknown>;
 }
 
-function localeValue(value: unknown): "id" | "en" {
-  if (value !== "id" && value !== "en") throw new Error("Invalid welcome locale.");
-  return value;
-}
+const localeValue = welcomeLocaleValue;
 
 function adminAction(handler: (ctx: ActionCtx, body: Record<string, unknown>) => Promise<unknown>) {
   return httpAction(async (ctx, request) => {
@@ -67,6 +66,51 @@ http.route({
     body: String(body.body ?? ""),
     signature: String(body.signature ?? ""),
     publish: body.publish === true,
+    auditAction: body.auditAction === "translate" ? "translate" : undefined,
+    actorEmailHash: String(body.actorEmailHash ?? ""),
+  })),
+});
+
+http.route({
+  path: "/admin/welcome-reservation-context",
+  method: "POST",
+  handler: adminAction((ctx, body) => ctx.runQuery(internal.welcomeReservations.getContext, {
+    reservationId: String(body.reservationId ?? "") as Id<"reservations">,
+  })),
+});
+
+http.route({
+  path: "/admin/ai-overview",
+  method: "POST",
+  handler: adminAction((ctx) => ctx.runQuery(internal.aiSettings.getOverview, {})),
+});
+
+http.route({
+  path: "/admin/ai-secret",
+  method: "POST",
+  handler: adminAction((ctx) => ctx.runQuery(internal.aiSettings.getSecret, {})),
+});
+
+http.route({
+  path: "/admin/ai-upsert",
+  method: "POST",
+  handler: adminAction((ctx, body) => ctx.runMutation(internal.aiSettings.upsert, {
+    provider: String(body.provider ?? "") as "openai" | "openrouter" | "anthropic" | "gemini",
+    model: String(body.model ?? ""),
+    enabled: body.enabled === true,
+    encryptedApiKey: typeof body.encryptedApiKey === "string" ? body.encryptedApiKey : undefined,
+    keyFingerprint: typeof body.keyFingerprint === "string" ? body.keyFingerprint : undefined,
+    clearKey: body.clearKey === true,
+  })),
+});
+
+http.route({
+  path: "/admin/ai-event",
+  method: "POST",
+  handler: adminAction((ctx, body) => ctx.runMutation(internal.aiSettings.recordEvent, {
+    action: String(body.action ?? "") as "save" | "test" | "translate",
+    provider: typeof body.provider === "string" ? body.provider as "openai" | "openrouter" | "anthropic" | "gemini" : undefined,
+    targetCount: typeof body.targetCount === "number" ? body.targetCount : undefined,
     actorEmailHash: String(body.actorEmailHash ?? ""),
   })),
 });

@@ -1,12 +1,20 @@
 {
   "slug": "admin",
   "name": "Kamyna guest experience admin",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "category": "operations",
-  "description": "Authenticated dashboard for drafting and publishing guest welcome content.",
+  "description": "Authenticated dashboard for reservation-linked multilingual welcome content and encrypted BYOK AI translation.",
   "contract": {
-    "inputs": ["WelcomeAdminOverview", "Admin session", "Server action"],
-    "outputs": ["AdminLoginPage", "AdminDashboard"],
+    "inputs": [
+      "WelcomeAdminOverview",
+      "Admin session",
+      "Server action"
+    ],
+    "outputs": [
+      "AdminLoginPage",
+      "AdminDashboard",
+      "AiSettingsPage"
+    ],
     "portable": true,
     "hardcodedUrls": []
   }

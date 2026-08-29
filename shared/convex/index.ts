@@ -1,6 +1,7 @@
 export {
   ensureWelcomeDefaults,
   getPublishedWelcome,
+  getReservationWelcomeContext,
   getWelcomeAdminOverview,
   recordAdminLoginAttempt,
   upsertWelcome,
@@ -18,3 +19,5 @@ export {
   pmsAdminRequest,
   seedRumaKamyna,
 } from "./pms";
+
+export { getAiSecret, getAiSettings, recordAiEvent, upsertAiSettings } from "./ai";

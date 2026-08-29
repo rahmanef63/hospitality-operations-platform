@@ -1,28 +1,35 @@
 import { v } from "convex/values";
 import { DEFAULT_WELCOME_CONTENT, WELCOME_PROPERTY_SLUG, validateWelcomeContent } from "../shared/welcome/config";
-import type { WelcomeLocale } from "../shared/welcome/types";
+import { WELCOME_LOCALES, type WelcomeLocale } from "../shared/welcome/types";
 import { internalMutation, internalQuery, query, type MutationCtx, type QueryCtx } from "./_generated/server";
-
-const localeValidator = v.union(v.literal("id"), v.literal("en"));
+import { welcomeLocaleValidator } from "./welcomeLocale";
 
 async function findConfig(ctx: QueryCtx | MutationCtx, propertySlug: string, locale: WelcomeLocale) {
-  return ctx.db
-    .query("welcomeConfigs")
+  return ctx.db.query("welcomeConfigs")
     .withIndex("by_property_locale", (q) => q.eq("propertySlug", propertySlug).eq("locale", locale))
     .unique();
 }
 
+function configState(config: NonNullable<Awaited<ReturnType<typeof findConfig>>>) {
+  return {
+    locale: config.locale,
+    draft: { headline: config.draftHeadline, body: config.draftBody, signature: config.draftSignature },
+    published: config.publishedHeadline && config.publishedBody && config.publishedSignature
+      ? { headline: config.publishedHeadline, body: config.publishedBody, signature: config.publishedSignature }
+      : undefined,
+    version: config.version,
+    updatedAt: config.updatedAt,
+    publishedAt: config.publishedAt,
+  };
+}
+
 export const getPublished = query({
-  args: { propertySlug: v.string(), locale: localeValidator },
+  args: { propertySlug: v.string(), locale: welcomeLocaleValidator },
   handler: async (ctx, args) => {
     const config = await findConfig(ctx, args.propertySlug, args.locale);
     if (!config?.publishedHeadline || !config.publishedBody || !config.publishedSignature) return null;
     return {
-      content: {
-        headline: config.publishedHeadline,
-        body: config.publishedBody,
-        signature: config.publishedSignature,
-      },
+      content: { headline: config.publishedHeadline, body: config.publishedBody, signature: config.publishedSignature },
       version: config.version,
       publishedAt: config.publishedAt,
     };
@@ -32,43 +39,16 @@ export const getPublished = query({
 export const getAdminOverview = internalQuery({
   args: { propertySlug: v.string() },
   handler: async (ctx, args) => {
-    const configs = await Promise.all(
-      (["id", "en"] as const).map(async (locale) => {
-        const config = await findConfig(ctx, args.propertySlug, locale);
-        if (!config) return null;
-        return {
-          locale,
-          draft: {
-            headline: config.draftHeadline,
-            body: config.draftBody,
-            signature: config.draftSignature,
-          },
-          published: config.publishedHeadline && config.publishedBody && config.publishedSignature
-            ? {
-                headline: config.publishedHeadline,
-                body: config.publishedBody,
-                signature: config.publishedSignature,
-              }
-            : undefined,
-          version: config.version,
-          updatedAt: config.updatedAt,
-          publishedAt: config.publishedAt,
-        };
-      }),
-    );
-    const events = await ctx.db
-      .query("adminAuditEvents")
+    const configs = (await Promise.all(WELCOME_LOCALES.map((locale) => findConfig(ctx, args.propertySlug, locale))))
+      .filter((config): config is NonNullable<typeof config> => config !== null)
+      .map(configState);
+    const events = await ctx.db.query("adminAuditEvents")
       .withIndex("by_property_created", (q) => q.eq("propertySlug", args.propertySlug))
-      .order("desc")
-      .take(12);
+      .order("desc").take(30);
     return {
-      configs: configs.filter((config) => config !== null),
+      configs,
       events: events.map(({ action, actorEmailHash, createdAt, locale, version }) => ({
-        action,
-        actorEmailHash,
-        createdAt,
-        locale,
-        version,
+        action, actorEmailHash, createdAt, locale, version,
       })),
     };
   },
@@ -76,20 +56,13 @@ export const getAdminOverview = internalQuery({
 
 export const upsert = internalMutation({
   args: {
-    propertySlug: v.string(),
-    locale: localeValidator,
-    headline: v.string(),
-    body: v.string(),
-    signature: v.string(),
-    publish: v.boolean(),
+    propertySlug: v.string(), locale: welcomeLocaleValidator,
+    headline: v.string(), body: v.string(), signature: v.string(), publish: v.boolean(),
+    auditAction: v.optional(v.union(v.literal("save"), v.literal("publish"), v.literal("translate"))),
     actorEmailHash: v.string(),
   },
   handler: async (ctx, args) => {
-    const parsed = validateWelcomeContent({
-      headline: args.headline,
-      body: args.body,
-      signature: args.signature,
-    });
+    const parsed = validateWelcomeContent({ headline: args.headline, body: args.body, signature: args.signature });
     if (!parsed.ok) throw new Error(parsed.error);
     const now = Date.now();
     const existing = await findConfig(ctx, args.propertySlug, args.locale);
@@ -102,21 +75,19 @@ export const upsert = internalMutation({
       draftSignature: parsed.value.signature,
       version,
       updatedAt: now,
-      ...(args.publish
-        ? {
-            publishedHeadline: parsed.value.headline,
-            publishedBody: parsed.value.body,
-            publishedSignature: parsed.value.signature,
-            publishedAt: now,
-          }
-        : {}),
+      ...(args.publish ? {
+        publishedHeadline: parsed.value.headline,
+        publishedBody: parsed.value.body,
+        publishedSignature: parsed.value.signature,
+        publishedAt: now,
+      } : {}),
     };
     if (existing) await ctx.db.patch(existing._id, fields);
     else await ctx.db.insert("welcomeConfigs", fields);
     await ctx.db.insert("adminAuditEvents", {
       propertySlug: args.propertySlug,
       locale: args.locale,
-      action: args.publish ? "publish" : "save",
+      action: args.auditAction ?? (args.publish ? "publish" : "save"),
       actorEmailHash: args.actorEmailHash,
       version,
       createdAt: now,
@@ -129,9 +100,8 @@ export const ensureDefaults = internalMutation({
   args: { actorEmailHash: v.string() },
   handler: async (ctx, args) => {
     let created = 0;
-    for (const locale of ["id", "en"] as const) {
-      const existing = await findConfig(ctx, WELCOME_PROPERTY_SLUG, locale);
-      if (existing) continue;
+    for (const locale of WELCOME_LOCALES) {
+      if (await findConfig(ctx, WELCOME_PROPERTY_SLUG, locale)) continue;
       const content = DEFAULT_WELCOME_CONTENT[locale];
       const now = Date.now();
       await ctx.db.insert("welcomeConfigs", {

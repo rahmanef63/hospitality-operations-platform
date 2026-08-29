@@ -28,6 +28,9 @@ describe("Convex Cloud activation", () => {
     expect(read("convex/adminSecurity.ts")).toContain("internalMutation");
     expect(read("convex/http.ts")).toContain("authorizeAdminRequest");
     expect(read("convex/http.ts")).toContain('path: "/admin/pms"');
+    expect(read("convex/http.ts")).toContain('path: "/admin/ai-secret"');
+    expect(read("convex/http.ts")).toContain('path: "/admin/welcome-reservation-context"');
+    expect(read("convex/aiSettings.ts")).toContain("internalQuery");
     expect(read("convex/pms/catalog.ts")).toContain("internalMutation");
     expect(read("convex/pms/public.ts")).toContain("export const getProperty = query");
     expect(read("proxy.ts")).toContain("verifyAdminSessionToken");
@@ -39,6 +42,8 @@ describe("Convex Cloud activation", () => {
     expect(dockerfile).not.toContain("ARG KAMYNA_ADMIN_PASSWORD");
     expect(dockerfile).not.toContain("ARG KAMYNA_ADMIN_SESSION_SECRET");
     expect(dockerfile).not.toContain("ARG KAMYNA_CONVEX_ADMIN_SECRET");
+    expect(dockerfile).not.toContain("ARG KAMYNA_AI_ENCRYPTION_KEY");
+    expect(dockerfile).not.toContain("ARG KAMYNA_GUEST_LINK_SECRET");
   });
 
   it("keeps the admin UI free from direct secret and deploy-key access", () => {
@@ -47,5 +52,7 @@ describe("Convex Cloud activation", () => {
     expect(clientSource).not.toContain("CONVEX_DEPLOY_KEY");
     expect(clientSource).not.toContain("KAMYNA_ADMIN_PASSWORD");
     expect(read("slices/pms/components/property-manager.tsx")).not.toContain("process.env");
+    expect(read("slices/admin/components/ai-settings-page.tsx")).not.toContain("process.env");
+    expect(read("slices/admin/components/ai-settings-page.tsx")).not.toContain("encryptedApiKey");
   });
 });

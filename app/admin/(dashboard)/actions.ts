@@ -24,11 +24,11 @@ const operations = {
     "id", "propertyId", "key", "name", "category", "description", "featured", "publicVisible", "active",
   ],
   "amenity.archive": ["id"],
-  "guest.upsert": ["id", "fullName", "email", "phone", "nationality", "notes"],
+  "guest.upsert": ["id", "fullName", "email", "phone", "nationality", "preferredLocale", "notes"],
   "guest.archive": ["id"],
   "reservation.upsert": [
     "id", "propertyId", "unitId", "guestId", "externalReference", "status", "source", "checkIn",
-    "checkOut", "adults", "children", "nightlyRate", "extraFees", "discountAmount", "notes",
+    "checkOut", "adults", "children", "nightlyRate", "extraFees", "discountAmount", "welcomeLocale", "notes",
   ],
   "reservation.archive": ["id"],
   "block.upsert": ["id", "propertyId", "unitId", "title", "reason", "startDate", "endDate", "notes"],

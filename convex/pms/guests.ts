@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { internalMutation, internalQuery } from "../_generated/server";
+import { welcomeLocaleValidator } from "../welcomeLocale";
 import { cleanText, optionalText, recordPmsAudit, requireGuest } from "./lib";
 
 export const list = internalQuery({
@@ -14,7 +15,8 @@ export const list = internalQuery({
 export const upsert = internalMutation({
   args: {
     id: v.optional(v.id("guests")), fullName: v.string(), email: v.optional(v.string()),
-    phone: v.optional(v.string()), nationality: v.optional(v.string()), notes: v.optional(v.string()),
+    phone: v.optional(v.string()), nationality: v.optional(v.string()),
+    preferredLocale: v.optional(welcomeLocaleValidator), notes: v.optional(v.string()),
     actorEmailHash: v.string(),
   },
   handler: async (ctx, args) => {
@@ -27,6 +29,7 @@ export const upsert = internalMutation({
       email,
       phone: optionalText(args.phone, 40),
       nationality: optionalText(args.nationality, 80),
+      preferredLocale: args.preferredLocale,
       notes: optionalText(args.notes, 2_000),
       updatedAt: now,
       archived: false,

@@ -1,85 +1,80 @@
-# Guest welcome and admin operations
+# Reservation-linked guest welcome and BYOK translation
 
 ## Active surfaces
 
 | Surface | Purpose | Indexing |
 |---|---|---|
-| `/api/welcome` | Guest welcome JSON endpoint. Accepts GET query parameters or POST JSON. | API and `noindex` response header |
-| `/api/concierge` | Sanitized verified-information question/answer endpoint. | API and `noindex` response header |
-| `/welcome` | Private guest-facing welcome page with optional personalization. | `noindex, nofollow` |
-| `/admin/login` | Admin credential entry. | `noindex, nofollow` |
-| `/admin/welcome` | Draft, preview, publish, and welcome activity dashboard. | Authenticated and `noindex, nofollow` |
+| `/api/welcome` | JSON welcome endpoint for a secure reservation token or legacy admin preview. | `noindex` response header |
+| `/welcome` | Private reservation-linked guest page with language switching. | `noindex, nofollow` |
+| `/admin/welcome` | Property selector, live reservation links, 20-language draft/publish editor. | Authenticated and `noindex` |
+| `/admin/ai` | Encrypted BYOK provider configuration, provider test, and draft translation. | Authenticated and `noindex` |
 
-## Public endpoint contract
+## Language library
 
-GET:
+The welcome subsystem supports exactly 20 locales:
 
 ```text
-/api/welcome?locale=id&name=Rahman
+id, en, ar, ja, zh-CN, ko, es, fr, de, pt,
+it, nl, ru, tr, th, vi, hi, ms, fil, la
 ```
 
-POST:
+Arabic renders with `dir="rtl"`; every other current locale is LTR. Every language has reviewed fallback copy, a native label, localized guest-page controls, and the `{{guest}}` placeholder. Unsupported locale values fall back to the reservation locale, then Indonesian.
 
-```json
-{
-  "locale": "en",
-  "name": "Rahman"
-}
+## Reservation integration
+
+1. A guest profile may define `preferredLocale`.
+2. A new reservation inherits that value, but the admin can override `welcomeLocale` for one stay.
+3. `/admin/welcome` loads actual reservations and generates an opaque encrypted link for each eligible stay.
+4. The token contains an encrypted reservation identifier, issue time, and expiry; it is authenticated with AES-256-GCM and expires 30 days after checkout.
+5. `/welcome` verifies the token server-side, then reads a bounded context through a protected Convex action: guest name, property slug/name, optional unit, dates, status, and locale.
+6. The property slug selects the correct welcome configuration, making the flow reusable for future Kamyna properties.
+
+Raw reservation IDs, financial values, internal notes, guest contacts, and API secrets never appear in a guest token response.
+
+Legacy preview remains available for authenticated editorial review:
+
+```text
+/welcome?property=ruma-kamyna&locale=ja&name=Guest
 ```
 
-`locale` accepts `id` or `en`; unsupported values fall back to Indonesian. `name` is optional, normalized, stripped of markup, and capped at 80 characters. The response always uses `Cache-Control: no-store`. When Convex Cloud is temporarily unavailable, the endpoint serves the reviewed static welcome copy and identifies the source as `fallback`.
+Production sharing should use the encrypted link shown beside an actual reservation.
 
-## Public concierge boundary
+## Draft and publish
 
-Kamyna Concierge is a deterministic information surface, not a live host or open-ended model. It reads the same active, published property facts used by the public stay page, combines them with verified Maps/contact configuration, and explicitly declines to invent rates, availability, capacity, check-in/out, or policies. It does not store conversations. Questions requiring current operational confirmation are handed to WhatsApp or email.
+- Save Draft updates only the private draft.
+- Publish updates the guest-facing version and increments its version.
+- Only one selected locale editor is rendered at a time; all 20 publication states remain visible.
+- The property selector changes the `propertySlug` used by Convex.
+- AI translations always write drafts with a `translate` audit event and never publish automatically.
 
-## Data model
+## BYOK AI boundary
 
-The welcome subsystem owns three bounded tables alongside the separate PMS tables:
+Supported fixed providers are OpenAI, OpenRouter, Anthropic, and Google Gemini. The admin supplies the provider, model, and API key.
 
-- `welcomeConfigs`: one document per property and locale, with separate draft and published fields.
-- `adminLoginAttempts`: distributed login throttling by HMAC request fingerprint.
-- `adminAuditEvents`: recent seed, save, and publish events without storing raw admin email.
+```text
+Browser form
+  → authenticated Next.js Server Action
+  → AES-256-GCM encryption using KAMYNA_AI_ENCRYPTION_KEY
+  → protected Convex HTTP action
+  → encryptedApiKey stored in aiProviderSettings
+```
 
-Only `welcome.getPublished` is part of the public Convex API. Admin reads and mutations are internal functions reached through authenticated Convex HTTP actions. The shared static property/content repository remains authoritative for the marketing website and property facts.
+The browser receives only provider/model, enabled state, configured state, and a one-way key fingerprint. The encrypted key is fetched and decrypted only inside a server action when testing or translating.
 
-## Authentication
+The translation request contains only:
 
-The single-admin login uses server-only environment values:
+- source locale;
+- headline, body, and signature;
+- target locale metadata;
+- the literal `{{guest}}` placeholder.
+
+It does not contain guest names, emails, phone numbers, reservation IDs, dates, rates, notes, or other PMS records. Provider output must parse as JSON, contain each requested locale exactly once, pass existing content limits, and preserve `{{guest}}` before any draft is saved.
+
+## Server-only environment
 
 ```env
-KAMYNA_ADMIN_EMAIL=
-KAMYNA_ADMIN_PASSWORD=
-KAMYNA_ADMIN_SESSION_SECRET=
-KAMYNA_CONVEX_ADMIN_SECRET=
+KAMYNA_GUEST_LINK_SECRET=
+KAMYNA_AI_ENCRYPTION_KEY=
 ```
 
-The password is never included in browser JavaScript or Docker build arguments. Successful login creates a signed, 12-hour, HttpOnly, Secure, SameSite=Lax cookie. Login failures are recorded atomically in Convex Cloud; five failures within fifteen minutes lock the request fingerprint for fifteen minutes.
-
-Next.js calls protected Convex HTTP actions with `KAMYNA_CONVEX_ADMIN_SECRET` in an HTTPS Authorization header. The static secret is not sent as a query or mutation argument. Convex stores the same secret as a deployment environment variable.
-
-## Publishing flow
-
-1. Sign in at `/admin/login`, then open `/admin/welcome`.
-2. Edit Indonesian or English copy. Use `{{guest}}` where the optional guest name should appear.
-3. **Save draft** updates only the private draft.
-4. **Publish** copies the validated draft into public fields and increments its version.
-5. `/api/welcome` and `/welcome` read only the published fields.
-
-Property facts and homestay operations are managed separately by the PMS described in `docs/PMS.md`. The welcome editor never changes reservation or property data.
-
-## Deployment
-
-The production topology is hybrid:
-
-```text
-Browser / guest
-      ↓
-Next.js on Dokploy
-      ├── static marketing repository
-      └── server-only Convex client / protected HTTP actions
-                         ↓
-                 Convex Cloud
-```
-
-Convex source and generated bindings are committed under `convex/`. Deploy the backend with the trusted `sc-convex-cloud` backend-only path, then deploy the Dokploy frontend with all existing environment values preserved. `CONVEX_DEPLOY_KEY` is deployment-only and must never be copied into Docker build arguments.
+Both values must be strong random secrets of at least 32 characters. They belong only in the Dokploy runtime environment, never in Docker build arguments, client bundles, Git, or Convex documents. Rotating the guest-link secret invalidates previously shared links. Rotating the AI encryption key requires re-entering the BYOK API key.

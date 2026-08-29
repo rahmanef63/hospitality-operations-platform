@@ -29,6 +29,7 @@ describe("public and admin navigation shells", () => {
     expect(nav).toContain("Admin mobile navigation");
     expect(nav).toContain("fixed inset-x-0 bottom-0");
     expect(nav).toContain("env(safe-area-inset-bottom)");
+    expect(nav).toContain('href: "/admin/ai"');
     expect(nav).not.toContain("overflow-x-auto");
   });
 

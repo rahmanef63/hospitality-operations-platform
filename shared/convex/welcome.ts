@@ -7,6 +7,7 @@ import {
   type WelcomeAdminOverview,
   type WelcomeConfigState,
   type WelcomeContent,
+  type ReservationWelcomeContext,
   type WelcomeLocale,
 } from "@/shared/welcome";
 import { adminFetch, getConvexClient } from "./core";
@@ -15,18 +16,18 @@ function defaultConfig(locale: WelcomeLocale): WelcomeConfigState {
   return { locale, draft: DEFAULT_WELCOME_CONTENT[locale], version: 0 };
 }
 
-export async function getPublishedWelcome(locale: WelcomeLocale) {
+export async function getPublishedWelcome(locale: WelcomeLocale, propertySlug = WELCOME_PROPERTY_SLUG) {
   return getConvexClient().query(api.welcome.getPublished, {
-    propertySlug: WELCOME_PROPERTY_SLUG,
+    propertySlug,
     locale,
   });
 }
 
-export async function getWelcomeAdminOverview(): Promise<WelcomeAdminOverview> {
+export async function getWelcomeAdminOverview(propertySlug = WELCOME_PROPERTY_SLUG): Promise<WelcomeAdminOverview> {
   const response = await adminFetch<{
     configs: WelcomeConfigState[];
     events: WelcomeAdminOverview["events"];
-  }>("/admin/welcome-overview", { propertySlug: WELCOME_PROPERTY_SLUG });
+  }>("/admin/welcome-overview", { propertySlug });
   const configs = Object.fromEntries(
     WELCOME_LOCALES.map((locale) => [locale, defaultConfig(locale)]),
   ) as Record<WelcomeLocale, WelcomeConfigState>;
@@ -35,18 +36,21 @@ export async function getWelcomeAdminOverview(): Promise<WelcomeAdminOverview> {
 }
 
 export async function upsertWelcome(input: {
+  propertySlug?: string;
   locale: WelcomeLocale;
   content: WelcomeContent;
   publish: boolean;
   actorEmailHash: string;
+  auditAction?: "translate";
 }) {
   return adminFetch<{ version: number; publishedAt?: number }>("/admin/welcome-upsert", {
-    propertySlug: WELCOME_PROPERTY_SLUG,
+    propertySlug: input.propertySlug ?? WELCOME_PROPERTY_SLUG,
     locale: input.locale,
     headline: input.content.headline,
     body: input.content.body,
     signature: input.content.signature,
     publish: input.publish,
+    auditAction: input.auditAction,
     actorEmailHash: input.actorEmailHash,
   });
 }
@@ -60,4 +64,8 @@ export async function recordAdminLoginAttempt(input: { fingerprint: string; succ
 
 export async function ensureWelcomeDefaults(actorEmailHash: string) {
   return adminFetch<{ created: number }>("/admin/ensure-welcome-defaults", { actorEmailHash });
+}
+
+export async function getReservationWelcomeContext(reservationId: string): Promise<ReservationWelcomeContext | null> {
+  return adminFetch<ReservationWelcomeContext | null>("/admin/welcome-reservation-context", { reservationId });
 }

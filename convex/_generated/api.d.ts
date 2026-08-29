@@ -9,6 +9,8 @@
  */
 
 import type * as adminSecurity from "../adminSecurity.js";
+import type * as aiSettings from "../aiSettings.js";
+import type * as aiValidators from "../aiValidators.js";
 import type * as http from "../http.js";
 import type * as lib_admin from "../lib/admin.js";
 import type * as pms_availability from "../pms/availability.js";
@@ -26,6 +28,8 @@ import type * as pms_seed from "../pms/seed.js";
 import type * as pms_tasks from "../pms/tasks.js";
 import type * as pms_validators from "../pms/validators.js";
 import type * as welcome from "../welcome.js";
+import type * as welcomeLocale from "../welcomeLocale.js";
+import type * as welcomeReservations from "../welcomeReservations.js";
 
 import type {
   ApiFromModules,
@@ -35,6 +39,8 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   adminSecurity: typeof adminSecurity;
+  aiSettings: typeof aiSettings;
+  aiValidators: typeof aiValidators;
   http: typeof http;
   "lib/admin": typeof lib_admin;
   "pms/availability": typeof pms_availability;
@@ -52,6 +58,8 @@ declare const fullApi: ApiFromModules<{
   "pms/tasks": typeof pms_tasks;
   "pms/validators": typeof pms_validators;
   welcome: typeof welcome;
+  welcomeLocale: typeof welcomeLocale;
+  welcomeReservations: typeof welcomeReservations;
 }>;
 
 /**

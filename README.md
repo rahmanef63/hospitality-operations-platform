@@ -6,7 +6,7 @@ Multi-property hospitality website and homestay-management system for the Kamyna
 
 - Next.js 16 App Router, React 19, Tailwind CSS 4, strict TypeScript.
 - Static-first marketing content with dynamic owner-verified property facts.
-- Convex Cloud for properties, units, amenities, guests, reservations, availability, finance, tasks, welcome publishing, login throttling, and audit history.
+- Convex Cloud for properties, units, amenities, guests, reservations, availability, finance, tasks, 20-language welcome publishing, encrypted BYOK AI metadata, login throttling, and audit history.
 - Signed server-only single-admin session using an HttpOnly cookie.
 - Docker standalone frontend on Dokploy; managed Convex Cloud backend.
 - Location-aware SEO, canonical/hreflang links, image sitemap, structured data, social cards, and Google verification.
@@ -32,7 +32,8 @@ Multi-property hospitality website and homestay-management system for the Kamyna
 | `/admin/amenities` | Facility CRUD and public visibility |
 | `/admin/finance` | Payments, refunds, and expenses |
 | `/admin/tasks` | Housekeeping and operations tasks |
-| `/admin/welcome` | Welcome copy draft/publish workflow |
+| `/admin/welcome` | Reservation-linked 20-language welcome workflow |
+| `/admin/ai` | Encrypted BYOK provider settings and draft translation |
 | `/api/health` | Deployment health probe |
 
 ## Local development
@@ -57,6 +58,8 @@ KAMYNA_ADMIN_EMAIL=
 KAMYNA_ADMIN_PASSWORD=
 KAMYNA_ADMIN_SESSION_SECRET=
 KAMYNA_CONVEX_ADMIN_SECRET=
+KAMYNA_GUEST_LINK_SECRET=
+KAMYNA_AI_ENCRYPTION_KEY=
 ```
 
 `CONVEX_DEPLOY_KEY` is deployment-only and must never enter browser code or Docker build arguments.
@@ -76,6 +79,8 @@ KAMYNA_CONVEX_ADMIN_SECRET=
 - `convex/pms/`: multi-property CRUD, availability rules, reporting, and public property reads.
 - `shared/media/`: editorial image metadata and responsive variants.
 - `shared/admin/`: server-only credentials and signed session helpers.
+- `shared/welcome/`: 20-language templates, opaque guest tokens, reservation-linked welcome resolution.
+- `shared/ai/`: BYOK encryption, fixed provider adapters, and PII-free template translation.
 - `shared/convex/`: server bridge to Convex public and protected surfaces.
 
 Ruma Kamyna is initialized with 3 bedrooms, swimming pool, gym, jacuzzi, and mountain view. Bathrooms, capacity, rates, policies, and historical operations remain empty until real values are provided. Generated imagery keeps its visible concept disclosure.

@@ -47,6 +47,8 @@ describe("admin UI interaction contracts", () => {
     expect(reservation).toContain("accommodationOptions");
     expect(reservation).toContain("Subtotal akomodasi");
     expect(reservation).toContain("Total reservasi");
+    expect(reservation).toContain("welcomeLocale");
+    expect(reservation).toContain("guest?.preferredLocale");
     expect(reservations).toContain("<CalendarBoard");
     expect(calendar).toContain("<CalendarBoard");
     expect(finance).toContain("outstandingAmount");
@@ -66,6 +68,9 @@ describe("admin UI interaction contracts", () => {
     expect(welcome).toContain("beforeunload");
     expect(welcome).toContain("WELCOME_GUEST_TOKEN");
     expect(welcome).toContain("Perubahan belum disimpan");
+    expect(read("app/admin/(dashboard)/welcome/page.tsx")).toContain("buildReservationWelcomeLinks");
+    expect(read("slices/admin/components/reservation-welcome-panel.tsx")).toContain("Salin link");
+    expect(read("slices/pms/components/guest-manager.tsx")).toContain("Riwayat reservasi");
   });
 
   it("documents every admin feature and the verification plan", () => {

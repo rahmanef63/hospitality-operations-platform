@@ -1,3 +1,4 @@
+import type { WelcomeLocale } from "../welcome/types";
 import type {
   AmenityCategory,
   BlockReason,
@@ -81,6 +82,7 @@ export type PmsGuest = {
   email?: string;
   phone?: string;
   nationality?: string;
+  preferredLocale?: WelcomeLocale;
   notes?: string;
   createdAt: number;
   updatedAt: number;
@@ -96,6 +98,8 @@ export type PmsReservation = {
   unitName?: string;
   guestId: string;
   guestName: string;
+  guestPreferredLocale?: WelcomeLocale;
+  welcomeLocale: WelcomeLocale;
   status: ReservationStatus;
   source: ReservationSource;
   checkIn: string;

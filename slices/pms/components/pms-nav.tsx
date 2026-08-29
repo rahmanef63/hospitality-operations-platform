@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BedDouble,
+  Bot,
   BookOpenText,
   CalendarDays,
   ChevronUp,
@@ -43,6 +44,7 @@ const groups = [
       { href: "/admin/finance", label: "Keuangan", icon: CircleDollarSign },
       { href: "/admin/tasks", label: "Tugas", icon: ClipboardCheck },
       { href: "/admin/welcome", label: "Sambutan", icon: BookOpenText },
+      { href: "/admin/ai", label: "AI & Bahasa", icon: Bot },
     ],
   },
 ] as const;
@@ -59,6 +61,7 @@ const moreItems = [
   ...groups[1].items,
   groups[2].items[0],
   groups[2].items[2],
+  groups[2].items[3],
 ] as const;
 
 function isCurrent(pathname: string, href: string) {

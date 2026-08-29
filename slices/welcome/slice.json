@@ -1,12 +1,17 @@
 {
   "slug": "welcome",
   "name": "Ruma Kamyna guest welcome",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "category": "guest-experience",
   "description": "Private, personalized guest welcome page backed by published Convex content.",
   "contract": {
-    "inputs": ["RenderedWelcome", "Contact link"],
-    "outputs": ["WelcomePage"],
+    "inputs": [
+      "RenderedWelcome",
+      "Contact link"
+    ],
+    "outputs": [
+      "WelcomePage"
+    ],
     "portable": true,
     "hardcodedUrls": []
   }

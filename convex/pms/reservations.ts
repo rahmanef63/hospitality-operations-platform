@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { internalMutation, internalQuery } from "../_generated/server";
+import { welcomeLocaleValidator } from "../welcomeLocale";
 import { reservationSourceValidator, reservationStatusValidator } from "./validators";
 import {
   cleanCurrency,
@@ -40,15 +41,17 @@ export const upsert = internalMutation({
     source: reservationSourceValidator, checkIn: v.string(), checkOut: v.string(), adults: v.optional(v.number()),
     children: v.optional(v.number()), nightlyRate: v.optional(v.number()),
     extraFees: v.optional(v.number()), discountAmount: v.optional(v.number()),
-    notes: v.optional(v.string()), actorEmailHash: v.string(),
+    welcomeLocale: v.optional(welcomeLocaleValidator), notes: v.optional(v.string()), actorEmailHash: v.string(),
   },
   handler: async (ctx, args) => {
-    const property = await requireProperty(ctx, args.propertyId);
-    await requireGuest(ctx, args.guestId);
+    const [property, guest] = await Promise.all([
+      requireProperty(ctx, args.propertyId),
+      requireGuest(ctx, args.guestId),
+    ]);
     const unit = args.unitId ? await requireUnit(ctx, args.unitId, args.propertyId) : undefined;
-    if (unit && (!unit.bookable || unit.status !== "active")) {
-      throw new Error("Selected unit is not bookable.");
-    }
+    if (unit && (!unit.bookable || unit.status !== "active")) throw new Error("Selected unit is not bookable.");
+    const existing = args.id ? await ctx.db.get(args.id) : null;
+    if (args.id && (!existing || existing.archived)) throw new Error("Reservation was not found.");
     const range = dateRange(args.checkIn, args.checkOut, "Check-in", "Check-out");
     const nights = nightsBetween(range.start, range.end);
     if (isBlockingReservation(args.status)) {
@@ -70,8 +73,6 @@ export const upsert = internalMutation({
       ? undefined
       : accommodationAmount + extraFees - discountAmount;
     const now = Date.now();
-    const existing = args.id ? await ctx.db.get(args.id) : null;
-    if (args.id && (!existing || existing.archived)) throw new Error("Reservation was not found.");
     const reference = existing?.reference
       ?? `${property.slug.replace(/[^a-z0-9]/g, "").slice(0, 4).toUpperCase()}-${now.toString(36).toUpperCase()}`;
     const fields = {
@@ -93,6 +94,7 @@ export const upsert = internalMutation({
       discountAmount: args.discountAmount === undefined ? undefined : discountAmount,
       totalAmount,
       currency: cleanCurrency(property.currency),
+      welcomeLocale: args.welcomeLocale ?? existing?.welcomeLocale ?? guest.preferredLocale ?? "id",
       notes: optionalText(args.notes, 2_000),
       cancelledAt: args.status === "cancelled" ? now : undefined,
       updatedAt: now,

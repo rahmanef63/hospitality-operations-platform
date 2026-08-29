@@ -7,6 +7,7 @@ const pages = [
   "/guides/things-to-do-near-puncak",
   "/guides/planning-a-slow-stay-in-megamendung",
   "/welcome?locale=id&name=Smoke",
+  "/welcome?locale=ar&name=Smoke",
   "/admin/login",
   "/api/health",
 ];
@@ -71,6 +72,7 @@ const protectedRoutes = [
   "/admin/finance",
   "/admin/tasks",
   "/admin/welcome",
+  "/admin/ai",
 ];
 for (const route of protectedRoutes) {
   const response = await fetch(`${target}${route}`, { redirect: "manual" });

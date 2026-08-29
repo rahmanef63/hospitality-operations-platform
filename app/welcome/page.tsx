@@ -1,47 +1,46 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { WelcomePage } from "@/features/welcome";
 import { getPublishedWelcome } from "@/shared/convex";
 import { getPropertyBySlug } from "@/shared/content";
-import {
-  DEFAULT_WELCOME_CONTENT,
-  normalizeGuestName,
-  parseWelcomeLocale,
-  renderWelcomeContent,
-} from "@/shared/welcome";
-
+import { defaultWelcomeContent, getWelcomeLocaleMeta, renderWelcomeContent } from "@/shared/welcome";
+import { resolveGuestWelcomeRequest } from "@/shared/welcome/resolve";
 
 export const metadata: Metadata = {
-  title: "Welcome to Ruma Kamyna",
-  description: "A private welcome for guests of Ruma Kamyna.",
+  title: "Welcome to Kamyna Living",
+  description: "A private welcome for guests of Kamyna Living.",
   robots: { index: false, follow: false, noarchive: true, googleBot: { index: false, follow: false } },
 };
-
 export const instant = false;
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ locale?: string; name?: string }>;
+export default async function Page({ searchParams }: {
+  searchParams: Promise<{ locale?: string; name?: string; token?: string; property?: string }>;
 }) {
   const params = await searchParams;
-  const locale = parseWelcomeLocale(params.locale);
-  const guestName = normalizeGuestName(params.name);
-  let content = DEFAULT_WELCOME_CONTENT[locale];
+  const resolved = await resolveGuestWelcomeRequest(params);
+  if (!resolved.valid) notFound();
+  const propertySlug = resolved.propertySlug ?? "ruma-kamyna";
+  const property = await getPropertyBySlug(propertySlug);
+  const propertyName = resolved.context?.propertyName ?? property?.name ?? "Ruma Kamyna";
+  let content = defaultWelcomeContent(resolved.locale, propertyName);
   try {
-    const published = await getPublishedWelcome(locale);
+    const published = await getPublishedWelcome(resolved.locale, propertySlug);
     if (published) content = published.content;
   } catch {
-    // The verified static fallback keeps the guest page available during a backend interruption.
+    // Reviewed multilingual defaults keep this private page available during backend interruptions.
   }
-  const property = await getPropertyBySlug("ruma-kamyna");
   const contactHref = property?.contact.whatsappHref ?? `mailto:${property?.contact.email ?? "hello@kamynaliving.com"}`;
-  const contactLabel = locale === "id" ? "Hubungi host" : "Contact your host";
+  const meta = getWelcomeLocaleMeta(resolved.locale);
   return (
     <WelcomePage
-      locale={locale}
-      content={renderWelcomeContent(content, locale, guestName)}
+      locale={resolved.locale}
+      content={renderWelcomeContent(content, resolved.locale, resolved.guestName, propertyName)}
+      propertyName={propertyName}
+      propertySlug={propertySlug}
+      context={resolved.context}
+      token={resolved.token}
       contactHref={contactHref}
-      contactLabel={contactLabel}
+      contactLabel={meta.contactLabel}
     />
   );
 }

@@ -1,7 +1,7 @@
 import type { Doc } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
 
-async function getNames(ctx: QueryCtx, reservations: Doc<"reservations">[]) {
+async function getReservationRelations(ctx: QueryCtx, reservations: Doc<"reservations">[]) {
   const propertyIds = [...new Set(reservations.map((item) => item.propertyId))];
   const unitIds = [...new Set(reservations.flatMap((item) => item.unitId ? [item.unitId] : []))];
   const guestIds = [...new Set(reservations.map((item) => item.guestId))];
@@ -13,12 +13,12 @@ async function getNames(ctx: QueryCtx, reservations: Doc<"reservations">[]) {
   return {
     properties: new Map(properties.filter(Boolean).map((item) => [item!._id, item!.name])),
     units: new Map(units.filter(Boolean).map((item) => [item!._id, item!.name])),
-    guests: new Map(guests.filter(Boolean).map((item) => [item!._id, item!.fullName])),
+    guests: new Map(guests.filter(Boolean).map((item) => [item!._id, item!])),
   };
 }
 
 export async function reservationRows(ctx: QueryCtx, reservations: Doc<"reservations">[]) {
-  const names = await getNames(ctx, reservations);
+  const relations = await getReservationRelations(ctx, reservations);
   const transactions = await ctx.db.query("transactions")
     .withIndex("by_archived_date", (q) => q.eq("archived", false)).take(1_000);
   const paidByReservation = new Map<string, number>();
@@ -31,15 +31,18 @@ export async function reservationRows(ctx: QueryCtx, reservations: Doc<"reservat
     );
   }
   return reservations.map(({ _id, ...reservation }) => {
+    const guest = relations.guests.get(reservation.guestId);
     const paidAmount = paidByReservation.get(_id) ?? 0;
     return {
+      ...reservation,
       id: _id,
-      propertyName: names.properties.get(reservation.propertyId) ?? "Archived property",
-      unitName: reservation.unitId ? names.units.get(reservation.unitId) : undefined,
-      guestName: names.guests.get(reservation.guestId) ?? "Archived guest",
+      propertyName: relations.properties.get(reservation.propertyId) ?? "Archived property",
+      unitName: reservation.unitId ? relations.units.get(reservation.unitId) : undefined,
+      guestName: guest?.fullName ?? "Archived guest",
+      guestPreferredLocale: guest?.preferredLocale,
+      welcomeLocale: reservation.welcomeLocale ?? guest?.preferredLocale ?? "id",
       paidAmount,
       outstandingAmount: Math.max(0, (reservation.totalAmount ?? 0) - paidAmount),
-      ...reservation,
     };
   });
 }

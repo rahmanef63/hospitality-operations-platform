@@ -6,6 +6,7 @@ import { useFormStatus } from "react-dom";
 import {
   WELCOME_GUEST_TOKEN,
   WELCOME_LIMITS,
+  getWelcomeLocaleMeta,
   renderWelcomeContent,
   type WelcomeConfigState,
   type WelcomeContent,
@@ -32,8 +33,10 @@ function sameContent(left: WelcomeContent | undefined, right: WelcomeContent) {
   return Boolean(left && left.headline === right.headline && left.body === right.body && left.signature === right.signature);
 }
 
-export function WelcomeEditor({ config, formAction, previewUrl, disabled = false }: {
+export function WelcomeEditor({ config, propertySlug, propertyName, formAction, previewUrl, disabled = false }: {
   config: WelcomeConfigState;
+  propertySlug: string;
+  propertyName: string;
   formAction: AdminFormAction;
   previewUrl: string;
   disabled?: boolean;
@@ -41,14 +44,15 @@ export function WelcomeEditor({ config, formAction, previewUrl, disabled = false
   const [headline, setHeadline] = useState(config.draft.headline);
   const [body, setBody] = useState(config.draft.body);
   const [signature, setSignature] = useState(config.draft.signature);
-  const [sampleName, setSampleName] = useState(config.locale === "id" ? "Tamu" : "Guest");
+  const meta = getWelcomeLocaleMeta(config.locale);
+  const [sampleName, setSampleName] = useState(meta.sampleName);
   const headlineRef = useRef<HTMLInputElement>(null);
   const submittingRef = useRef(false);
   const draft = useMemo(() => ({ headline, body, signature }), [body, headline, signature]);
   const dirty = !sameContent(config.draft, draft);
   const publishable = dirty || !sameContent(config.published, draft);
-  const preview = useMemo(() => renderWelcomeContent(draft, config.locale, sampleName), [config.locale, draft, sampleName]);
-  const localeLabel = config.locale === "id" ? "Bahasa Indonesia" : "English";
+  const preview = useMemo(() => renderWelcomeContent(draft, config.locale, sampleName, propertyName), [config.locale, draft, propertyName, sampleName]);
+  const localeLabel = meta.nativeLabel;
 
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => {
@@ -87,8 +91,9 @@ export function WelcomeEditor({ config, formAction, previewUrl, disabled = false
         </div>
       </header>
 
-      <form action={formAction} onSubmit={() => { submittingRef.current = true; }} className="grid xl:grid-cols-[1.02fr_.98fr]">
+      <form action={formAction} onSubmit={() => { submittingRef.current = true; }} className="grid xl:grid-cols-[1.02fr_.98fr]" dir={meta.direction}>
         <input type="hidden" name="locale" value={config.locale} />
+        <input type="hidden" name="propertySlug" value={propertySlug} />
         <fieldset className="min-w-0 space-y-6 p-5 sm:p-7">
           <legend className="sr-only">Edit {localeLabel} welcome content</legend>
           <label className="block">
@@ -113,14 +118,14 @@ export function WelcomeEditor({ config, formAction, previewUrl, disabled = false
           </div>
         </fieldset>
 
-        <aside className="flex min-h-[32rem] flex-col justify-between bg-charcoal p-6 text-ivory sm:p-9">
+        <aside dir={meta.direction} className="flex min-h-[32rem] flex-col justify-between bg-charcoal p-6 text-ivory sm:p-9">
           <div>
             <div className="flex items-center justify-between gap-4"><p className="kicker text-warm-sand">Live preview</p><Eye className="size-4 text-ivory/55" aria-hidden="true" /></div>
             <label className="mt-6 block"><span className="text-[.62rem] font-bold tracking-[.1em] text-ivory/55 uppercase">Nama contoh</span><input value={sampleName} onChange={(event) => setSampleName(event.target.value)} maxLength={WELCOME_LIMITS.guestName} className="mt-2 min-h-11 w-full rounded-[.3rem] border border-ivory/16 bg-ivory/8 px-3 text-sm text-ivory outline-none focus:border-warm-sand" /></label>
             <p className="mt-12 font-serif text-5xl leading-[.92] tracking-[-.03em]">{preview.headline}</p>
             <p className="mt-7 max-w-md whitespace-pre-line text-sm leading-8 text-ivory/75">{preview.body}</p>
           </div>
-          <div><p className="font-serif text-xl italic text-warm-sand">{preview.signature}</p><a href={`${previewUrl}?locale=${config.locale}&name=${encodeURIComponent(sampleName)}`} target="_blank" rel="noreferrer" className="editorial-link mt-7 text-ivory">Buka guest view</a></div>
+          <div><p className="font-serif text-xl italic text-warm-sand">{preview.signature}</p><a href={`${previewUrl}?locale=${config.locale}&name=${encodeURIComponent(sampleName)}&property=${encodeURIComponent(propertySlug)}`} target="_blank" rel="noreferrer" className="editorial-link mt-7 text-ivory">Buka guest view</a></div>
         </aside>
       </form>
     </article>

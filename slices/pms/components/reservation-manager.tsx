@@ -29,6 +29,7 @@ export function ReservationManager({
   state,
   backendError,
   formAction,
+  welcomeLinks = {},
 }: {
   catalog: PmsCatalog;
   booking: PmsBookingData;
@@ -40,6 +41,7 @@ export function ReservationManager({
   state: PmsPageState;
   backendError: boolean;
   formAction: PmsFormAction;
+  welcomeLinks?: Record<string, string>;
 }) {
   const ready = catalog.properties.length > 0 && booking.guests.length > 0;
   const outstanding = booking.reservations.reduce((sum, reservation) => sum + reservation.outstandingAmount, 0);
@@ -107,7 +109,7 @@ export function ReservationManager({
                 leading={<PmsIcon name="booking" />}
                 trailing={<StatusPill value={reservation.status} options={reservationStatusOptions} />}
               >
-                <ReservationForm reservation={reservation} catalog={catalog} booking={booking} action={formAction} today={today} returnTo={returnTo} />
+                <ReservationForm reservation={reservation} catalog={catalog} booking={booking} action={formAction} today={today} returnTo={returnTo} welcomeUrl={welcomeLinks[reservation.id]} />
               </RecordPanel>
             )) : <div className="p-4 sm:p-6"><EmptyState title="Belum ada reservasi"><span>Buat reservasi pertama setelah data tamu tersedia.</span></EmptyState></div>}
           </div>

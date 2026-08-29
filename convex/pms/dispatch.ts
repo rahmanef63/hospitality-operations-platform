@@ -18,6 +18,7 @@ import {
   UNIT_STATUSES,
   UNIT_TYPES,
 } from "../../shared/pms/constants";
+import { optionalWelcomeLocale } from "../welcomeLocale";
 
 function payloadObject(body: Record<string, unknown>) {
   const payload = body.payload;
@@ -121,7 +122,7 @@ export async function handlePmsAdmin(ctx: ActionCtx, body: Record<string, unknow
       return ctx.runMutation(internal.pms.guests.upsert, {
         id: optionalId<"guests">(payload, "id"), fullName: text(payload, "fullName"), email: optionalText(payload, "email"),
         phone: optionalText(payload, "phone"), nationality: optionalText(payload, "nationality"),
-        notes: optionalText(payload, "notes"), actorEmailHash,
+        preferredLocale: optionalWelcomeLocale(payload.preferredLocale), notes: optionalText(payload, "notes"), actorEmailHash,
       });
     case "guest.archive":
       return ctx.runMutation(internal.pms.guests.archive, { id: idValue<"guests">(payload, "id"), actorEmailHash });
@@ -141,7 +142,7 @@ export async function handlePmsAdmin(ctx: ActionCtx, body: Record<string, unknow
         adults: numberValue(payload, "adults"), children: numberValue(payload, "children"),
         nightlyRate: numberValue(payload, "nightlyRate"),
         extraFees: numberValue(payload, "extraFees"), discountAmount: numberValue(payload, "discountAmount"),
-        notes: optionalText(payload, "notes"), actorEmailHash,
+        welcomeLocale: optionalWelcomeLocale(payload.welcomeLocale), notes: optionalText(payload, "notes"), actorEmailHash,
       });
     case "reservation.archive":
       return ctx.runMutation(internal.pms.reservations.archive, { id: idValue<"reservations">(payload, "id"), actorEmailHash });

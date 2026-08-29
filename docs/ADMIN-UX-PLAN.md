@@ -65,3 +65,14 @@ The browser presents this calculation immediately. Convex repeats it inside the 
 - Full TypeScript, ESLint, architecture audits, test suite, and production build.
 - Authenticated desktop and mobile browser audits for every admin route, creation flows, custom selects, calendar navigation, no overflow, no undersized targets, no console errors, and no failed requests.
 - Deploy Convex first when backend signatures change, then deploy the exact frontend Git revision and run production smoke tests.
+
+
+## Welcome, localization, and BYOK extension
+
+- Connect each welcome link to the selected reservation and guest instead of accepting a typed name as its source of truth.
+- Store a guest-level preferred language and a reservation-level override.
+- Support 20 reviewed locales, including RTL Arabic, through one language library and one selected editor at a time.
+- Use opaque authenticated-encryption tokens rather than raw reservation IDs; links expire 30 days after checkout.
+- Keep legacy name previews for admin review, while production guest links always resolve live reservation context.
+- Store provider API keys only after AES-256-GCM encryption. The browser receives only configured/enabled state and a one-way fingerprint.
+- Auto-translation sends template fields only, validates JSON and field limits, preserves `{{guest}}`, and saves drafts without auto-publishing.
