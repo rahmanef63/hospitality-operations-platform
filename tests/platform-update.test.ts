@@ -41,6 +41,14 @@ describe("tenant platform update center", () => {
     expect(config).toContain('process.env.VERCEL ? {} : { output: "standalone" }');
   });
 
+  it("keeps runtime env files untracked while allowing the upstream env contract to evolve", () => {
+    const ignore = fs.readFileSync(".gitignore", "utf8");
+    const distribution = JSON.parse(fs.readFileSync(".platform/distribution.json", "utf8"));
+    expect(ignore).toContain(".env.*");
+    expect(ignore).toContain("!.env.example");
+    expect(distribution.tenantProtectedPrefixes).not.toContain(".env");
+  });
+
   it("documents deterministic AI-agent and private-control-plane boundaries", () => {
     const onboarding = fs.readFileSync("docs/AI-AGENT-ONBOARDING.md", "utf8");
     const distribution = fs.readFileSync("docs/PLATFORM-DISTRIBUTION.md", "utf8");

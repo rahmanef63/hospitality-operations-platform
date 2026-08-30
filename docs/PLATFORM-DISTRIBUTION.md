@@ -26,7 +26,7 @@ Each tenant repository commits:
 - `.platform/tenant.json` — non-secret tenant identity/update channel;
 - `.platform/tenant.lock.json` — exact installed upstream tag/commit.
 
-Tenant-protected prefixes are declared only in `.platform/distribution.json`; currently they include tenant metadata, `.env*`, `.vercel/`, `tenant/`, `public/tenant/`, `shared/tenant/`, `convex/tenant/`, tenant-owned launcher assets, and reviewed PWA screenshots.
+Tenant-protected **tracked** prefixes are declared only in `.platform/distribution.json`; they include tenant metadata, `.vercel/`, `tenant/`, `public/tenant/`, `shared/tenant/`, `convex/tenant/`, tenant-owned launcher assets, and reviewed PWA screenshots. Runtime `.env*` files are excluded from Git by `.gitignore`; `.env.example` is intentionally upstream-owned because it is the non-secret environment contract and must evolve with platform releases.
 
 Provider secrets belong in Vercel/GitHub/Convex secret stores. Business data belongs in the provider Convex deployment. Public copy/composition should normally use CMS; property and operational facts should use PMS rather than source overrides.
 

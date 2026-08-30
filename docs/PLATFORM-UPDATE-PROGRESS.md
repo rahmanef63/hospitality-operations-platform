@@ -24,6 +24,7 @@ A platform release must be safe for an AI-agent-operated tenant repository:
 | Tenant apply workflow | Implemented | Workflow verifies exact PR, deploys Convex before merge, promotes frontend, and verifies exact health build ID. |
 | Health revision contract | Implemented | `/api/health` reports the build revision used for exact promotion verification. |
 | Superseded update cleanup | Implemented | A newer platform PR closes older open platform-update PRs instead of leaving ambiguous choices. |
+| Environment contract updateability | Fix implemented in v0.1.5 candidate | `.env.example` is upstream-owned and may evolve; real `.env*` values stay untracked via `.gitignore` and deployment secret stores. |
 | Reference tenant Update Center bootstrap | Pending | Existing reference tenant predates `/admin/settings`; v0.1.4 must be installed once through the controlled Convex-first bootstrap path before future admin one-click updates are available. |
 | Reference tenant Vercel Git access | Verified | Vercel can read/build the private tenant repository from an exact Git SHA. |
 | Reference tenant Vercel build portability | Fix implemented | Private-repo clone/install/Next compile succeeded; Vercel failed only during adapter finalization because container-only standalone output was forced. Platform now uses native Vercel output and pins Node 22. |
@@ -46,10 +47,12 @@ A platform release must be safe for an AI-agent-operated tenant repository:
 
 - 2026-08-30: Release candidate `v0.1.4` full local gate passed: 24 test files / 93 tests, strict TypeScript, zero-warning lint, production build, repository audits, dependency audit with 0 vulnerabilities, diff check, and provider-neutral literal audit.
 
+- 2026-08-30: `v0.1.4` upstream release succeeded but tenant preparation correctly stopped on a policy false positive: `.env.example` matched the old `.env` protected prefix. Runtime `.env*` files are already Git-ignored; patch candidate `v0.1.5` removes only that over-broad tracked-prefix rule so the non-secret upstream environment contract can update safely.
+
 ## Release state
 
-Current released upstream baseline: `v0.1.3`.
+Current released upstream baseline: `v0.1.4`.
 
-Current release candidate: `v0.1.4` — Update Center, tenant-owned coordinated apply workflow, AI-agent onboarding, updater cleanup, exact health revision, and Vercel/container portability.
+Current release candidate: `v0.1.5` — patch the `.env.example` tenant-boundary false positive so the Update Center release can be prepared for existing tenants.
 
-`v0.1.4` is not released until full local verification, hosted CI, provider-neutral release audit, and upstream PR review succeed.
+`v0.1.5` is not released until full local verification, hosted CI, provider-neutral release audit, and updater/tenant PR verification succeed.

@@ -27,7 +27,7 @@ describe("platform distribution", () => {
     expect(isProtected(".platform/tenant.json", prefixes)).toBe(true);
     expect(isProtected("tenant/branding.json", prefixes)).toBe(true);
     expect(isProtected("public/tenant/logo.svg", prefixes)).toBe(true);
-    expect(isProtected(".env.production", prefixes)).toBe(true);
+    expect(isProtected(".env.example", prefixes)).toBe(false);
     expect(isProtected("slices/pms/components/pms-shell.tsx", prefixes)).toBe(false);
   });
 

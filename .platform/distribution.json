@@ -2,7 +2,6 @@
   "schemaVersion": 1,
   "strategy": "external-control-plane-pr",
   "tenantProtectedPrefixes": [
-    ".env",
     ".vercel/",
     ".platform/tenant.json",
     ".platform/tenant.lock.json",
