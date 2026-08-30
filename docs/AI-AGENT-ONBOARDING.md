@@ -42,8 +42,9 @@ The checkout is an independently owned provider deployment.
 | Public authored content | Tenant CMS draft/published snapshot |
 | Property/unit/amenity truth | Tenant PMS/Convex |
 | Reservations/guests/finance/tasks | Tenant Convex only |
-| Deployment secrets | Tenant Vercel/GitHub/Convex secret stores |
+| Deployment secrets | Tenant Vercel/GitHub/Convex secret stores; runtime `.env*` stays untracked |
 | Installed platform version | Tenant package version plus `.platform/tenant.lock.json` |
+| Environment variable names/examples | Upstream `.env.example` (values remain tenant secrets) |
 | Managed tenant routing | Private updater control plane, never upstream |
 
 ## 3. Safe change decision tree
