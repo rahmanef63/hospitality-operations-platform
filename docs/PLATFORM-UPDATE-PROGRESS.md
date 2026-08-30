@@ -44,6 +44,7 @@ A platform release must be safe for an AI-agent-operated tenant repository:
 - 2026-08-30: Tenant `main` exact SHA built on Vercel with Node 22 and native Next output; `/api/health` returned the exact SHA and `platformVersion: 0.1.6`. Canonical domain was not moved.
 - 2026-08-30: A Git-connected tenant Vercel project was created separately. Branch pushes triggered Vercel automatically. Commits by a user outside the tenant Vercel team were blocked; the same probe authored by the tenant GitHub owner reached READY.
 - 2026-08-30: Candidate `v0.1.7` adds the generic tenant `deploymentActor` author contract and switches exact apply merge to rebase so hosting author identity survives promotion.
+- 2026-08-30: Exact `v0.1.7` candidate passed full real-tenant simulation: update commit author resolved to the tenant GitHub deployment user, 24 test files / 95 tests passed, production build passed, and protected-overlay hash remained unchanged.
 - 2026-08-30: Convex Composio token details and deploy-key listing both still fail with `401 MissingAccessToken`; production one-click backend proof remains blocked on a valid Convex management/deploy credential.
 
 ## Release state
