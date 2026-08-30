@@ -1,0 +1,170 @@
+name: Apply platform update
+run-name: Apply platform update PR #${{ inputs.pr_number }} → ${{ inputs.expected_version }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Prepared platform update pull request number
+        required: true
+        type: string
+      expected_version:
+        description: Expected SemVer without v prefix
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+  actions: read
+  issues: write
+
+concurrency:
+  group: platform-apply
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: github.repository != 'rahmanef63/hospitality-operations-platform'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      GH_TOKEN: ${{ github.token }}
+      CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
+      SITE_URL: ${{ vars.HOSPITALITY_SITE_URL }}
+      VERCEL_MODE: ${{ vars.HOSPITALITY_VERCEL_MODE }}
+      VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+      PR_NUMBER: ${{ inputs.pr_number }}
+      EXPECTED_VERSION: ${{ inputs.expected_version }}
+    steps:
+      - name: Preflight tenant deployment configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CONVEX_DEPLOY_KEY" || { echo 'Missing tenant CONVEX_DEPLOY_KEY secret.' >&2; exit 1; }
+          test -n "$SITE_URL" || { echo 'Missing HOSPITALITY_SITE_URL repository variable.' >&2; exit 1; }
+          case "$VERCEL_MODE" in
+            git) ;;
+            hook) test -n "$VERCEL_DEPLOY_HOOK_URL" || { echo 'hook mode requires VERCEL_DEPLOY_HOOK_URL.' >&2; exit 1; } ;;
+            *) echo 'HOSPITALITY_VERCEL_MODE must be git or hook.' >&2; exit 1 ;;
+          esac
+
+      - name: Resolve exact prepared PR
+        id: resolve
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" > "$RUNNER_TEMP/pr.json"
+          node <<'NODE' >> "$GITHUB_OUTPUT"
+          const fs=require('fs');
+          const pr=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/pr.json','utf8'));
+          const prefix='platform/update-v';
+          const expected=process.env.EXPECTED_VERSION;
+          if(pr.state!=='open'||pr.draft) throw new Error('Prepared update PR must be open and non-draft.');
+          const defaultBranch=require('child_process').execFileSync('gh',['repo','view',process.env.GITHUB_REPOSITORY,'--json','defaultBranchRef','--jq','.defaultBranchRef.name'],{encoding:'utf8'}).trim();
+          if(pr.base?.ref!==defaultBranch) throw new Error(`Prepared update PR must target default branch ${defaultBranch}.`);
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/base-branch', defaultBranch);
+          if(!pr.head?.ref?.startsWith(prefix)||pr.head.ref.slice(prefix.length)!==expected) throw new Error('Prepared update branch/version mismatch.');
+          if(pr.mergeable===false||pr.mergeable_state==='dirty') throw new Error('Prepared update is not mergeable.');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/head-sha', pr.head.sha);
+          console.log(`head_sha=${pr.head.sha}`);
+          console.log(`head_ref=${pr.head.ref}`);
+          NODE
+          head_sha="$(cat "$RUNNER_TEMP/head-sha")"
+          gh api "repos/$GITHUB_REPOSITORY/commits/$head_sha/check-runs?per_page=100" > "$RUNNER_TEMP/checks.json"
+          node <<'NODE'
+          const fs=require('fs');
+          const runs=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/checks.json','utf8')).check_runs||[];
+          if(!runs.length) throw new Error('Prepared update has no CI check runs.');
+          if(runs.some(r=>r.status!=='completed')) throw new Error('Prepared update checks are still running.');
+          const ok=new Set(['success','neutral','skipped']);
+          const bad=runs.filter(r=>!ok.has(r.conclusion));
+          if(bad.length) throw new Error(`Prepared update has failing checks: ${bad.map(r=>r.name).join(', ')}`);
+          NODE
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.resolve.outputs.head_sha }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Validate version and migration class
+        shell: bash
+        run: |
+          set -euo pipefail
+          base_branch="$(cat "$RUNNER_TEMP/base-branch")"
+          git fetch origin "$base_branch" --no-tags
+          node <<'NODE'
+          const fs=require('fs'),{execFileSync}=require('child_process');
+          const next=JSON.parse(fs.readFileSync('package.json','utf8')).version;
+          const lock=JSON.parse(fs.readFileSync('.platform/tenant.lock.json','utf8'));
+          const branch=fs.readFileSync(process.env.RUNNER_TEMP+'/base-branch','utf8').trim();
+          const base=JSON.parse(execFileSync('git',['show',`origin/${branch}:package.json`],{encoding:'utf8'})).version;
+          const major=v=>Number(/^([0-9]+)\./.exec(v)?.[1]??-1);
+          if(next!==process.env.EXPECTED_VERSION||lock.version!==next||lock.tag!==`v${next}`) throw new Error('PR package/tenant lock does not match requested version.');
+          if(major(base)!==major(next)) throw new Error('Major platform updates require an explicit migration workflow.');
+          NODE
+
+      - run: npm ci --legacy-peer-deps
+      - run: npm run verify
+
+      - name: Deploy tenant Convex backend
+        shell: bash
+        run: npx convex deploy --typecheck enable --message "Platform update v${EXPECTED_VERSION}"
+
+      - name: Revalidate exact PR head after backend deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          current="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.head.sha + " " + .state')"
+          expected="${{ steps.resolve.outputs.head_sha }} open"
+          test "$current" = "$expected" || { echo "PR changed after verification: $current" >&2; exit 1; }
+
+      - name: Merge exact verified PR
+        id: merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/merge" \
+            -f sha="${{ steps.resolve.outputs.head_sha }}" -f merge_method=merge \
+            -f commit_title="chore(platform): apply v${EXPECTED_VERSION}" > "$RUNNER_TEMP/merge.json"
+          node <<'NODE' >> "$GITHUB_OUTPUT"
+          const fs=require('fs');const result=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/merge.json','utf8'));
+          if(!result.merged||!result.sha) throw new Error(result.message||'Exact PR merge failed.');
+          console.log(`merge_sha=${result.sha}`);
+          NODE
+
+      - name: Trigger configured Vercel promotion
+        if: env.VERCEL_MODE == 'hook'
+        shell: bash
+        run: curl --fail --silent --show-error --max-time 20 -X POST "$VERCEL_DEPLOY_HOOK_URL" >/dev/null
+
+      - name: Verify exact frontend revision
+        shell: bash
+        env:
+          MERGE_SHA: ${{ steps.merge.outputs.merge_sha }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 90); do
+            body="$(curl -fsS --max-time 12 -H 'Cache-Control: no-cache' "${SITE_URL%/}/api/health?revision=$MERGE_SHA" 2>/dev/null || true)"
+            current="$(printf '%s' "$body" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{console.log(JSON.parse(s).buildVersion||'')}catch{console.log('')}})" )"
+            if [ "$current" = "$MERGE_SHA" ]; then echo "Exact frontend revision is live: $MERGE_SHA"; exit 0; fi
+            sleep 10
+          done
+          echo "Timed out waiting for exact frontend revision $MERGE_SHA" >&2
+          exit 1
+
+      - name: Report incomplete post-merge promotion
+        if: ${{ failure() && steps.merge.outputs.merge_sha != '' }}
+        continue-on-error: true
+        shell: bash
+        run: |
+          title="Platform update v${EXPECTED_VERSION} promotion incomplete"
+          body="The exact platform PR was merged after a successful Convex deployment, but frontend exact-revision verification did not complete. Review this workflow before retrying or changing deployment state."
+          number="$(gh issue list --state open --search "$title in:title" --json number --jq '.[0].number // empty' --limit 1)"
+          if [ -n "$number" ]; then gh issue edit "$number" --body "$body"; else gh issue create --title "$title" --body "$body"; fi

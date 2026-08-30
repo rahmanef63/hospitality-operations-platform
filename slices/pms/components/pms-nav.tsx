@@ -16,6 +16,7 @@ import {
   MoreHorizontal,
   PanelsTopLeft,
   Sparkles,
+  Settings2,
   UserRound,
   X,
 } from "lucide-react";
@@ -47,6 +48,7 @@ const groups = [
       { href: "/admin/welcome", label: "Sambutan", icon: BookOpenText },
       { href: "/admin/ai", label: "AI & Bahasa", icon: Bot },
       { href: "/admin/cms", label: "CMS", icon: PanelsTopLeft },
+      { href: "/admin/settings", label: "Settings", icon: Settings2 },
     ],
   },
 ] as const;
@@ -64,6 +66,8 @@ const moreItems = [
   groups[2].items[0],
   groups[2].items[2],
   groups[2].items[3],
+  groups[2].items[4],
+  groups[2].items[5],
 ] as const;
 
 function isCurrent(pathname: string, href: string) {

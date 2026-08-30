@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { execFileSync, spawnSync } from "node:child_process";
-import { compareVersions, distribution, isProtected, product, tagForVersion } from "./lib.mjs";
+import { compareVersions, distribution, isProtected, product, tagForVersion, versionFromUpdateBranch } from "./lib.mjs";
 
 const platform = product();
 const policy = distribution();
@@ -79,9 +79,10 @@ try {
   const merge = spawnSync("git", ["merge", "--no-ff", "--no-commit", requestedTag], { cwd: target, env: baseEnv, encoding: "utf8" });
   if (merge.status !== 0) {
     const conflicts = lines(capture("git", ["diff", "--name-only", "--diff-filter=U"]));
+    const diagnostics = conflicts.length ? conflicts : lines(`${merge.stderr ?? ""}\n${merge.stdout ?? ""}`).slice(0, 12);
     try { run("git", ["merge", "--abort"], { cwd: target, stdio: "ignore" }); } catch {}
-    notifyBlocked("Git merge conflict requires manual review.", conflicts);
-    throw new Error(`Merge conflict updating ${nwo} to ${requestedTag}`);
+    notifyBlocked(conflicts.length ? "Git merge conflict requires manual review." : "Git merge failed before a conflict set could be resolved.", diagnostics);
+    throw new Error(`Could not merge ${nwo} to ${requestedTag}`);
   }
 
   writeTargetJson(".platform/tenant.lock.json", { schemaVersion: 1, upstream: expectedUpstream, version: nextVersion, tag: requestedTag, commit: nextCommit, installedAt: new Date().toISOString() });
@@ -95,7 +96,7 @@ try {
 
   const existing = JSON.parse(capture("gh", ["pr", "list", "--repo", nwo, "--state", "open", "--head", updateBranch, "--base", baseBranch, "--json", "number,url", "--limit", "1"], process.cwd()) || "[]");
   const changes = lines(capture("git", ["log", "--oneline", "--no-merges", `${lock.tag}..${requestedTag}`], target)).slice(0, 30);
-  const body = [`## Hospitality Operations Platform ${requestedTag}`, "", `Automated update from \`${lock.version}\` to \`${nextVersion}\`.`, "", "### Validation", "- Tenant protected overlays were unchanged.", "- No tenant core-code drift was detected.", "- `npm run verify` passed on the merged tenant tree.", "", "### Upstream changes", ...(changes.length ? changes.map((item) => `- ${item}`) : ["- No non-merge commits listed."]), "", "Merge this PR to apply the platform update. Runtime data and secrets are not modified by this PR."].join("\n");
+  const body = [`## Hospitality Operations Platform ${requestedTag}`, "", `Automated update from \`${lock.version}\` to \`${nextVersion}\`.`, "", "### Validation", "- Tenant protected overlays were unchanged.", "- No tenant core-code drift was detected.", "- `npm run verify` passed on the merged tenant tree.", "", "### Upstream changes", ...(changes.length ? changes.map((item) => `- ${item}`) : ["- No non-merge commits listed."]), "", "Apply this update from the tenant `/admin/settings` Update now action so Convex deploys before the exact PR is merged and frontend promotion is verified. Runtime data and secrets are not modified by this PR."].join("\n");
   let url;
   if (existing[0]?.number) {
     run("gh", ["pr", "edit", String(existing[0].number), "--repo", nwo, "--title", `chore(platform): update to ${requestedTag}`, "--body", body], { cwd: process.cwd(), stdio: "ignore" });
@@ -103,6 +104,14 @@ try {
   } else {
     url = capture("gh", ["pr", "create", "--repo", nwo, "--head", updateBranch, "--base", baseBranch, "--title", `chore(platform): update to ${requestedTag}`, "--body", body], process.cwd());
   }
+  const openUpdates = JSON.parse(capture("gh", ["pr", "list", "--repo", nwo, "--state", "open", "--base", baseBranch, "--json", "number,headRefName,url", "--limit", "100"], process.cwd()) || "[]");
+  for (const candidate of openUpdates) {
+    if (candidate.headRefName === updateBranch) continue;
+    const candidateVersion = versionFromUpdateBranch(candidate.headRefName ?? "", policy.updater.branchPrefix);
+    if (!candidateVersion || compareVersions(candidateVersion, nextVersion) >= 0) continue;
+    run("gh", ["pr", "close", String(candidate.number), "--repo", nwo, "--comment", `Superseded by tested platform update ${requestedTag}.`, "--delete-branch"], { cwd: process.cwd(), stdio: "ignore" });
+  }
+
   const reviewers = (process.env.TENANT_REVIEWERS ?? "").split(",").map((item) => item.trim()).filter(Boolean);
   if (reviewers.length) run("gh", ["pr", "edit", url, "--repo", nwo, "--add-reviewer", reviewers.join(",")], { cwd: process.cwd(), stdio: "ignore" });
   console.log(JSON.stringify({ tenant: nwo, from: lock.version, to: nextVersion, branch: updateBranch, pullRequest: url }));

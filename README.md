@@ -1,6 +1,6 @@
 # Hospitality Operations Platform
 
-Versioned multi-property hospitality operations platform combining PMS, CMS, reservations, finance, operational tasks, guest experience, PWA, and tenant-safe distribution. **Hospitality Operations Platform / Property** is the first reference tenant and production proving ground; provider deployments are independently owned tenant repositories and cloud projects.
+Versioned multi-property hospitality operations platform combining PMS, CMS, reservations, finance, operational tasks, guest experience, PWA, and tenant-safe distribution. The upstream repository is deliberately provider-neutral; every real provider runs from an independently owned tenant repository and cloud deployment.
 
 The canonical product source is `rahmanef63/hospitality-operations-platform`. Tenant repositories receive tested SemVer update pull requests and keep provider secrets, business data, branding overlays, and deployment ownership separate from this upstream repository.
 
@@ -17,13 +17,13 @@ The canonical product source is `rahmanef63/hospitality-operations-platform`. Te
 ## Versioned tenant distribution
 
 - Upstream releases are tagged with Semantic Versioning (`vX.Y.Z`).
-- Managed tenant repositories are registered after the dedicated updater GitHub App is installed.
-- Each update is merged into an automation branch, validated against tenant overlay guards, built/tested, then opened as a pull request.
-- Provider operators receive the normal GitHub PR/reviewer notification and apply a clean update by merging the PR.
-- Core-code drift or merge conflicts block automation rather than overwriting customer work.
-- Arbitrary unknown clones cannot be notified by GitHub; installing the updater App is the explicit enrollment mechanism for managed updates.
+- Managed tenant routing lives only in the private updater control plane, never in this product repository.
+- Each release is prepared as a tested tenant PR after protected-overlay, drift, merge, and full-build checks.
+- `/admin/settings` is the tenant-owned update center: an eligible **Update now** request deploys Convex first, merges the exact verified PR SHA, then waits for the exact Vercel revision.
+- Core-code drift, merge conflicts, failed checks, or missing deployment configuration block automation rather than overwriting customer work.
+- Arbitrary clones are unmanaged until explicitly enrolled; a normal clone/fork does not grant the upstream operator control of that deployment.
 
-See `docs/PLATFORM-DISTRIBUTION.md` for provisioning, transfer, release, and update details.
+AI agents must read `docs/AI-AGENT-ONBOARDING.md` first. See `docs/PLATFORM-DISTRIBUTION.md` for provisioning, transfer, release, update, and recovery details.
 
 ## Routes
 
@@ -49,6 +49,7 @@ See `docs/PLATFORM-DISTRIBUTION.md` for provisioning, transfer, release, and upd
 | `/admin/tasks` | Housekeeping and operations tasks |
 | `/admin/welcome` | Reservation-linked 20-language welcome, announcement, prayer-time, and audio workflow |
 | `/admin/ai` | Encrypted BYOK provider settings and draft translation |
+| `/admin/settings` | Tenant platform version, prepared update status, and coordinated update action |
 | `/admin/cms` | Public CMS overview, draft/publish and secondary CMS navigation |
 | `/admin/cms/site` | Header, navigation, footer, and concierge chrome |
 | `/admin/cms/home` | Homepage composition, copy, SEO, CTAs, and media |
@@ -83,9 +84,11 @@ HOSPITALITY_ADMIN_SESSION_SECRET=
 HOSPITALITY_CONVEX_ADMIN_SECRET=
 HOSPITALITY_GUEST_LINK_SECRET=
 HOSPITALITY_AI_ENCRYPTION_KEY=
+HOSPITALITY_GITHUB_REPOSITORY=
+HOSPITALITY_UPDATE_GITHUB_TOKEN=
 ```
 
-`CONVEX_DEPLOY_KEY` is deployment-only and must never enter browser code or Docker build arguments.
+`HOSPITALITY_UPDATE_GITHUB_TOKEN` is tenant-scoped and server-only; it reads prepared tenant update state and dispatches the tenant-owned apply workflow. `CONVEX_DEPLOY_KEY` is deployment-only and belongs in tenant GitHub/CI secrets, never browser code or Docker build arguments. Repository variables `HOSPITALITY_SITE_URL` and `HOSPITALITY_VERCEL_MODE` complete the coordinated deployment contract.
 
 ## PWA and TV presentation
 
@@ -133,4 +136,4 @@ The repository enforces strict TypeScript, zero-warning ESLint, in-memory Convex
 
 Deploy Convex functions and provider environment values before promoting the matching frontend revision. Tenant repositories own their Vercel/Convex projects, domains, and secrets independently of upstream.
 
-See `docs/CMS.md`, `docs/PMS.md`, `docs/ADMIN-UX-PLAN.md`, `docs/GUEST-WELCOME-ADMIN.md`, and `docs/ARCHITECTURE.md`.
+Start with `docs/AI-AGENT-ONBOARDING.md`. See also `docs/PLATFORM-DISTRIBUTION.md`, `docs/PLATFORM-UPDATE-PROGRESS.md`, `docs/CMS.md`, `docs/PMS.md`, `docs/GUEST-WELCOME-ADMIN.md`, and `docs/ARCHITECTURE.md`.

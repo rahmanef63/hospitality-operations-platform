@@ -15,7 +15,8 @@
       "AdminLoginPage",
       "AdminDashboard",
       "AiSettingsPage",
-      "AnnouncementManager"
+      "AnnouncementManager",
+      "PlatformSettingsPage"
     ],
     "portable": true,
     "hardcodedUrls": []

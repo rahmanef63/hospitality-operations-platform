@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import { describe, expect, it } from "vitest";
-import { compareVersions, isProtected, tagForVersion } from "../scripts/platform/lib.mjs";
+import { compareVersions, isProtected, tagForVersion, versionFromUpdateBranch } from "../scripts/platform/lib.mjs";
 
 const product = JSON.parse(fs.readFileSync(".platform/product.json", "utf8"));
 const distribution = JSON.parse(fs.readFileSync(".platform/distribution.json", "utf8"));
@@ -40,7 +40,13 @@ describe("platform distribution", () => {
     const release = fs.readFileSync(".github/workflows/platform-release.yml", "utf8");
     expect(release).toContain("hospitality-platform-updater/dispatches");
     expect(release).not.toContain("HOSPITALITY_MANAGED_TENANTS");
+    expect(fs.existsSync(".platform/tenants.json")).toBe(false);
   });
+  it("parses and orders updater branches without treating arbitrary branches as releases", () => {
+    expect(versionFromUpdateBranch("platform/update-v1.3.2", "platform/update-")).toBe("1.3.2");
+    expect(versionFromUpdateBranch("feature/v1.3.2", "platform/update-")).toBeNull();
+  });
+
   it("configures updater Git identity before attempting the tenant merge", async () => {
     const { readFileSync } = await import("node:fs");
     const source = readFileSync("scripts/platform/sync-tenant.mjs", "utf8");

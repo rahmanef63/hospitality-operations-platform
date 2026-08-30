@@ -1,4 +1,5 @@
 const buildVersion = process.env.NEXT_PUBLIC_BUILD_VERSION?.trim()
+  || process.env.VERCEL_GIT_COMMIT_SHA?.trim()
   || process.env.SOURCE_COMMIT?.trim()
   || process.env.GITHUB_SHA?.trim()
   || `build-${Date.now().toString(36)}`;
@@ -8,7 +9,8 @@ const canonicalHost = canonical.hostname;
 const wwwHost = canonicalHost.startsWith("www.") ? canonicalHost.slice(4) : `www.${canonicalHost}`;
 /** @type {import("next").NextConfig} */
 const nextConfig = {
-  output: "standalone", cacheComponents: true, compress: true, poweredByHeader: false, reactStrictMode: true,
+  ...(process.env.VERCEL ? {} : { output: "standalone" }),
+  cacheComponents: true, compress: true, poweredByHeader: false, reactStrictMode: true,
   env: { NEXT_PUBLIC_BUILD_VERSION: buildVersion }, generateBuildId: async () => buildVersion,
   images: { formats: ["image/avif", "image/webp"], qualities: [75] },
   async redirects() { return [{ source: "/:path*", has: [{ type: "host", value: wwwHost }], destination: `${canonical.origin}/:path*`, permanent: true }]; },

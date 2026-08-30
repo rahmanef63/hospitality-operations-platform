@@ -49,6 +49,8 @@ authenticated admin form
 
 ## Tenant distribution
 
-Upstream uses Semantic Version releases. Managed tenant repositories receive update branches and pull requests only after protected-overlay checks, core-drift checks, merge checks, and the full tenant verification suite pass. Unsafe updates create a blocked-update issue rather than overwriting provider changes.
+Upstream uses Semantic Version releases. The private updater control plane prepares tenant PRs only after protected-overlay, core-drift, merge, and full tenant verification checks pass. Managed routing never lives in product source.
 
-See `docs/PLATFORM-DISTRIBUTION.md` for the full release contract.
+Application is tenant-owned: `/admin/settings` dispatches the tenant apply workflow, which revalidates the exact PR head, deploys Convex first, atomically merges that SHA, then waits for `/api/health` to report the exact Vercel build revision. Major releases require an explicit migration path.
+
+See `docs/AI-AGENT-ONBOARDING.md` and `docs/PLATFORM-DISTRIBUTION.md` for the full contract.

@@ -23,6 +23,7 @@
   "updater": {
     "branchPrefix": "platform/update-",
     "appIdSecret": "HOSPITALITY_UPDATER_APP_ID",
-    "privateKeySecret": "HOSPITALITY_UPDATER_PRIVATE_KEY"
+    "privateKeySecret": "HOSPITALITY_UPDATER_PRIVATE_KEY",
+    "tenantApplyWorkflow": "apply-platform-update.yml"
   }
 }

@@ -77,7 +77,7 @@ HOSPITALITY_GUEST_LINK_SECRET=
 HOSPITALITY_AI_ENCRYPTION_KEY=
 ```
 
-Both values must be strong random secrets of at least 32 characters. They belong only in the Dokploy runtime environment, never in Docker build arguments, client bundles, Git, or Convex documents. Rotating the guest-link secret invalidates previously shared links. Rotating the AI encryption key requires re-entering the BYOK API key.
+Both values must be strong random secrets of at least 32 characters. They belong only in the tenant server runtime secret store (for example Vercel project secrets or an equivalent container runtime), never in Docker build arguments, client bundles, Git, or Convex documents. Rotating the guest-link secret invalidates previously shared links. Rotating the AI encryption key requires re-entering the BYOK API key.
 
 ## TV presentation
 
