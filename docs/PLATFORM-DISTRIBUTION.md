@@ -93,3 +93,8 @@ Commit the two generated tenant metadata files on top of the release baseline, c
 ## Transferability
 
 A customer repository, Vercel project, domain, Convex project, secrets, and business data can be transferred independently. Removing a tenant from the updater registry or uninstalling the GitHub App stops future managed updates without affecting the running customer system.
+
+
+## Updater credentials
+
+Production should use a GitHub App installed on managed tenant repositories. During bootstrap, `HOSPITALITY_UPDATER_TOKEN` may be stored as an encrypted upstream Actions secret; migrate to the GitHub App before onboarding third-party providers. Tenant identifiers belong in the encrypted/control-plane configuration, never in source files.

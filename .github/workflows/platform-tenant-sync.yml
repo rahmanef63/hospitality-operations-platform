@@ -11,6 +11,8 @@ on:
         required: false
       HOSPITALITY_UPDATER_PRIVATE_KEY:
         required: false
+      HOSPITALITY_UPDATER_TOKEN:
+        required: false
   workflow_dispatch:
     inputs:
       tag:
@@ -21,6 +23,9 @@ on:
 permissions:
   contents: read
 
+env:
+  MANAGED_TENANTS: ${{ vars.HOSPITALITY_MANAGED_TENANTS }}
+
 jobs:
   prepare:
     if: github.repository == 'rahmanef63/hospitality-operations-platform'
@@ -29,14 +34,18 @@ jobs:
       tenants: ${{ steps.matrix.outputs.tenants }}
       count: ${{ steps.matrix.outputs.count }}
     steps:
-      - uses: actions/checkout@v4
       - id: matrix
         shell: bash
         run: |
           node <<'NODE' >> "$GITHUB_OUTPUT"
-          const fs = require('fs');
-          const registry = JSON.parse(fs.readFileSync('.platform/tenants.json', 'utf8'));
-          const tenants = registry.tenants.filter((tenant) => tenant.enabled !== false);
+          const raw = process.env.MANAGED_TENANTS?.trim() || '{"tenants":[]}';
+          const parsed = JSON.parse(raw);
+          const records = Array.isArray(parsed) ? parsed : (parsed.tenants ?? []);
+          const tenants = records.filter((tenant) => tenant.enabled !== false);
+          for (const tenant of tenants) {
+            if (!tenant.owner || !tenant.repo || !tenant.defaultBranch) throw new Error('Managed tenant records require owner, repo, and defaultBranch.');
+            tenant.reviewers ??= [];
+          }
           console.log(`tenants=${JSON.stringify(tenants)}`);
           console.log(`count=${tenants.length}`);
           NODE
@@ -49,18 +58,34 @@ jobs:
       matrix:
         tenant: ${{ fromJSON(needs.prepare.outputs.tenants) }}
     runs-on: ubuntu-latest
+    env:
+      UPDATER_APP_ID: ${{ secrets.HOSPITALITY_UPDATER_APP_ID }}
+      UPDATER_PRIVATE_KEY: ${{ secrets.HOSPITALITY_UPDATER_PRIVATE_KEY }}
+      UPDATER_FALLBACK_TOKEN: ${{ secrets.HOSPITALITY_UPDATER_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Create tenant-scoped updater token
         id: tenant-token
+        if: env.UPDATER_APP_ID != '' && env.UPDATER_PRIVATE_KEY != ''
         uses: actions/create-github-app-token@v2
         with:
-          app-id: ${{ secrets.HOSPITALITY_UPDATER_APP_ID }}
-          private-key: ${{ secrets.HOSPITALITY_UPDATER_PRIVATE_KEY }}
+          app-id: ${{ env.UPDATER_APP_ID }}
+          private-key: ${{ env.UPDATER_PRIVATE_KEY }}
           owner: ${{ matrix.tenant.owner }}
           repositories: ${{ matrix.tenant.repo }}
+      - name: Resolve updater credential
+        id: credential
+        shell: bash
+        env:
+          APP_TOKEN: ${{ steps.tenant-token.outputs.token }}
+        run: |
+          token="$APP_TOKEN"
+          if [ -z "$token" ]; then token="$UPDATER_FALLBACK_TOKEN"; fi
+          if [ -z "$token" ]; then echo 'No updater credential configured.' >&2; exit 1; fi
+          echo "token=$token" >> "$GITHUB_OUTPUT"
+          echo "::add-mask::$token"
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -72,4 +97,4 @@ jobs:
           TENANT_REPO: ${{ matrix.tenant.repo }}
           TENANT_DEFAULT_BRANCH: ${{ matrix.tenant.defaultBranch }}
           TENANT_REVIEWERS: ${{ join(matrix.tenant.reviewers, ',') }}
-          TENANT_TOKEN: ${{ steps.tenant-token.outputs.token }}
+          TENANT_TOKEN: ${{ steps.credential.outputs.token }}
