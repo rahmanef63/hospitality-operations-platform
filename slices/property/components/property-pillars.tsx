@@ -1,7 +1,7 @@
 import Image from "next/image";
-import type { PropertyContent } from "@/shared/content";
+import type { PropertyContent, PropertyPageUi } from "@/shared/content";
 
-export function PropertyPillars({ property }: { property: PropertyContent }) {
+export function PropertyPillars({ property, ui }: { property: PropertyContent; ui: PropertyPageUi }) {
   const leadImage = property.pillars[0]?.image;
   if (!leadImage) return null;
 
@@ -10,7 +10,7 @@ export function PropertyPillars({ property }: { property: PropertyContent }) {
       <div className="page-shell grid gap-14 lg:grid-cols-[.88fr_1.12fr] lg:gap-20">
         <div>
           <h2 className="content-inset scroll-reveal text-balance font-serif text-6xl leading-[0.9] tracking-[-0.035em] sm:text-8xl">
-            Considered in every direction.
+            {ui.pillarsTitle}
           </h2>
           <figure className="scroll-media mt-12">
             <div className="image-frame aspect-[4/5]">

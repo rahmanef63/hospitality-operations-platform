@@ -5,6 +5,7 @@ import { getPublishedWelcome } from "@/shared/convex";
 import { getPropertyBySlug } from "@/shared/content";
 import { defaultWelcomeContent, getWelcomeLocaleMeta, renderWelcomeContent } from "@/shared/welcome";
 import { resolveGuestWelcomeRequest } from "@/shared/welcome/resolve";
+import { getAnnouncementProgram } from "@/shared/announcements/server";
 
 export const metadata: Metadata = {
   title: "Kamyna TV Presentation",
@@ -24,12 +25,16 @@ export default async function Page({ searchParams }: {
   const property = await getPropertyBySlug(propertySlug);
   const propertyName = resolved.context?.propertyName ?? property?.name ?? "Ruma Kamyna";
   let content = defaultWelcomeContent(resolved.locale, propertyName);
-  try {
-    const published = await getPublishedWelcome(resolved.locale, propertySlug);
-    if (published) content = published.content;
-  } catch {
-    // Reviewed multilingual defaults keep this presentation available during backend interruptions.
-  }
+  const [published, announcements] = await Promise.all([
+    getPublishedWelcome(resolved.locale, propertySlug).catch(() => null),
+    getAnnouncementProgram({
+      propertySlug,
+      locale: resolved.locale,
+      timezone: property?.timezone ?? "Asia/Jakarta",
+      coordinates: property?.location.geo,
+    }),
+  ]);
+  if (published) content = published.content;
   const contactHref = property?.contact.whatsappHref ?? `mailto:${property?.contact.email ?? "hello@kamynaliving.com"}`;
   const meta = getWelcomeLocaleMeta(resolved.locale);
   return (
@@ -42,6 +47,7 @@ export default async function Page({ searchParams }: {
       token={resolved.token}
       contactHref={contactHref}
       contactLabel={meta.contactLabel}
+      announcements={announcements}
       tvMode={params.tv !== "0"}
     />
   );

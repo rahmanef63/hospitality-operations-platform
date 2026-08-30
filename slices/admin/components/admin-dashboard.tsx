@@ -4,21 +4,31 @@ import { WELCOME_LOCALE_OPTIONS } from "@/shared/welcome";
 import { ActivityPanel } from "./activity-panel";
 import { ReservationWelcomePanel } from "./reservation-welcome-panel";
 import { WelcomeEditor } from "./welcome-editor";
+import { AnnouncementManager } from "./announcement-manager";
 import type { AdminDashboardProps } from "../types";
 
 const statusMessages: Record<string, string> = {
   saved: "Draft tersimpan di Convex Cloud.",
   published: "Welcome message sudah dipublikasikan.",
   translated: "Terjemahan AI disimpan sebagai draft untuk ditinjau.",
+  "announcement-settings": "Pengaturan announcement dan audio tersimpan.",
+  "announcement-rule": "Announcement rule tersimpan.",
+  "announcement-archived": "Announcement rule diarsipkan.",
+  "announcement-seeded": "Greeting default berhasil dipasang.",
+  "experience-saved": "Tampilan welcome dan presentation sudah diperbarui.",
 };
 const errorMessages: Record<string, string> = {
   locale: "Pilihan bahasa tidak valid.",
   validation: "Periksa panjang dan field yang wajib diisi.",
   service: "Convex Cloud tidak dapat menyelesaikan permintaan.",
   ai: "Terjemahan AI tidak dapat diselesaikan. Periksa konfigurasi BYOK.",
+  "announcement-geo": "Koordinat properti harus tersedia sebelum prayer schedule diaktifkan.",
+  "announcement-validation": "Periksa field announcement, rentang waktu, token, dan volume.",
+  "announcement-service": "Announcement tidak dapat diperbarui. Coba kembali.",
+  "experience-validation": "Minimal satu slide harus aktif dan semua urutan, durasi, serta media harus valid.",
 };
 
-export function AdminDashboard({ overview, links, linkError, properties, selectedProperty, endpointUrl, previewUrl, backendError, status, error, selectedLocale, formAction }: AdminDashboardProps) {
+export function AdminDashboard({ overview, links, linkError, properties, selectedProperty, endpointUrl, previewUrl, backendError, status, error, selectedLocale, formAction, announcementOverview, announcementTimezone, announcementCoordinatesAvailable, prayerPreview, announcementSettingsAction, announcementExperienceAction, announcementRuleAction, announcementArchiveAction, announcementSeedAction }: AdminDashboardProps) {
   const publishedCount = Object.values(overview.configs).filter((config) => config.publishedAt).length;
   const selected = overview.configs[selectedLocale];
   return (
@@ -48,6 +58,19 @@ export function AdminDashboard({ overview, links, linkError, properties, selecte
         </form>
 
         <ReservationWelcomePanel links={links} linkError={linkError} />
+
+        <AnnouncementManager
+          overview={announcementOverview}
+          propertySlug={selectedProperty.slug}
+          timezone={announcementTimezone}
+          coordinatesAvailable={announcementCoordinatesAvailable}
+          prayerPreview={prayerPreview}
+          settingsAction={announcementSettingsAction}
+          experienceAction={announcementExperienceAction}
+          ruleAction={announcementRuleAction}
+          archiveAction={announcementArchiveAction}
+          seedAction={announcementSeedAction}
+        />
 
         <section className="overflow-hidden rounded-[.55rem] border border-charcoal/12 bg-white">
           <header className="border-b border-charcoal/10 p-5 sm:p-7"><p className="kicker text-umber">Language library</p><h2 className="mt-2 font-serif text-3xl">Pilih template yang akan diedit</h2></header>

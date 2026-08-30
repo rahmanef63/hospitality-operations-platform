@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { BotanicalMark } from "@/shared/brand";
-import type { PropertyContent } from "@/shared/content";
+import type { PropertyContent, PropertyPageUi } from "@/shared/content";
 
-export function PropertyStory({ property }: { property: PropertyContent }) {
+export function PropertyStory({ property, ui }: { property: PropertyContent; ui: PropertyPageUi }) {
   const firstImage = property.storyImages[0];
   const secondImage = property.storyImages[1];
   if (!firstImage || !secondImage) return null;
@@ -12,7 +12,7 @@ export function PropertyStory({ property }: { property: PropertyContent }) {
       <div className="page-shell">
         <div className="content-inset scroll-reveal grid gap-10 lg:grid-cols-12 lg:items-end">
           <p className="text-balance font-serif text-5xl leading-[1.02] tracking-[-0.03em] sm:text-7xl lg:col-span-9 lg:text-8xl">
-            Somewhere between arriving and leaving, time begins to feel different.
+            {ui.storyTitle}
           </p>
           <BotanicalMark className="hidden size-20 justify-self-end text-olive/75 lg:col-span-3 lg:block" />
         </div>

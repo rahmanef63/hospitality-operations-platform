@@ -25,8 +25,13 @@
   "features": [
     {
       "slug": "tv-pwa",
+      "version": "1.1.0",
+      "description": "Fullscreen configurable guest slideshow, CC0 lo-fi audio, install lifecycle, offline fallback, and version restart."
+    },
+    {
+      "slug": "guest-announcements",
       "version": "1.0.0",
-      "description": "Fullscreen guest slideshow, install lifecycle, offline fallback, and version restart."
+      "description": "Property-scoped time-window, fixed-time, and verified-coordinate prayer announcements with opt-in speech and presentation ambient audio."
     }
   ],
   "slices": [
@@ -68,13 +73,13 @@
     },
     {
       "slug": "welcome",
-      "version": "1.2.1",
+      "version": "1.3.0",
       "category": "guest-experience",
       "addedAt": "2026-08-28"
     },
     {
       "slug": "admin",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "category": "operations",
       "addedAt": "2026-08-28"
     },
@@ -83,6 +88,12 @@
       "version": "1.0.0",
       "category": "operations",
       "addedAt": "2026-08-28"
+    },
+    {
+      "slug": "cms",
+      "version": "1.0.0",
+      "category": "operations",
+      "addedAt": "2026-08-30"
     }
   ],
   "skills": [
@@ -107,7 +118,9 @@
       "adminSecurity",
       "pms",
       "welcomeReservations",
-      "aiSettings"
+      "aiSettings",
+      "announcements",
+      "cms"
     ]
   }
 }

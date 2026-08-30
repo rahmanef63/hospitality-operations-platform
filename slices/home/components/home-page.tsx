@@ -6,16 +6,15 @@ import { IntroductionSection } from "./introduction-section";
 import { PhilosophySection } from "./philosophy-section";
 import { RitualsSection } from "./rituals-section";
 
-export function HomePage({ content, properties }: HomePageProps) {
+export function HomePage({ content, properties, ui }: HomePageProps) {
   const primaryProperty = properties[0];
-  return (
-    <main id="main-content">
-      <HeroSection content={content.hero} />
-      <IntroductionSection content={content.introduction} />
-      <CollectionSection content={content.collection} properties={properties} />
-      <RitualsSection content={content.rituals} />
-      <PhilosophySection content={content.philosophy} />
-      <ContactSection content={content.contact} property={primaryProperty} />
-    </main>
-  );
+  const sections = {
+    hero: <HeroSection content={content.hero} />,
+    introduction: <IntroductionSection content={content.introduction} />,
+    collection: <CollectionSection content={content.collection} properties={properties} linkLabel={ui.collectionLinkLabel} />,
+    rituals: <RitualsSection content={content.rituals} />,
+    philosophy: <PhilosophySection content={content.philosophy} />,
+    contact: <ContactSection content={content.contact} property={primaryProperty} />,
+  };
+  return <main id="main-content">{ui.sections.order.filter((id) => !ui.sections.hidden.includes(id)).map((id) => <div key={id}>{sections[id]}</div>)}</main>;
 }

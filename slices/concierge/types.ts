@@ -1,8 +1,9 @@
-import type { NavigationItem } from "@/shared/content";
+import type { ConciergeUi, NavigationItem } from "@/shared/content";
 import type { ConciergeLink } from "@/shared/concierge";
 
 export type GuestConciergeProps = {
   navigation: NavigationItem[];
+  config: ConciergeUi;
 };
 
 export type ConciergeMessage = {

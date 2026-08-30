@@ -3,7 +3,7 @@ import { Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BrandAsset } from "../types";
 
-export function AssetCard({ asset, index }: { asset: BrandAsset; index: number }) {
+export function AssetCard({ asset, index, eyebrow, downloadLabel }: { asset: BrandAsset; index: number; eyebrow: string; downloadLabel: string }) {
   const reversed = index % 2 === 1;
   return (
     <article className="grid border-t border-charcoal/16 lg:grid-cols-12">
@@ -13,7 +13,7 @@ export function AssetCard({ asset, index }: { asset: BrandAsset; index: number }
           reversed ? "lg:order-2 lg:pl-14" : "lg:pr-14",
         )}
       >
-        <p className="text-sm font-semibold text-umber">Scalable vector source</p>
+        <p className="text-sm font-semibold text-umber">{eyebrow}</p>
         <div className="mt-16 lg:mt-24">
           <h2 className="text-balance font-serif text-5xl leading-[0.94] tracking-[-0.03em] sm:text-6xl">
             {asset.name}
@@ -22,7 +22,7 @@ export function AssetCard({ asset, index }: { asset: BrandAsset; index: number }
             {asset.description}
           </p>
           <a href={asset.href} download className="editorial-link mt-9">
-            Download source
+            {downloadLabel}
             <Download className="size-4" aria-hidden="true" />
           </a>
         </div>

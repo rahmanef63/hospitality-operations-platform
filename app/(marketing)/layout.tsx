@@ -6,10 +6,10 @@ export default async function MarketingLayout({ children }: Readonly<{ children:
   const content = await getSiteContent();
   return (
     <div className="min-h-screen bg-ivory text-charcoal">
-      <SiteHeader navigation={content.navigation} />
+      {content.publicUi.shell.showHeader ? <SiteHeader navigation={content.navigation} /> : null}
       {children}
-      <SiteFooter footer={content.footer} />
-      <GuestConcierge navigation={content.navigation} />
+      {content.publicUi.shell.showFooter ? <SiteFooter footer={content.footer} /> : null}
+      <GuestConcierge navigation={content.navigation} config={content.publicUi.shell.concierge} />
     </div>
   );
 }

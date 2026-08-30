@@ -20,11 +20,20 @@ import {
 } from "./pms/validators";
 import { welcomeLocaleValidator } from "./welcomeLocale";
 import { aiProviderValidator } from "./aiValidators";
+import { announcementKindValidator, lofiTrackKeyValidator, madhabValidator, prayerMethodValidator, prayerNameValidator, presentationSlideValidator } from "./announcementValidators";
 
 const locale = welcomeLocaleValidator;
 const timestamps = { createdAt: v.number(), updatedAt: v.number(), archived: v.boolean() };
 
 export default defineSchema({
+  cmsSnapshots: defineTable({
+    key: v.string(), draftJson: v.string(), publishedJson: v.optional(v.string()),
+    version: v.number(), updatedAt: v.number(), publishedAt: v.optional(v.number()),
+  }).index("by_key", ["key"]),
+  cmsAuditEvents: defineTable({
+    key: v.string(), action: v.union(v.literal("seed"), v.literal("save"), v.literal("publish")),
+    actorEmailHash: v.string(), version: v.number(), createdAt: v.number(),
+  }).index("by_key_created", ["key", "createdAt"]),
   welcomeConfigs: defineTable({
     propertySlug: v.string(), locale,
     draftHeadline: v.string(), draftBody: v.string(), draftSignature: v.string(),
@@ -42,6 +51,31 @@ export default defineSchema({
     provider: v.optional(aiProviderValidator), targetCount: v.optional(v.number()),
     actorEmailHash: v.string(), createdAt: v.number(),
   }).index("by_created", ["createdAt"]),
+  announcementSettings: defineTable({
+    propertySlug: v.string(), prayerEnabled: v.boolean(), prayerMethod: prayerMethodValidator,
+    madhab: madhabValidator, announcementVolume: v.number(), musicEnabled: v.boolean(),
+    musicVolume: v.number(), musicTrackKey: v.optional(lofiTrackKeyValidator),
+    welcomeShowBrand: v.optional(v.boolean()), welcomeShowLanguage: v.optional(v.boolean()),
+    welcomeShowAnnouncement: v.optional(v.boolean()), welcomeShowBody: v.optional(v.boolean()),
+    welcomeShowStay: v.optional(v.boolean()), welcomeShowContact: v.optional(v.boolean()),
+    welcomeShowSignature: v.optional(v.boolean()), welcomeShowPrivateNote: v.optional(v.boolean()),
+    presentationShowBrand: v.optional(v.boolean()), presentationShowLanguage: v.optional(v.boolean()),
+    presentationShowAnnouncement: v.optional(v.boolean()), presentationShowCounter: v.optional(v.boolean()),
+    presentationShowInstall: v.optional(v.boolean()), presentationSlides: v.optional(v.array(presentationSlideValidator)),
+    createdAt: v.number(), updatedAt: v.number(),
+  }).index("by_property", ["propertySlug"]),
+  announcementRules: defineTable({
+    propertySlug: v.string(), name: v.string(), locale, kind: announcementKindValidator,
+    message: v.string(), enabled: v.boolean(), speak: v.boolean(),
+    startTime: v.optional(v.string()), endTime: v.optional(v.string()), fixedTime: v.optional(v.string()),
+    prayer: v.optional(prayerNameValidator), offsetMinutes: v.number(), displayMinutes: v.number(),
+    priority: v.number(), createdAt: v.number(), updatedAt: v.number(), archived: v.boolean(),
+  }).index("by_property", ["propertySlug"]).index("by_property_archived", ["propertySlug", "archived"]),
+  announcementAuditEvents: defineTable({
+    propertySlug: v.string(), resource: v.union(v.literal("settings"), v.literal("experience"), v.literal("rule")),
+    resourceId: v.string(), action: v.union(v.literal("create"), v.literal("update"), v.literal("archive"), v.literal("seed")),
+    summary: v.string(), actorEmailHash: v.string(), createdAt: v.number(),
+  }).index("by_property_created", ["propertySlug", "createdAt"]),
 
   adminLoginAttempts: defineTable({
     fingerprint: v.string(), failures: v.number(), windowStartedAt: v.number(),

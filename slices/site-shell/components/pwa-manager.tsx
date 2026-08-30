@@ -19,6 +19,26 @@ function isInstalledMode() {
     || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
 }
 
+
+function isAdminRoute() {
+  return window.location.pathname.startsWith("/admin");
+}
+
+function clearStorageByPrefix(storage: Storage, prefixes: readonly string[]) {
+  const keys = Array.from({ length: storage.length }, (_, index) => storage.key(index)).filter((key): key is string => Boolean(key));
+  for (const key of keys) if (prefixes.some((prefix) => key.startsWith(prefix))) storage.removeItem(key);
+}
+
+function cleanupPublicClientState() {
+  clearStorageByPrefix(window.localStorage, ["kamyna:", "kamyna-pwa-"]);
+  clearStorageByPrefix(window.sessionStorage, ["kamyna:", "kamyna-pwa-"]);
+  for (const part of document.cookie.split(";")) {
+    const name = part.split("=")[0]?.trim();
+    if (!name || !(name.startsWith("kamyna-public-") || name.startsWith("kamyna-pwa-"))) continue;
+    document.cookie = `${name}=; Max-Age=0; Path=/; SameSite=Lax`;
+  }
+}
+
 function readWorkerVersion(worker: ServiceWorker): Promise<string | undefined> {
   return new Promise((resolve) => {
     const channel = new MessageChannel();
@@ -41,10 +61,12 @@ export function PwaManager() {
   const reloadingRef = useRef(false);
   const restartingRef = useRef(false);
   const installPromptRef = useRef<InstallPromptEvent | undefined>(undefined);
+  const cleanupBeforeReloadRef = useRef(false);
 
   const reloadLatest = useCallback(() => {
     if (!restartingRef.current || reloadingRef.current) return;
     reloadingRef.current = true;
+    if (cleanupBeforeReloadRef.current && !isAdminRoute()) cleanupPublicClientState();
     window.location.reload();
   }, []);
 
@@ -148,22 +170,32 @@ export function PwaManager() {
   }, [promptInstall, reloadLatest]);
 
 
-  async function restartWithLatest() {
+  const restartWithLatest = useCallback(async (automatic = false) => {
+    if (restartingRef.current) return;
     setRestarting(true);
     restartingRef.current = true;
+    cleanupBeforeReloadRef.current = !isAdminRoute();
     const current = registration ?? await navigator.serviceWorker?.getRegistration("/");
     if (!current) {
+      if (cleanupBeforeReloadRef.current) cleanupPublicClientState();
       window.location.reload();
       return;
     }
     if (!current.waiting) await current.update().catch(() => undefined);
     if (current.waiting) {
-      current.waiting.postMessage({ type: "KAMYNA_SKIP_WAITING" });
+      current.waiting.postMessage({ type: "KAMYNA_SKIP_WAITING", automatic });
       window.setTimeout(reloadLatest, 5000);
       return;
     }
+    if (cleanupBeforeReloadRef.current) cleanupPublicClientState();
     window.location.reload();
-  }
+  }, [registration, reloadLatest]);
+
+  useEffect(() => {
+    if (!updateReady || restarting || isAdminRoute()) return;
+    const timer = window.setTimeout(() => void restartWithLatest(true), 900);
+    return () => window.clearTimeout(timer);
+  }, [restartWithLatest, restarting, updateReady]);
 
   function dismissInstall() {
     window.localStorage.setItem(DISMISS_KEY, String(Date.now()));
@@ -181,9 +213,9 @@ export function PwaManager() {
         <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-olive/10 text-olive">{updateReady ? <RefreshCw className={`size-5 ${restarting ? "animate-spin" : ""}`} aria-hidden="true" /> : <Download className="size-5" aria-hidden="true" />}</span>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-bold">{updateReady ? "Versi baru Kamyna siap" : showManual ? "Pasang dari menu browser" : "Pasang Kamyna sebagai aplikasi"}</p>
-          <p className="mt-1 text-xs leading-6 text-ink-soft">{updateReady ? "Restart akan mengaktifkan build terbaru dan menghapus hanya cache Kamyna dari versi lama." : showManual ? "Pilih Install app atau Add to Home screen. Dukungan pemasangan pada browser TV berbeda-beda." : "Dapatkan jendela standalone, launcher icon, offline fallback, dan pengalaman layar penuh yang lebih bersih."}</p>
+          <p className="mt-1 text-xs leading-6 text-ink-soft">{updateReady ? isAdminRoute() ? "Build baru siap. Restart manual menjaga sesi dan data admin tetap utuh." : "Aplikasi akan restart otomatis, mengaktifkan build terbaru, dan membersihkan cache serta state publik Kamyna versi lama." : showManual ? "Pilih Install app atau Add to Home screen. Dukungan pemasangan pada browser TV berbeda-beda." : "Dapatkan jendela standalone, launcher icon, offline fallback, dan pengalaman layar penuh yang lebih bersih."}</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            {updateReady ? <button type="button" onClick={restartWithLatest} disabled={restarting} className="cta-solid min-h-11 disabled:opacity-60">{restarting ? "Restarting…" : "Restart sekarang"}</button> : showInstall ? <button type="button" onClick={promptInstall} className="cta-solid min-h-11">Install app</button> : null}
+            {updateReady ? <button type="button" onClick={() => void restartWithLatest(false)} disabled={restarting} className="cta-solid min-h-11 disabled:opacity-60">{restarting ? "Updating…" : isAdminRoute() ? "Restart sekarang" : "Update sekarang"}</button> : showInstall ? <button type="button" onClick={promptInstall} className="cta-solid min-h-11">Install app</button> : null}
             {!updateReady ? <button type="button" onClick={dismissInstall} className="cta-outline min-h-11">Nanti</button> : null}
           </div>
           <p className="mt-2 font-mono text-[.58rem] text-charcoal/38">build {PWA_BUILD_VERSION.slice(0, 14)}</p>

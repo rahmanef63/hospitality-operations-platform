@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import type { GuidePageProps } from "../types";
 
-export function GuidePage({ guide, property }: GuidePageProps) {
+export function GuidePage({ guide, property, ui }: GuidePageProps) {
   return (
     <main id="main-content" className="bg-paper">
       <section className="section-pad-compact">
@@ -11,7 +11,7 @@ export function GuidePage({ guide, property }: GuidePageProps) {
           <div className="content-inset scroll-reveal flex flex-col justify-between border-y border-charcoal/16 py-8 lg:py-10 lg:pr-12">
             <Link prefetch={false} href={`/stays/${property.slug}`} className="editorial-link w-fit text-charcoal/72">
               <ArrowLeft className="size-4" aria-hidden="true" />
-              Back to Ruma Kamyna
+              {ui.backLabel}
             </Link>
             <div className="mt-20">
               <p className="kicker text-umber">{guide.eyebrow}</p>
@@ -41,9 +41,9 @@ export function GuidePage({ guide, property }: GuidePageProps) {
       <section className="section-pad bg-ivory">
         <div className="page-shell content-inset grid gap-14 lg:grid-cols-[.6fr_1.4fr] lg:gap-24">
           <div className="scroll-reveal lg:sticky lg:top-28 lg:self-start">
-            <p className="kicker text-umber">Megamendung notes</p>
+            <p className="kicker text-umber">{ui.notesEyebrow}</p>
             <p className="text-balance mt-7 font-serif text-5xl leading-[0.95] tracking-[-0.03em] sm:text-6xl">
-              Useful only when it is verified.
+              {ui.notesTitle}
             </p>
           </div>
           <div className="border-y border-charcoal/18">
@@ -58,7 +58,7 @@ export function GuidePage({ guide, property }: GuidePageProps) {
           </div>
           <div className="lg:col-start-2">
             <Link prefetch={false} href={`/stays/${property.slug}`} className="cta-solid">
-              View Ruma Kamyna in Megamendung
+              {ui.propertyCtaLabel}
               <ArrowUpRight className="size-4" aria-hidden="true" />
             </Link>
           </div>

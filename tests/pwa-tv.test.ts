@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import manifest from "@/app/manifest";
 import { GET as presentationManifestResponse } from "@/app/presentation.webmanifest/route";
 import { GET as serviceWorker } from "@/app/sw.js/route";
+import { LOFI_TRACKS } from "@/shared/announcements";
 
 const root = process.cwd();
 const read = (file: string) => readFileSync(path.join(root, file), "utf8");
@@ -11,11 +12,8 @@ const read = (file: string) => readFileSync(path.join(root, file), "utf8");
 describe("TV presentation and PWA lifecycle", () => {
   it("keeps the main app mobile-oriented while publishing richer install metadata", () => {
     const value = manifest();
-    expect(value.id).toBe("/");
-    expect(value.start_url).toBe("/");
-    expect(value.display).toBe("standalone");
+    expect(value).toMatchObject({ id: "/", start_url: "/", display: "standalone", orientation: "portrait-primary" });
     expect(value.display_override).toEqual(["standalone", "minimal-ui"]);
-    expect(value.orientation).toBe("portrait-primary");
     expect(value.icons).toHaveLength(5);
     expect(value.screenshots).toHaveLength(2);
     expect(value.shortcuts?.some((shortcut) => shortcut.url === "/presentation?tv=1")).toBe(true);
@@ -28,61 +26,81 @@ describe("TV presentation and PWA lifecycle", () => {
     const response = presentationManifestResponse();
     const value = await response.json();
     expect(response.headers.get("content-type")).toContain("application/manifest+json");
-    expect(value).toMatchObject({
-      id: "/presentation",
-      start_url: "/presentation?tv=1",
-      display: "fullscreen",
-      orientation: "landscape",
-    });
+    expect(value).toMatchObject({ id: "/presentation", start_url: "/presentation?tv=1", display: "fullscreen", orientation: "landscape" });
     expect(read("app/presentation/page.tsx")).toContain('manifest: "/presentation.webmanifest"');
     expect(read("app/welcome/page.tsx")).not.toContain("PresentationPage");
     expect(read("slices/welcome/components/welcome-page.tsx")).not.toContain("WelcomePresentation");
   });
 
-  it("serves a no-cache worker with bounded cleanup and private-route exclusions", async () => {
+  it("serves a no-cache worker with bounded cleanup, private-route exclusions, and offline audio", async () => {
     const response = serviceWorker();
     const source = await response.text();
     expect(response.headers.get("cache-control")).toContain("no-store");
     expect(response.headers.get("service-worker-allowed")).toBe("/");
     expect(source).toContain("KAMYNA_SKIP_WAITING");
-    expect(source).toContain("KAMYNA_SW_ACTIVATED");
     expect(source).toContain('key.startsWith(CONFIG.cachePrefix + "-")');
     expect(source).toContain('url.pathname.startsWith("/admin")');
     expect(source).toContain('url.pathname.startsWith("/api")');
     expect(source).toContain('["/welcome", "/presentation"].includes(url.pathname)');
     expect(source).toContain('url.searchParams.has("token")');
-    expect(source).toContain("CONFIG.presentationUrl");
+    expect(source).toContain('pathname.startsWith("/audio/")');
+    expect(source).toContain("audioRangeResponse");
+    expect(source).toContain('request.headers.has("range")');
+    expect(source).toContain('"Content-Range"');
+    expect(source).toContain('fetch(request, { cache: "no-store" })');
+    expect(source).toContain('/^bytes=([0-9]+)-([0-9]*)$/');
+    expect(source).toContain('status: 206');
     expect(source).not.toContain("localStorage.clear");
+    for (const track of LOFI_TRACKS) {
+      expect(source).toContain(track.src);
+      expect(existsSync(path.join(root, "public", track.src.replace(/^\//, "")))).toBe(true);
+    }
   });
 
-  it("prompts before activating a new build and cleaning obsolete Kamyna caches", () => {
+  it("auto-activates public updates with bounded cleanup while protecting admin sessions", () => {
     const manager = read("slices/site-shell/components/pwa-manager.tsx");
     expect(manager).toContain("beforeinstallprompt");
     expect(manager).toContain("updatefound");
     expect(manager).toContain("controllerchange");
     expect(manager).toContain("KAMYNA_SKIP_WAITING");
     expect(manager).toContain("KAMYNA_GET_VERSION");
-    expect(manager).toContain("version !== PWA_BUILD_VERSION");
-    expect(manager).toContain("Restart sekarang");
+    expect(manager).toContain("cleanupPublicClientState");
+    expect(manager).toContain('window.location.pathname.startsWith("/admin")');
+    expect(manager).toContain('window.setTimeout(() => void restartWithLatest(true), 900)');
+    expect(manager).toContain('name.startsWith("kamyna-public-")');
+    expect(manager).toContain('name.startsWith("kamyna-pwa-")');
+    expect(manager).not.toContain("localStorage.clear()");
+    expect(manager).not.toContain('document.cookie = "__Host-kamyna-admin');
     expect(manager).toContain('updateViaCache: "none"');
-    expect(read("app/layout.tsx")).toContain("<PwaManager />");
-    expect(read("app/offline/page.tsx")).toContain("data-kamyna-offline");
   });
 
-  it("ships /presentation with fullscreen, remote keys, wake lock, and reduced motion", () => {
+  it("ships configurable /presentation slides, real CC0 lo-fi, fullscreen, remote keys, and wake lock", () => {
     const presentation = read("slices/welcome/components/welcome-presentation.tsx");
-    const styles = read("app/presentation.css");
+    const page = read("slices/welcome/components/presentation-page.tsx");
+    const music = read("slices/welcome/hooks/use-lofi-music.ts");
     expect(presentation).toContain("requestFullscreen");
     expect(presentation).toContain("wakeLock");
-    expect(presentation).toContain('"ArrowRight"');
-    expect(presentation).toContain("MediaPlayPause");
-    expect(presentation).toContain('event.key.toLowerCase() === "f"');
-    expect(presentation).toContain("prefers-reduced-motion: reduce");
-    expect(presentation).toContain("SLIDE_INTERVAL");
-    expect(presentation).toContain('routePath="/presentation"');
-    expect(styles).toContain(".welcome-tv-root:fullscreen");
-    expect(styles).toContain("min-aspect-ratio: 16/10");
-    expect(read("slices/admin/components/reservation-welcome-panel.tsx")).toContain('url.pathname = "/presentation"');
-    expect(read("slices/admin/components/welcome-editor.tsx")).toContain("presentationUrl");
+    expect(presentation).toContain('event.key.toLowerCase() === "m"');
+    expect(presentation).toContain("music.track.title");
+    expect(presentation).not.toContain("Play ambient music");
+    expect(music).toContain("new Audio(input.track.src)");
+    expect(music).toContain("audio.loop = true");
+    expect(page).toContain("presentationSlides");
+    expect(page).toContain("durationSeconds");
+    expect(read("public/audio/LICENSE.txt")).toContain("CC0 1.0 Universal");
+    expect(read("slices/admin/components/announcement-settings-form.tsx")).toContain("LOFI_TRACKS");
+    expect(read("slices/admin/components/guest-experience-settings-form.tsx")).toContain("Slide composition");
+  });
+
+  it("keeps /welcome full-viewport with admin-controlled sections and an icon-only announcement mute", () => {
+    const welcome = read("slices/welcome/components/welcome-page.tsx");
+    const styles = read("app/welcome.css");
+    expect(welcome).toContain('min-h-[100svh] min-h-[100dvh] w-full');
+    expect(welcome).not.toContain('max-w-[96rem]');
+    expect(welcome).toContain("welcomeShowLanguage");
+    expect(welcome).toContain("welcomeShowStay");
+    expect(welcome).toContain("Unmute guest announcements");
+    expect(welcome).toContain('aria-live="polite"');
+    expect(styles).toContain("height: 100dvh");
   });
 });

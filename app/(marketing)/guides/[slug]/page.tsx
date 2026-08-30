@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { GuidePage } from "@/features/guides";
 import { SITE_NAME, SITE_URL } from "@/shared/config/site";
-import { getAreaGuideBySlug, getPropertyBySlug, listAreaGuides } from "@/shared/content";
+import { getAreaGuideBySlug, getPropertyBySlug, getSiteContent, listAreaGuides } from "@/shared/content";
 import { socialImages } from "@/shared/media";
 import { buildAreaGuideSchema, JsonLd } from "@/shared/seo";
 
@@ -52,12 +52,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const { slug } = await params;
   const guide = await getAreaGuideBySlug(slug);
   if (!guide) notFound();
-  const property = await getPropertyBySlug(guide.relatedPropertySlug);
+  const [property, site] = await Promise.all([getPropertyBySlug(guide.relatedPropertySlug), getSiteContent()]);
   if (!property) notFound();
   return (
     <>
       <JsonLd data={buildAreaGuideSchema(guide, property)} />
-      <GuidePage guide={guide} property={property} />
+      <GuidePage guide={guide} property={property} ui={site.publicUi.guide} />
     </>
   );
 }

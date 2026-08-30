@@ -36,7 +36,7 @@ export function SiteFooter({ footer }: SiteFooterProps) {
       <div className="border-t border-ivory/10">
         <div className="page-shell content-inset flex flex-col gap-3 py-6 text-xs text-ivory/55 sm:flex-row sm:items-center sm:justify-between">
           <p>© {COPYRIGHT_YEAR} {footer.legal}</p>
-          <p className="lowercase tracking-[0.18em]">return to stillness</p>
+          <p className="lowercase tracking-[0.18em]">{footer.tagline}</p>
         </div>
       </div>
     </footer>

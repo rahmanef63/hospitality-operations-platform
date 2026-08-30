@@ -1,4 +1,5 @@
 import "server-only";
+import { cacheLife, cacheTag } from "next/cache";
 import { api } from "@/convex/_generated/api";
 import {
   RUMA_KAMYNA_PUBLIC_FALLBACK,
@@ -82,6 +83,9 @@ export async function seedRumaKamyna(actorEmailHash: string) {
 }
 
 export async function getPublicPropertyFacts(slug: string): Promise<PublicPropertyFacts | null> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("public-property-facts", `property-facts:${slug}`);
   try {
     const data = await getConvexClient().query(api.pms.public.getProperty, { slug });
     if (data) {

@@ -4,7 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import { BrandLockup } from "@/shared/brand";
 import type { CollectionSectionProps } from "../types";
 
-export function CollectionSection({ content, properties }: CollectionSectionProps) {
+export function CollectionSection({ content, properties, linkLabel }: CollectionSectionProps) {
   const property = properties[0];
   const primaryImage = content.images[0];
   const secondaryImage = content.images[1];
@@ -43,7 +43,7 @@ export function CollectionSection({ content, properties }: CollectionSectionProp
               </h3>
               <p className="mt-7 max-w-xl text-sm leading-7 text-ivory/68 sm:text-base">{property.shortDescription}</p>
               <Link prefetch={false} href={`/stays/${property.slug}`} className="editorial-link mt-9 text-ivory">
-                Discover Ruma Kamyna in Puncak, Bogor
+                {linkLabel}
                 <ArrowUpRight className="size-4" aria-hidden="true" />
               </Link>
             </div>

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { GalleryItem, PropertyContent } from "@/shared/content";
+import type { GalleryItem, PropertyContent, PropertyPageUi } from "@/shared/content";
 
 function GalleryFigure({ item, className, sizes }: { item: GalleryItem; className: string; sizes: string }) {
   return (
@@ -14,7 +14,7 @@ function GalleryFigure({ item, className, sizes }: { item: GalleryItem; classNam
   );
 }
 
-export function PropertyGallery({ property }: { property: PropertyContent }) {
+export function PropertyGallery({ property, ui }: { property: PropertyContent; ui: PropertyPageUi }) {
   const first = property.gallery[0];
   const second = property.gallery[1];
   const third = property.gallery[2];
@@ -26,10 +26,10 @@ export function PropertyGallery({ property }: { property: PropertyContent }) {
       <div className="page-shell">
         <div className="content-inset scroll-reveal">
           <h2 className="text-balance max-w-5xl font-serif text-6xl leading-[0.9] tracking-[-0.035em] sm:text-8xl">
-            A home made of quiet details.
+            {ui.galleryTitle}
           </h2>
           <p className="mt-7 max-w-2xl text-base leading-8 text-ink-soft">
-            Light, material, proportion, and everyday objects work together without asking to become the centre of attention.
+            {ui.galleryDescription}
           </p>
         </div>
 

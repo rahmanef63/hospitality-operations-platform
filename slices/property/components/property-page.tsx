@@ -8,17 +8,16 @@ import { PropertyPillars } from "./property-pillars";
 import { PropertyRhythm } from "./property-rhythm";
 import { PropertyStory } from "./property-story";
 
-export function PropertyPage({ property, guides, facts }: PropertyPageProps) {
-  return (
-    <main id="main-content">
-      <PropertyHero property={property} />
-      <PropertyStory property={property} />
-      <PropertyFacts facts={facts} />
-      <PropertyGallery property={property} />
-      <PropertyPillars property={property} />
-      <PropertyRhythm property={property} />
-      <PropertyGuides guides={guides} />
-      <PropertyEnquiry property={property} />
-    </main>
-  );
+export function PropertyPage({ property, guides, facts, ui }: PropertyPageProps) {
+  const sections = {
+    hero: <PropertyHero property={property} ui={ui} />,
+    story: <PropertyStory property={property} ui={ui} />,
+    facts: <PropertyFacts facts={facts} ui={ui} />,
+    gallery: <PropertyGallery property={property} ui={ui} />,
+    pillars: <PropertyPillars property={property} ui={ui} />,
+    rhythm: <PropertyRhythm property={property} ui={ui} />,
+    guides: <PropertyGuides guides={guides} ui={ui} />,
+    enquiry: <PropertyEnquiry property={property} ui={ui} />,
+  };
+  return <main id="main-content">{ui.sections.order.filter((id) => !ui.sections.hidden.includes(id)).map((id) => <div key={id}>{sections[id]}</div>)}</main>;
 }

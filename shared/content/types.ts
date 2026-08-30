@@ -69,6 +69,7 @@ export type PropertyContent = {
   collectionLabel: string;
   tagline: string;
   status: string;
+  timezone: string;
   shortDescription: string;
   heroStatement: string;
   visualNote: string;
@@ -148,14 +149,101 @@ export type HomeContent = {
   };
 };
 
+export type HomeSectionId = "hero" | "introduction" | "collection" | "rituals" | "philosophy" | "contact";
+export type PropertySectionId = "hero" | "story" | "facts" | "gallery" | "pillars" | "rhythm" | "guides" | "enquiry";
+
+export type SectionComposition<T extends string> = { order: T[]; hidden: T[] };
+
+export type ConciergeUi = {
+  enabled: boolean;
+  desktopButtonLabel: string;
+  mobileButtonLabel: string;
+  eyebrow: string;
+  title: string;
+  openingMessage: string;
+  suggestions: string[];
+  unavailableMessage: string;
+  inputPlaceholder: string;
+  privacyNote: string;
+};
+
+export type HomePageUi = {
+  seoTitle: string;
+  seoDescription: string;
+  sections: SectionComposition<HomeSectionId>;
+  collectionLinkLabel: string;
+};
+
+export type PropertyPageUi = {
+  sections: SectionComposition<PropertySectionId>;
+  backLabel: string;
+  storyTitle: string;
+  factsEyebrow: string;
+  factsTitle: string;
+  bookableUnitsLabel: string;
+  galleryTitle: string;
+  galleryDescription: string;
+  pillarsTitle: string;
+  rhythmEyebrow: string;
+  rhythmTitle: string;
+  guidesEyebrow: string;
+  guidesTitle: string;
+  guidesDescription: string;
+  guideReadLabel: string;
+  enquiryTitle: string;
+  enquiryDescription: string;
+  whatsappLabel: string;
+};
+
+export type GuidePageUi = {
+  backLabel: string;
+  notesEyebrow: string;
+  notesTitle: string;
+  propertyCtaLabel: string;
+};
+
+export type BrandAssetCopy = { href: string; name: string; description: string; visible: boolean };
+export type BrandAssetsUi = {
+  seoTitle: string;
+  seoDescription: string;
+  visible: boolean;
+  backLabel: string;
+  heroEyebrow: string;
+  heroTitle: string;
+  heroDescription: string;
+  heroMediaKey: string;
+  identityEyebrow: string;
+  identityTitle: string;
+  assetEyebrow: string;
+  downloadLabel: string;
+  paletteVisible: boolean;
+  paletteEyebrow: string;
+  paletteTitle: string;
+  usageVisible: boolean;
+  usageEyebrow: string;
+  usageTitle: string;
+  usageRules: string[];
+  assets: BrandAssetCopy[];
+};
+
+export type PublicUiConfig = {
+  shell: { showHeader: boolean; showFooter: boolean; concierge: ConciergeUi };
+  home: HomePageUi;
+  properties: Record<string, PropertyPageUi>;
+  guide: GuidePageUi;
+  brandAssets: BrandAssetsUi;
+};
+
 export type SiteContent = {
   navigation: NavigationItem[];
   home: HomeContent;
   properties: PropertyContent[];
+  publicUi: PublicUiConfig;
   footer: {
     statement: string;
     links: NavigationItem[];
     legal: string;
+    tagline: string;
   };
 };
 

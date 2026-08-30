@@ -34,18 +34,29 @@ The worker bypasses `/admin/*`, `/api/*`, and any `/welcome` or `/presentation` 
 
 ## New-version restart
 
-Each build embeds one build ID in the app and worker. The client checks for updates on load, focus, visibility return, and every 15 minutes. When a new worker waits, a persistent **Restart sekarang** toast appears.
+Each build embeds one build ID in the app and worker. The client checks for updates on load, focus, visibility return, and every 15 minutes.
 
-Restart performs this bounded sequence:
+On public routes, a waiting worker is activated automatically. The update sequence is deliberately bounded:
 
 1. send `KAMYNA_SKIP_WAITING`;
 2. activate the new worker;
-3. delete only obsolete cache names beginning with `kamyna-pwa-`;
-4. claim active windows and notify them after cleanup;
-5. reload once under the new controller.
+3. delete only obsolete Cache Storage entries whose name starts with `kamyna-pwa-`;
+4. clear only Kamyna-owned public `localStorage`/`sessionStorage` keys and non-HttpOnly public cookies using the `kamyna:` / `kamyna-pwa-` / `kamyna-public-` prefixes;
+5. claim active windows and reload once under the new controller.
 
-It never clears cookies, local storage, unrelated caches, or server-only secrets.
+`/admin/*` never auto-restarts. Admin receives a manual restart action so unsaved forms are not interrupted. The signed `__Host-kamyna-admin` HttpOnly cookie is never targeted or cleared. Unrelated cookies, storage, caches, and browser data are untouched.
 
 ## Verification
 
 Run `npm run verify` and `npm run smoke`, then check `/presentation` at 1920×1080, 1280×720, and 390×844. Verify keyboard/remote navigation, fullscreen feature detection, service-worker registration, manifest parsing, offline fallback, and an update cycle across two build versions.
+
+## Presentation audio
+
+The `/presentation` controls include an icon-only lo-fi toggle and the keyboard shortcut `M`. Audio starts muted and plays only after a user gesture. The selected same-origin MP3 is chosen per property in admin, loops locally, supports PWA byte-range playback, and stops when the component is removed. All bundled tracks are original sample-free Kamyna recordings dedicated under CC0 1.0; see `docs/AUDIO-LICENSES.md`.
+
+The regular `/welcome` route has a separate icon-only announcement mute control. This does not turn the presentation music on or off. Both routes remain usable when their respective browser audio APIs are unavailable.
+
+
+## Configurable lo-fi and presentation composition
+
+The selected presentation track, volume, slide visibility, order, duration, media, brand chrome, language selector, counter, and install button are property-scoped settings managed from `/admin/welcome`. The three bundled loops are original, sample-free recordings dedicated under CC0 1.0 and documented in `docs/AUDIO-LICENSES.md`. Playback always starts muted and requires a user gesture. The `M` key mirrors the icon-only music control. Audio files are same-origin PWA assets and are available to the generic offline presentation shell.

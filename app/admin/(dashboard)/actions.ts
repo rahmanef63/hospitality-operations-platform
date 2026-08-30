@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { hashAdminIdentity, requireAdminSession } from "@/shared/admin";
 import { pmsAdminRequest } from "@/shared/convex";
@@ -102,6 +102,7 @@ export async function pmsAction(formData: FormData) {
   } catch {
     redirect(resultUrl(returnTo, "error", "operation"));
   }
+  updateTag("public-property-facts");
   revalidatePath("/admin", "layout");
   revalidatePath("/stays/ruma-kamyna");
   redirect(resultUrl(returnTo, "status", "saved"));

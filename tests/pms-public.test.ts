@@ -47,7 +47,8 @@ describe("public PMS projection", () => {
     const { readFileSync } = await import("node:fs");
     const page = readFileSync("app/(marketing)/stays/[slug]/page.tsx", "utf8");
     const facts = readFileSync("slices/property/components/property-facts.tsx", "utf8");
-    expect(page).toContain("await connection()");
+    expect(page).not.toContain("await connection()");
+    expect(readFileSync("shared/convex/pms.ts", "utf8")).toContain('cacheTag("public-property-facts"');
     expect(page).toContain("getPublicPropertyFacts");
     expect(page).toContain("getPublicPropertyFacts(slug)");
     expect(facts).toContain("facts.amenities.map");

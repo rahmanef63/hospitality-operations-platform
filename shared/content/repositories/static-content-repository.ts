@@ -1,16 +1,6 @@
-import { areaGuides, footerLinks, homeContent, navigation, properties } from "../config";
+import { areaGuides, properties, siteContent } from "../config";
 import type { AreaGuideContent, ContentRepository, PropertyContent, SiteContent } from "../types";
 
-const siteContent: SiteContent = {
-  navigation,
-  home: homeContent,
-  properties,
-  footer: {
-    statement: "A growing collection of homes for slower living.",
-    links: footerLinks,
-    legal: "Kamyna Living. All rights reserved.",
-  },
-};
 
 export class StaticContentRepository implements ContentRepository {
   async getSiteContent(): Promise<SiteContent> {

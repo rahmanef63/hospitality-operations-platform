@@ -6,20 +6,13 @@ import type { ConciergeReply } from "@/shared/concierge";
 import type { ConciergeMessage, GuestConciergeProps } from "../types";
 import { PublicMobileDock } from "./public-mobile-dock";
 
-const openingMessage: ConciergeMessage = {
-  id: "opening",
-  role: "assistant",
-  text: "Selamat datang. Saya concierge informasi otomatis Ruma Kamyna. Saya hanya menjawab dari detail properti yang sudah diverifikasi.",
-  suggestions: ["Fasilitas apa saja?", "Lokasinya di mana?", "Bagaimana cara reservasi?"],
-};
-
 function messageId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-export function GuestConcierge({ navigation }: GuestConciergeProps) {
+export function GuestConcierge({ navigation, config }: GuestConciergeProps) {
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<ConciergeMessage[]>([openingMessage]);
+  const [messages, setMessages] = useState<ConciergeMessage[]>(() => [{ id: "opening", role: "assistant", text: config.openingMessage, suggestions: config.suggestions }]);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -70,7 +63,7 @@ export function GuestConcierge({ navigation }: GuestConciergeProps) {
         {
           id: messageId(),
           role: "assistant",
-          text: "Informasi otomatis sedang tidak tersedia. Silakan hubungi host melalui bagian Contact untuk bantuan langsung.",
+          text: config.unavailableMessage,
         },
       ]);
     } finally {
@@ -80,9 +73,9 @@ export function GuestConcierge({ navigation }: GuestConciergeProps) {
 
   return (
     <>
-      <PublicMobileDock navigation={navigation} chatOpen={open} onChatOpen={() => setOpen(true)} />
+      <PublicMobileDock navigation={navigation} chatOpen={open} onChatOpen={() => setOpen(true)} chatLabel={config.mobileButtonLabel} showChat={config.enabled} />
 
-      <button
+      {config.enabled ? <button
         type="button"
         onClick={() => setOpen(true)}
         aria-expanded={open}
@@ -90,10 +83,10 @@ export function GuestConcierge({ navigation }: GuestConciergeProps) {
         className="fixed bottom-6 right-6 z-[80] hidden min-h-13 items-center gap-3 border border-charcoal bg-charcoal px-5 text-xs font-bold tracking-[.1em] text-ivory uppercase shadow-[0_18px_45px_rgba(45,43,39,0.24)] transition hover:bg-olive md:flex"
       >
         <MessageCircle className="size-4" aria-hidden="true" />
-        Ask Kamyna
-      </button>
+        {config.desktopButtonLabel}
+      </button> : null}
 
-      {open ? (
+      {open && config.enabled ? (
         <>
           <button
             type="button"
@@ -110,8 +103,8 @@ export function GuestConcierge({ navigation }: GuestConciergeProps) {
           >
             <header className="flex items-start justify-between gap-5 border-b border-charcoal/12 bg-charcoal px-5 py-4 text-ivory">
               <div>
-                <p className="text-[0.62rem] font-bold tracking-[.16em] text-warm-sand uppercase">Ruma Kamyna</p>
-                <h2 id="kamyna-concierge-title" className="mt-1 font-serif text-2xl leading-none">Kamyna Concierge</h2>
+                <p className="text-[0.62rem] font-bold tracking-[.16em] text-warm-sand uppercase">{config.eyebrow}</p>
+                <h2 id="kamyna-concierge-title" className="mt-1 font-serif text-2xl leading-none">{config.title}</h2>
               </div>
               <button
                 type="button"
@@ -188,7 +181,7 @@ export function GuestConcierge({ navigation }: GuestConciergeProps) {
                   onChange={(event) => setInput(event.target.value)}
                   maxLength={400}
                   autoComplete="off"
-                  placeholder="Tanyakan fasilitas, lokasi, atau reservasi"
+                  placeholder={config.inputPlaceholder}
                   className="min-h-13 min-w-0 bg-transparent px-4 text-sm outline-none"
                 />
                 <button
@@ -200,7 +193,7 @@ export function GuestConcierge({ navigation }: GuestConciergeProps) {
                   <Send className="size-4" aria-hidden="true" />
                 </button>
               </div>
-              <p className="mt-2 px-1 text-[0.62rem] leading-5 text-ink-soft">Tidak menyimpan percakapan. Harga dan ketersediaan dikonfirmasi langsung oleh host.</p>
+              <p className="mt-2 px-1 text-[0.62rem] leading-5 text-ink-soft">{config.privacyNote}</p>
             </form>
           </section>
         </>

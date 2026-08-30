@@ -1,4 +1,5 @@
 import { Bath, BedDouble, Dumbbell, House, Mountain, Waves } from "lucide-react";
+import type { PropertyPageUi } from "@/shared/content";
 import type { PublicAmenity, PublicPropertyFacts } from "@/shared/pms";
 
 const amenityIcons = {
@@ -21,7 +22,7 @@ function AmenityItem({ amenity }: { amenity: PublicAmenity }) {
   );
 }
 
-export function PropertyFacts({ facts }: { facts: PublicPropertyFacts }) {
+export function PropertyFacts({ facts, ui }: { facts: PublicPropertyFacts; ui: PropertyPageUi }) {
   const bedroomLabel = facts.bedroomCount
     ? `${facts.bedroomCount} ${facts.bedroomCount === 1 ? "bedroom" : "bedrooms"}`
     : null;
@@ -30,9 +31,9 @@ export function PropertyFacts({ facts }: { facts: PublicPropertyFacts }) {
       <div className="page-shell">
         <div className="content-inset grid gap-8 lg:grid-cols-[.72fr_1.28fr] lg:items-end">
           <div>
-            <p className="kicker text-umber">At a glance</p>
+            <p className="kicker text-umber">{ui.factsEyebrow}</p>
             <h2 id="property-facts-title" className="mt-6 font-serif text-6xl leading-[.9] tracking-[-.04em] sm:text-8xl">
-              The essentials, clearly stated.
+              {ui.factsTitle}
             </h2>
           </div>
           <div className="lg:pb-2">
@@ -52,7 +53,7 @@ export function PropertyFacts({ facts }: { facts: PublicPropertyFacts }) {
         ) : null}
         {facts.units.length ? (
           <div className="content-inset mt-10 border-t border-charcoal/16 pt-8">
-            <p className="kicker text-umber">Bookable units</p>
+            <p className="kicker text-umber">{ui.bookableUnitsLabel}</p>
             <ul className="mt-5 flex flex-wrap gap-3">
               {facts.units.map((unit) => (
                 <li key={unit.id} className="border border-charcoal/18 bg-paper px-4 py-3 text-sm">

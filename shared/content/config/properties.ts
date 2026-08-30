@@ -10,6 +10,7 @@ export const properties: PropertyContent[] = [
     collectionLabel: "Megamendung, Puncak Bogor",
     tagline: "return to stillness",
     status: "Stay enquiries are open",
+    timezone: "Asia/Jakarta",
     shortDescription:
       "A private three-bedroom villa in Megamendung, Puncak Bogor, with a swimming pool, gym, jacuzzi, and mountain view.",
     heroStatement: "A private home for slower days.",

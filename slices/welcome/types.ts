@@ -1,3 +1,4 @@
+import type { AnnouncementProgram, PresentationSlideKey } from "@/shared/announcements";
 import type { MediaVariant } from "@/shared/media";
 import type {
   RenderedWelcome,
@@ -7,12 +8,13 @@ import type {
 } from "@/shared/welcome";
 
 export type WelcomePresentationSlide = {
-  id: string;
+  id: PresentationSlideKey;
   src: string;
   alt: string;
   caption: string;
   width: number;
   height: number;
+  durationSeconds: number;
   variants?: readonly MediaVariant[];
 };
 
@@ -25,6 +27,7 @@ export type WelcomePageProps = {
   token?: string;
   contactHref: string;
   contactLabel: string;
+  announcements: AnnouncementProgram;
 };
 
 export type WelcomePresentationProps = WelcomePageProps & {

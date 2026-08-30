@@ -23,7 +23,7 @@ if (manifest.auth?.provider !== expected.auth) errors.push(`auth.provider must b
 if (manifest.convex?.mode !== "cloud") errors.push("convex.mode must be cloud");
 if (manifest.convex?.urlEnv !== "NEXT_PUBLIC_CONVEX_URL") errors.push("convex.urlEnv must be NEXT_PUBLIC_CONVEX_URL");
 if (manifest.convex?.generatedDir !== "convex/_generated") errors.push("convex.generatedDir must be convex/_generated");
-for (const domain of ["welcome", "adminSecurity", "pms"]) {
+for (const domain of ["welcome", "adminSecurity", "pms", "announcements", "cms"]) {
   if (!manifest.convex?.domains?.includes(domain)) errors.push(`convex.domains must include ${domain}`);
 }
 for (const file of ["api.d.ts", "api.js", "dataModel.d.ts", "server.d.ts", "server.js"]) {

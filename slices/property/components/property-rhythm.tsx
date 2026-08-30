@@ -1,14 +1,14 @@
 import { BotanicalMark } from "@/shared/brand";
-import type { PropertyContent } from "@/shared/content";
+import type { PropertyContent, PropertyPageUi } from "@/shared/content";
 
-export function PropertyRhythm({ property }: { property: PropertyContent }) {
+export function PropertyRhythm({ property, ui }: { property: PropertyContent; ui: PropertyPageUi }) {
   return (
     <section className="section-pad bg-warm-sand/52">
       <div className="page-shell grid gap-14 lg:grid-cols-[.68fr_1.32fr] lg:gap-24">
         <div className="content-inset scroll-reveal lg:sticky lg:top-28 lg:self-start">
-          <p className="kicker text-umber">A day at Ruma</p>
+          <p className="kicker text-umber">{ui.rhythmEyebrow}</p>
           <h2 className="text-balance mt-7 font-serif text-6xl leading-[0.9] tracking-[-0.04em] sm:text-8xl">
-            Let the day unfold slowly.
+            {ui.rhythmTitle}
           </h2>
           <BotanicalMark className="mt-10 size-18 text-olive/75" />
         </div>

@@ -17,10 +17,14 @@ export function PublicMobileDock({
   navigation,
   chatOpen,
   onChatOpen,
+  chatLabel,
+  showChat,
 }: {
   navigation: NavigationItem[];
   chatOpen: boolean;
   onChatOpen: () => void;
+  chatLabel: string;
+  showChat: boolean;
 }) {
   const pathname = usePathname();
   const [hash, setHash] = useState("");
@@ -35,7 +39,7 @@ export function PublicMobileDock({
   return (
     <nav
       aria-label="Mobile navigation"
-      className="fixed inset-x-0 bottom-0 z-[90] grid grid-cols-5 border-t border-charcoal/12 bg-paper/96 pt-1.5 shadow-[0_-16px_40px_rgba(45,43,39,0.12)] backdrop-blur-xl md:hidden"
+      className={`fixed inset-x-0 bottom-0 z-[90] grid ${showChat ? "grid-cols-5" : "grid-cols-4"} border-t border-charcoal/12 bg-paper/96 pt-1.5 shadow-[0_-16px_40px_rgba(45,43,39,0.12)] backdrop-blur-xl md:hidden`}
       style={{
         paddingBottom: "max(0.45rem, env(safe-area-inset-bottom))",
         paddingLeft: "max(0.25rem, env(safe-area-inset-left))",
@@ -61,6 +65,7 @@ export function PublicMobileDock({
           </Link>
         );
       })}
+{showChat ? (
       <button
         type="button"
         aria-expanded={chatOpen}
@@ -71,8 +76,9 @@ export function PublicMobileDock({
         }`}
       >
         <MessagesSquare className={`size-4.5 ${chatOpen ? "text-olive" : ""}`} aria-hidden="true" />
-        <span>Chat</span>
+        <span>{chatLabel}</span>
       </button>
+      ) : null}
     </nav>
   );
 }

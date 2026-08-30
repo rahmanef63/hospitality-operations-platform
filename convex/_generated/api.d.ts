@@ -11,6 +11,9 @@
 import type * as adminSecurity from "../adminSecurity.js";
 import type * as aiSettings from "../aiSettings.js";
 import type * as aiValidators from "../aiValidators.js";
+import type * as announcementValidators from "../announcementValidators.js";
+import type * as announcements from "../announcements.js";
+import type * as cms from "../cms.js";
 import type * as http from "../http.js";
 import type * as lib_admin from "../lib/admin.js";
 import type * as pms_availability from "../pms/availability.js";
@@ -41,6 +44,9 @@ declare const fullApi: ApiFromModules<{
   adminSecurity: typeof adminSecurity;
   aiSettings: typeof aiSettings;
   aiValidators: typeof aiValidators;
+  announcementValidators: typeof announcementValidators;
+  announcements: typeof announcements;
+  cms: typeof cms;
   http: typeof http;
   "lib/admin": typeof lib_admin;
   "pms/availability": typeof pms_availability;

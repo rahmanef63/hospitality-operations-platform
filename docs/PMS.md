@@ -29,6 +29,7 @@ No bathroom count, guest capacity, rate, deposit, minimum stay, check-in time, c
 | `/admin/tasks` | Housekeeping, maintenance, inspection, and guest requests |
 | `/admin/welcome` | Reservation-linked welcome links and 20-language publishing |
 | `/admin/ai` | Encrypted BYOK provider and draft-only auto-translation |
+| `/admin/cms/*` | Draft/publish public content management with a secondary sidebar/dock |
 
 All routes share the existing signed admin session and remain `noindex`. Desktop exposes them in a persistent grouped sidebar; mobile exposes primary modules in a safe-area dock and the remaining modules in a bounded “Lainnya” sheet.
 
@@ -81,7 +82,7 @@ The Convex admin secret is server-only, the deploy key is deployment-only, and n
 
 ## Public property facts
 
-The property page reads only active, published facts and amenities through the public read-only `pms.public.getProperty` query. If Convex is temporarily unavailable, the page uses a reviewed Ruma Kamyna fallback containing the same five owner-confirmed facts. Public JSON-LD adds `numberOfRooms` and `amenityFeature`, but omits pricing, capacity, bathrooms, ratings, availability, and policies until confirmed.
+The property page reads only active, published facts and amenities through the public read-only `pms.public.getProperty` query. This public projection is held behind a tagged Next.js server cache and invalidated when PMS writes occur, so normal page requests do not query Convex repeatedly. If Convex is temporarily unavailable, the page uses a reviewed Ruma Kamyna fallback containing the same five owner-confirmed facts. Public JSON-LD adds `numberOfRooms` and `amenityFeature`, but omits pricing, capacity, bathrooms, ratings, availability, and policies until confirmed.
 
 ## Cross-module integrations
 
@@ -90,3 +91,9 @@ The property page reads only active, published facts and amenities through the p
 - `/admin/welcome` reads live reservations and contacts, while `/welcome` resolves its property and published template from the reservation.
 - Finance derives currency from the linked reservation/property; tasks derive property/unit from linked reservations; calendar and reservations share one availability projection.
 - No module auto-creates payments, tasks, reservations, units, or property facts without an explicit admin action.
+
+## Guest announcement domain
+
+The `announcementSettings`, `announcementRules`, and `announcementAuditEvents` tables add property-scoped scheduling without putting guest or reservation data into reusable templates. Rules can be created, updated, paused, prioritized, or archived from `/admin/welcome`; deletion uses archive semantics. Public reads return only active rules for the requested property and locale.
+
+Prayer-time rules are computed from verified property coordinates, the property timezone, an explicit calculation method, and an explicit Asr madhab. The feature is off by default and does not guess a location. Announcement speech and the procedural ambient layer are muted until the viewer acts.

@@ -30,14 +30,15 @@ describe("public and admin navigation shells", () => {
     expect(nav).toContain("fixed inset-x-0 bottom-0");
     expect(nav).toContain("env(safe-area-inset-bottom)");
     expect(nav).toContain('href: "/admin/ai"');
+    expect(nav).toContain('href: "/admin/cms"');
     expect(nav).not.toContain("overflow-x-auto");
   });
 
   it("ships the chatbot only on public routes with desktop and mobile launchers", () => {
     const concierge = read("slices/concierge/components/guest-concierge.tsx");
     const api = read("app/api/concierge/route.ts");
-    expect(concierge).toContain("Ask Kamyna");
-    expect(concierge).toContain("Kamyna Concierge");
+    expect(concierge).toContain("config.desktopButtonLabel");
+    expect(concierge).toContain("config.title");
     expect(concierge).toContain("<PublicMobileDock");
     expect(concierge).toContain("hidden min-h-13");
     expect(api).toContain('"Cache-Control": "no-store"');

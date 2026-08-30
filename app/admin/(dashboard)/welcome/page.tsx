@@ -1,11 +1,14 @@
 import { AdminDashboard } from "@/features/admin";
 import { SITE_URL } from "@/shared/config/site";
+import { getPropertyBySlug } from "@/shared/content";
+import { calculatePrayerMoments, defaultAnnouncementSettings, defaultRulesForProperty, type AnnouncementAdminOverview } from "@/shared/announcements";
 import { requireAdminSession } from "@/shared/admin";
-import { getPmsBookingData, getPmsCatalog, getWelcomeAdminOverview } from "@/shared/convex";
+import { getAnnouncementAdminOverview, getPmsBookingData, getPmsCatalog, getWelcomeAdminOverview } from "@/shared/convex";
 import type { PmsBookingData, PmsCatalog } from "@/shared/pms";
 import { DEFAULT_WELCOME_CONTENT, WELCOME_LOCALES, defaultWelcomeContent, parseWelcomeLocale, type ReservationWelcomeLink, type WelcomeAdminOverview } from "@/shared/welcome";
 import { buildReservationWelcomeLinks } from "@/shared/welcome/server";
 import { updateWelcomeAction } from "./actions";
+import { archiveAnnouncementRuleAction, ensureAnnouncementDefaultsAction, updateAnnouncementSettingsAction, updateGuestVisibilityAction, upsertAnnouncementRuleAction } from "./announcement-actions";
 
 const emptyCatalog: PmsCatalog = { properties: [], units: [], amenities: [] };
 const emptyBooking: PmsBookingData = { guests: [], reservations: [] };
@@ -17,6 +20,14 @@ function fallbackOverview(propertyName: string): WelcomeAdminOverview {
       draft: propertyName === "Ruma Kamyna" ? DEFAULT_WELCOME_CONTENT[locale] : defaultWelcomeContent(locale, propertyName),
       version: 0,
     }])) as WelcomeAdminOverview["configs"],
+    events: [],
+  };
+}
+
+function fallbackAnnouncements(propertySlug: string): AnnouncementAdminOverview {
+  return {
+    settings: defaultAnnouncementSettings(propertySlug),
+    rules: defaultRulesForProperty(propertySlug),
     events: [],
   };
 }
@@ -36,11 +47,18 @@ export default async function Page({ searchParams }: {
   const selectedProperty = catalog.properties.find((property) => property.slug === params.property)
     ?? catalog.properties.find((property) => property.slug === "ruma-kamyna")
     ?? catalog.properties[0]
-    ?? { slug: "ruma-kamyna", name: "Ruma Kamyna" };
+    ?? { slug: "ruma-kamyna", name: "Ruma Kamyna", timezone: "Asia/Jakarta" };
+  const propertyContent = await getPropertyBySlug(selectedProperty.slug);
+  const announcementTimezone = "timezone" in selectedProperty ? selectedProperty.timezone : propertyContent?.timezone ?? "Asia/Jakarta";
+  const announcementCoordinates = propertyContent?.location.geo;
+  let announcementOverview = fallbackAnnouncements(selectedProperty.slug);
   let overview = fallbackOverview(selectedProperty.name);
   let links: ReservationWelcomeLink[] = [];
   let linkError = false;
   if (!backendError) {
+    try {
+      announcementOverview = await getAnnouncementAdminOverview(selectedProperty.slug);
+    } catch { backendError = true; }
     try {
       const loaded = await getWelcomeAdminOverview(selectedProperty.slug);
       overview = {
@@ -57,6 +75,12 @@ export default async function Page({ searchParams }: {
       links = buildReservationWelcomeLinks(booking, catalog).filter((link) => link.propertySlug === selectedProperty.slug);
     } catch { linkError = true; }
   }
+  const prayerPreview = announcementCoordinates ? calculatePrayerMoments({
+    ...announcementCoordinates,
+    timezone: announcementTimezone,
+    method: announcementOverview.settings.prayerMethod,
+    madhab: announcementOverview.settings.madhab,
+  }) : [];
   return (
     <AdminDashboard
       sessionEmail={session.email}
@@ -72,6 +96,15 @@ export default async function Page({ searchParams }: {
       error={params.error}
       selectedLocale={selectedLocale}
       formAction={updateWelcomeAction}
+      announcementOverview={announcementOverview}
+      announcementTimezone={announcementTimezone}
+      announcementCoordinatesAvailable={Boolean(announcementCoordinates)}
+      prayerPreview={prayerPreview}
+      announcementSettingsAction={updateAnnouncementSettingsAction}
+      announcementExperienceAction={updateGuestVisibilityAction}
+      announcementRuleAction={upsertAnnouncementRuleAction}
+      announcementArchiveAction={archiveAnnouncementRuleAction}
+      announcementSeedAction={ensureAnnouncementDefaultsAction}
     />
   );
 }

@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
 import { PropertyPage } from "@/features/property";
 import { SITE_NAME, SITE_URL } from "@/shared/config/site";
-import { getPropertyBySlug, listAreaGuides, listProperties } from "@/shared/content";
+import { getPropertyBySlug, getSiteContent, listAreaGuides, listProperties } from "@/shared/content";
 import { getPublicPropertyFacts } from "@/shared/convex";
 import { buildPropertySchema, JsonLd } from "@/shared/seo";
 
@@ -55,18 +54,17 @@ export const instant = false;
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  await connection();
-  const [property, guides, facts] = await Promise.all([
-    getPropertyBySlug(slug),
-    listAreaGuides(),
-    getPublicPropertyFacts(slug),
+  const [property, guides, facts, site] = await Promise.all([
+    getPropertyBySlug(slug), listAreaGuides(), getPublicPropertyFacts(slug), getSiteContent(),
   ]);
   if (!property || !facts) notFound();
   const relatedGuides = guides.filter((guide) => guide.relatedPropertySlug === property.slug);
+  const pageUi = site.publicUi.properties[property.slug];
+  if (!pageUi) notFound();
   return (
     <>
       <JsonLd data={buildPropertySchema(property, facts)} />
-      <PropertyPage property={property} guides={relatedGuides} facts={facts} />
+      <PropertyPage property={property} guides={relatedGuides} facts={facts} ui={pageUi} />
     </>
   );
 }

@@ -118,6 +118,12 @@ const protectedRoutes = [
   "/admin/tasks",
   "/admin/welcome",
   "/admin/ai",
+  "/admin/cms",
+  "/admin/cms/site",
+  "/admin/cms/home",
+  "/admin/cms/properties",
+  "/admin/cms/guides",
+  "/admin/cms/brand-assets",
 ];
 for (const route of protectedRoutes) {
   const response = await fetch(`${target}${route}`, { redirect: "manual" });

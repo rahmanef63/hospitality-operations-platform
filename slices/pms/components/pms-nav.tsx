@@ -14,6 +14,7 @@ import {
   House,
   LogOut,
   MoreHorizontal,
+  PanelsTopLeft,
   Sparkles,
   UserRound,
   X,
@@ -45,6 +46,7 @@ const groups = [
       { href: "/admin/tasks", label: "Tugas", icon: ClipboardCheck },
       { href: "/admin/welcome", label: "Sambutan", icon: BookOpenText },
       { href: "/admin/ai", label: "AI & Bahasa", icon: Bot },
+      { href: "/admin/cms", label: "CMS", icon: PanelsTopLeft },
     ],
   },
 ] as const;

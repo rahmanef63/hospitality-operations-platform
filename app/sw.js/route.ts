@@ -78,6 +78,7 @@ function isCacheableAsset(pathname) {
     || pathname.startsWith("/brand/")
     || pathname.startsWith("/media/")
     || pathname.startsWith("/pwa/")
+    || pathname.startsWith("/audio/")
     || pathname === "/favicon.svg"
     || pathname === "/favicon.ico"
     || pathname === "/apple-touch-icon.png"
@@ -87,7 +88,7 @@ function isCacheableAsset(pathname) {
 
 async function networkFirstNavigation(request) {
   try {
-    return await fetch(request);
+    return await fetch(request, { cache: "no-store" });
   } catch {
     const url = new URL(request.url);
     if (url.pathname === "/presentation" && !url.searchParams.has("token")) {
@@ -96,6 +97,37 @@ async function networkFirstNavigation(request) {
     }
     return (await caches.match(CONFIG.offlineUrl)) || Response.error();
   }
+}
+
+async function audioRangeResponse(request) {
+  const range = request.headers.get("range");
+  if (!range) return fetch(request);
+  let response = await caches.match(request.url);
+  if (!response) {
+    response = await fetch(new Request(request.url, { cache: "reload" }));
+    if (response.ok && response.status === 200) {
+      const cache = await caches.open(RUNTIME_CACHE);
+      await cache.put(request.url, response.clone());
+    }
+  }
+  if (!response || !response.ok) return response || Response.error();
+  const match = /^bytes=([0-9]+)-([0-9]*)$/.exec(range);
+  if (!match) return new Response(null, { status: 416 });
+  const buffer = await response.arrayBuffer();
+  const start = Number(match[1]);
+  const requestedEnd = match[2] ? Number(match[2]) : buffer.byteLength - 1;
+  const end = Math.min(requestedEnd, buffer.byteLength - 1);
+  if (!Number.isFinite(start) || start < 0 || start > end) {
+    return new Response(null, {
+      status: 416,
+      headers: { "Content-Range": "bytes */" + buffer.byteLength },
+    });
+  }
+  const headers = new Headers(response.headers);
+  headers.set("Accept-Ranges", "bytes");
+  headers.set("Content-Length", String(end - start + 1));
+  headers.set("Content-Range", "bytes " + start + "-" + end + "/" + buffer.byteLength);
+  return new Response(buffer.slice(start, end + 1), { status: 206, statusText: "Partial Content", headers });
 }
 
 async function staleWhileRevalidate(request) {
@@ -115,6 +147,10 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin || url.pathname === "/sw.js" || isPrivateRequest(url)) return;
   if (request.mode === "navigate") {
     event.respondWith(networkFirstNavigation(request));
+    return;
+  }
+  if (url.pathname.startsWith("/audio/") && request.headers.has("range")) {
+    event.respondWith(audioRangeResponse(request));
     return;
   }
   if (isCacheableAsset(url.pathname)) event.respondWith(staleWhileRevalidate(request));

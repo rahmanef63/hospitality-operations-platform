@@ -84,3 +84,24 @@ Both values must be strong random secrets of at least 32 characters. They belong
 Every reservation-linked welcome row includes a TV mode action. It preserves the encrypted token but opens the dedicated `/presentation` endpoint, which starts the slideshow while keeping the guest context server-authoritative. The standard `/welcome` page remains unchanged. Fullscreen remains an explicit browser gesture. The presentation never adds unverified property facts and keeps the visual-concept disclosure visible.
 
 The same page exposes install guidance for compatible phone, desktop, and TV browsers. Details are documented in `docs/PWA-TV.md`.
+
+## Time-aware announcements and audio
+
+`/welcome` fills the available viewport width and height and can replace the main headline with a property-scoped announcement. Rules are managed from the **Time-aware welcome** area in `/admin/welcome` and support:
+
+- a time window, including windows that cross midnight;
+- a fixed local time with a bounded display duration;
+- one of five prayer moments with an optional minute offset;
+- per-rule locale, priority, active state, visual message, and opt-in speech;
+- the tokens `{{tamu}}`/`{{guest}}`, `{{property}}`, and `{{prayer}}`.
+
+Voice announcements use the browser speech engine and begin muted. A guest must use the icon-only volume control to allow speech. A visual greeting still appears while audio is muted or unavailable.
+
+Prayer rules are disabled by default. They can only be activated when the property has verified coordinates. Calculation also requires an explicit IANA timezone, method, and Asr madhab; the admin shows a daily preview and asks the operator to compare it with the local mosque schedule before activation. No guessed coordinates or remote prayer-time API are used.
+
+The `/presentation` toolbar has a separate icon-only ambient-music control. Its sound is generated locally with Web Audio, starts muted, and does not use a third-party music recording. Announcement mute and presentation music mute are independent.
+
+
+## Guest-visible composition and scheduled announcements
+
+`/admin/welcome` also controls the standard welcome sections, presentation chrome, slide order/media/duration, selected CC0 lo-fi track, announcement voice volume, and optional coordinate-based prayer schedules. Greeting and prayer rules are property- and locale-scoped. Both speech and music start muted, and no tokenized guest response is stored in Cache Storage. See `docs/GUEST-EXPERIENCE-CONTROLS.md` and `docs/AUDIO-LICENSES.md`.

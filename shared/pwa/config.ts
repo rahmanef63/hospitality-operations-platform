@@ -22,4 +22,8 @@ export const PWA_PRECACHE_URLS = [
   "/media/kamyna/pool-courtyard.webp",
   "/media/kamyna/bedroom-retreat.webp",
   "/media/kamyna/welcome-details.webp",
+  "/audio/still-morning.mp3",
+  "/audio/mountain-air.mp3",
+  "/audio/night-courtyard.mp3",
+  "/audio/LICENSE.txt",
 ] as const;

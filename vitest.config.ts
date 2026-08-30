@@ -7,6 +7,7 @@ const root = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   resolve: {
     alias: [
+      { find: "server-only", replacement: path.resolve(root, "tests/server-only.ts") },
       { find: "@/features", replacement: path.resolve(root, "slices") },
       { find: "@/shared", replacement: path.resolve(root, "shared") },
       { find: "@", replacement: root },

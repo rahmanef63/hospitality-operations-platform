@@ -1,12 +1,12 @@
 import { brandPalette } from "@/shared/brand";
 
-export function PaletteGrid() {
+export function PaletteGrid({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <section className="mt-24 border-t border-charcoal/16 pt-12 lg:mt-32">
       <div className="content-inset scroll-reveal grid gap-8 lg:grid-cols-[.55fr_1.45fr] lg:items-end">
-        <p className="text-sm font-semibold text-umber">Core palette</p>
+        <p className="text-sm font-semibold text-umber">{eyebrow}</p>
         <h2 className="text-balance font-serif text-5xl leading-[0.94] tracking-[-0.03em] sm:text-7xl">
-          Warm neutrals, held by earth and olive.
+          {title}
         </h2>
       </div>
       <div className="scroll-media mt-12 grid grid-cols-2 border-l border-t border-charcoal/14 sm:grid-cols-3 lg:grid-cols-6">

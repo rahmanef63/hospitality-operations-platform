@@ -80,6 +80,118 @@ http.route({
 });
 
 http.route({
+  path: "/admin/announcement-overview",
+  method: "POST",
+  handler: adminAction((ctx, body) => ctx.runQuery(internal.announcements.getAdminOverview, {
+    propertySlug: String(body.propertySlug ?? ""),
+  })),
+});
+
+http.route({
+  path: "/admin/announcement-settings-upsert",
+  method: "POST",
+  handler: adminAction((ctx, body) => ctx.runMutation(internal.announcements.upsertSettings, {
+    propertySlug: String(body.propertySlug ?? ""),
+    prayerEnabled: body.prayerEnabled === true,
+    prayerMethod: String(body.prayerMethod ?? "singapore") as "singapore",
+    madhab: String(body.madhab ?? "shafi") as "shafi",
+    announcementVolume: Number(body.announcementVolume),
+    musicEnabled: body.musicEnabled === true,
+    musicVolume: Number(body.musicVolume),
+    musicTrackKey: String(body.musicTrackKey ?? "still-morning") as "still-morning",
+    actorEmailHash: String(body.actorEmailHash ?? ""),
+  })),
+});
+
+http.route({
+  path: "/admin/announcement-experience-upsert",
+  method: "POST",
+  handler: adminAction((ctx, body) => ctx.runMutation(internal.announcements.upsertExperience, {
+    propertySlug: String(body.propertySlug ?? ""),
+    welcomeShowBrand: body.welcomeShowBrand === true,
+    welcomeShowLanguage: body.welcomeShowLanguage === true,
+    welcomeShowAnnouncement: body.welcomeShowAnnouncement === true,
+    welcomeShowBody: body.welcomeShowBody === true,
+    welcomeShowStay: body.welcomeShowStay === true,
+    welcomeShowContact: body.welcomeShowContact === true,
+    welcomeShowSignature: body.welcomeShowSignature === true,
+    welcomeShowPrivateNote: body.welcomeShowPrivateNote === true,
+    presentationShowBrand: body.presentationShowBrand === true,
+    presentationShowLanguage: body.presentationShowLanguage === true,
+    presentationShowAnnouncement: body.presentationShowAnnouncement === true,
+    presentationShowCounter: body.presentationShowCounter === true,
+    presentationShowInstall: body.presentationShowInstall === true,
+    presentationSlides: Array.isArray(body.presentationSlides) ? body.presentationSlides as Array<{
+      key: "arrival" | "stay" | "stillness" | "contact";
+      enabled: boolean;
+      sortOrder: number;
+      durationSeconds: number;
+      mediaKey: "livingCourtyard" | "bedroomRetreat" | "poolCourtyard" | "welcomeDetails" | "livingDining" | "spaBath" | "diningTable" | "materialPalette";
+    }> : [],
+    actorEmailHash: String(body.actorEmailHash ?? ""),
+  })),
+});
+
+http.route({
+  path: "/admin/announcement-rule-upsert",
+  method: "POST",
+  handler: adminAction((ctx, body) => ctx.runMutation(internal.announcements.upsertRule, {
+    ruleId: typeof body.ruleId === "string" && body.ruleId ? body.ruleId as Id<"announcementRules"> : undefined,
+    propertySlug: String(body.propertySlug ?? ""),
+    name: String(body.name ?? ""),
+    locale: localeValue(body.locale),
+    kind: String(body.kind ?? "time_window") as "time_window",
+    message: String(body.message ?? ""),
+    enabled: body.enabled === true,
+    speak: body.speak === true,
+    startTime: typeof body.startTime === "string" && body.startTime ? body.startTime : undefined,
+    endTime: typeof body.endTime === "string" && body.endTime ? body.endTime : undefined,
+    fixedTime: typeof body.fixedTime === "string" && body.fixedTime ? body.fixedTime : undefined,
+    prayer: typeof body.prayer === "string" && body.prayer ? body.prayer as "fajr" : undefined,
+    offsetMinutes: Number(body.offsetMinutes),
+    displayMinutes: Number(body.displayMinutes),
+    priority: Number(body.priority),
+    actorEmailHash: String(body.actorEmailHash ?? ""),
+  })),
+});
+
+http.route({
+  path: "/admin/announcement-rule-archive",
+  method: "POST",
+  handler: adminAction((ctx, body) => ctx.runMutation(internal.announcements.archiveRule, {
+    ruleId: String(body.ruleId ?? "") as Id<"announcementRules">,
+    propertySlug: String(body.propertySlug ?? ""),
+    actorEmailHash: String(body.actorEmailHash ?? ""),
+  })),
+});
+
+http.route({
+  path: "/admin/ensure-announcement-defaults",
+  method: "POST",
+  handler: adminAction((ctx, body) => ctx.runMutation(internal.announcements.ensureDefaults, {
+    propertySlug: String(body.propertySlug ?? ""),
+    actorEmailHash: String(body.actorEmailHash ?? ""),
+  })),
+});
+
+http.route({
+  path: "/admin/cms-overview", method: "POST",
+  handler: adminAction((ctx) => ctx.runQuery(internal.cms.getAdminOverview, {})),
+});
+http.route({
+  path: "/admin/cms-ensure", method: "POST",
+  handler: adminAction((ctx, body) => ctx.runMutation(internal.cms.ensure, { json: String(body.json ?? ""), actorEmailHash: String(body.actorEmailHash ?? "") })),
+});
+http.route({
+  path: "/admin/cms-save", method: "POST",
+  handler: adminAction((ctx, body) => ctx.runMutation(internal.cms.saveDraft, { json: String(body.json ?? ""), actorEmailHash: String(body.actorEmailHash ?? "") })),
+});
+http.route({
+  path: "/admin/cms-publish", method: "POST",
+  handler: adminAction((ctx, body) => ctx.runMutation(internal.cms.publish, { actorEmailHash: String(body.actorEmailHash ?? "") })),
+});
+
+http.route({
   path: "/admin/ai-overview",
   method: "POST",
   handler: adminAction((ctx) => ctx.runQuery(internal.aiSettings.getOverview, {})),

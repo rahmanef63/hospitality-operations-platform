@@ -30,6 +30,14 @@ describe("Convex Cloud activation", () => {
     expect(read("convex/http.ts")).toContain('path: "/admin/pms"');
     expect(read("convex/http.ts")).toContain('path: "/admin/ai-secret"');
     expect(read("convex/http.ts")).toContain('path: "/admin/welcome-reservation-context"');
+    expect(read("convex/http.ts")).toContain('path: "/admin/announcement-overview"');
+    expect(read("convex/http.ts")).toContain('path: "/admin/announcement-rule-upsert"');
+    expect(read("convex/http.ts")).toContain('path: "/admin/cms-overview"');
+    expect(read("convex/http.ts")).toContain('path: "/admin/cms-publish"');
+    expect(read("convex/announcements.ts")).toContain("internalMutation");
+    expect(read("convex/announcements.ts")).toContain("export const getPublic = query");
+    expect(read("convex/cms.ts")).toContain("export const getPublished = query");
+    expect(read("convex/cms.ts")).toContain("internalMutation");
     expect(read("convex/aiSettings.ts")).toContain("internalQuery");
     expect(read("convex/pms/catalog.ts")).toContain("internalMutation");
     expect(read("convex/pms/public.ts")).toContain("export const getProperty = query");

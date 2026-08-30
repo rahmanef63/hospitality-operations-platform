@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { BrandLockup } from "@/shared/brand";
-import type { PropertyContent } from "@/shared/content";
+import type { PropertyContent, PropertyPageUi } from "@/shared/content";
 import { ResponsiveHeroImage } from "@/shared/media";
 
-export function PropertyHero({ property }: { property: PropertyContent }) {
+export function PropertyHero({ property, ui }: { property: PropertyContent; ui: PropertyPageUi }) {
   return (
     <section className="relative min-h-[calc(100dvh-4.5rem)] overflow-hidden bg-charcoal text-ivory">
       <ResponsiveHeroImage asset={property.heroImage} />
@@ -13,7 +13,7 @@ export function PropertyHero({ property }: { property: PropertyContent }) {
       <div className="page-shell content-inset relative z-10 flex min-h-[calc(100dvh-4.5rem)] flex-col justify-between py-8 sm:py-10 lg:py-12">
         <Link prefetch={false} href="/" className="w-fit editorial-link text-ivory/82">
           <ArrowLeft className="size-4" aria-hidden="true" />
-          Back to the collection
+          {ui.backLabel}
         </Link>
 
         <div className="hero-copy-intro grid items-end gap-12 lg:grid-cols-[1.25fr_.75fr]">
