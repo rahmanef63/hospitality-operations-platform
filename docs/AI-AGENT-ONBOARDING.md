@@ -86,8 +86,8 @@ upstream release
   → Update now dispatches tenant-owned apply workflow
   → verify exact PR head
   → deploy Convex
-  → atomically merge that exact PR
-  → Vercel promotes merged revision
+  → non-force fast-forward default branch to that exact verified PR head
+  → Vercel promotes the exact advanced revision
   → /api/health confirms exact build revision
 ```
 

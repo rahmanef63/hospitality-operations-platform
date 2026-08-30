@@ -65,6 +65,8 @@ jobs:
           const defaultBranch=require('child_process').execFileSync('gh',['repo','view',process.env.GITHUB_REPOSITORY,'--json','defaultBranchRef','--jq','.defaultBranchRef.name'],{encoding:'utf8'}).trim();
           if(pr.base?.ref!==defaultBranch) throw new Error(`Prepared update PR must target default branch ${defaultBranch}.`);
           fs.writeFileSync(process.env.RUNNER_TEMP+'/base-branch', defaultBranch);
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/base-sha', pr.base.sha);
+          console.log(`base_sha=${pr.base.sha}`);
           if(!pr.head?.ref?.startsWith(prefix)||pr.head.ref.slice(prefix.length)!==expected) throw new Error('Prepared update branch/version mismatch.');
           if(pr.mergeable===false||pr.mergeable_state==='dirty') throw new Error('Prepared update is not mergeable.');
           fs.writeFileSync(process.env.RUNNER_TEMP+'/head-sha', pr.head.sha);
@@ -117,27 +119,30 @@ jobs:
         shell: bash
         run: npx convex deploy --typecheck enable --message "Platform update v${EXPECTED_VERSION}"
 
-      - name: Revalidate exact PR head after backend deploy
+      - name: Revalidate exact PR and base after backend deploy
         shell: bash
         run: |
           set -euo pipefail
           current="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.head.sha + " " + .state')"
           expected="${{ steps.resolve.outputs.head_sha }} open"
           test "$current" = "$expected" || { echo "PR changed after verification: $current" >&2; exit 1; }
+          base_branch="$(cat "$RUNNER_TEMP/base-branch")"
+          expected_base="$(cat "$RUNNER_TEMP/base-sha")"
+          current_base="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/$base_branch" --jq '.object.sha')"
+          test "$current_base" = "$expected_base" || { echo "Default branch changed after verification: $current_base" >&2; exit 1; }
 
-      - name: Merge exact verified PR
-        id: merge
+      - name: Fast-forward default branch to exact verified head
+        id: promote
         shell: bash
         run: |
           set -euo pipefail
-          gh api --method PUT "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/merge" \
-            -f sha="${{ steps.resolve.outputs.head_sha }}" -f merge_method=rebase \
-            -f commit_title="chore(platform): apply v${EXPECTED_VERSION}" > "$RUNNER_TEMP/merge.json"
-          node <<'NODE' >> "$GITHUB_OUTPUT"
-          const fs=require('fs');const result=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/merge.json','utf8'));
-          if(!result.merged||!result.sha) throw new Error(result.message||'Exact PR merge failed.');
-          console.log(`merge_sha=${result.sha}`);
-          NODE
+          base_branch="$(cat "$RUNNER_TEMP/base-branch")"
+          head_sha="${{ steps.resolve.outputs.head_sha }}"
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/heads/$base_branch" \
+            -f sha="$head_sha" -F force=false > "$RUNNER_TEMP/ref-update.json"
+          updated="$(node -e "const r=require(process.env.RUNNER_TEMP+'/ref-update.json');console.log(r.object?.sha||'')")"
+          test "$updated" = "$head_sha" || { echo "Default branch did not advance to exact verified head." >&2; exit 1; }
+          echo "merge_sha=$head_sha" >> "$GITHUB_OUTPUT"
 
       - name: Trigger configured Vercel promotion
         if: env.VERCEL_MODE == 'hook'
@@ -147,7 +152,7 @@ jobs:
       - name: Verify exact frontend revision
         shell: bash
         env:
-          MERGE_SHA: ${{ steps.merge.outputs.merge_sha }}
+          MERGE_SHA: ${{ steps.promote.outputs.merge_sha }}
         run: |
           set -euo pipefail
           for attempt in $(seq 1 90); do
@@ -160,7 +165,7 @@ jobs:
           exit 1
 
       - name: Report incomplete post-merge promotion
-        if: ${{ failure() && steps.merge.outputs.merge_sha != '' }}
+        if: ${{ failure() && steps.promote.outputs.merge_sha != '' }}
         continue-on-error: true
         shell: bash
         run: |

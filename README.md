@@ -19,8 +19,8 @@ The canonical product source is `rahmanef63/hospitality-operations-platform`. Te
 - Upstream releases are tagged with Semantic Versioning (`vX.Y.Z`).
 - Managed tenant routing lives only in the private updater control plane, never in this product repository.
 - Each release is prepared as a tested tenant PR after protected-overlay, drift, merge, and full-build checks.
-- Update commits are authored as a configured tenant deployment actor; exact application uses rebase merge so private Vercel Git author/seat policy remains tenant-owned.
-- `/admin/settings` is the tenant-owned update center: an eligible **Update now** request deploys Convex first, merges the exact verified PR SHA, then waits for the exact Vercel revision.
+- Update commits are authored as a configured tenant deployment actor; exact application non-force fast-forwards the default branch to that verified head so private Vercel Git author/seat policy remains tenant-owned.
+- `/admin/settings` is the tenant-owned update center: an eligible **Update now** request deploys Convex first, non-force fast-forwards the default branch to the exact verified PR SHA, then waits for the exact Vercel revision.
 - Core-code drift, merge conflicts, failed checks, or missing deployment configuration block automation rather than overwriting customer work.
 - Arbitrary clones are unmanaged until explicitly enrolled; a normal clone/fork does not grant the upstream operator control of that deployment.
 
