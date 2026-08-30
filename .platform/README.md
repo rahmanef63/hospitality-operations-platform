@@ -1,12 +1,16 @@
 # Platform distribution contract
 
-`rahmanef63/hospitality-operations-platform` is the canonical source repository. Customer repositories are independent GitHub repositories, not operationally coupled private forks.
+`rahmanef63/hospitality-operations-platform` is the canonical provider-neutral source repository. Customer deployments are independent GitHub repositories, not operationally coupled forks.
 
-Each tenant repository keeps the same Git history as the upstream release it was provisioned from and commits two local files:
+The product repository contains **no managed tenant registry**. Managed routing exists only in the private updater control plane. A normal clone/fork is unmanaged until explicitly enrolled.
 
-- `.platform/tenant.json` — non-secret tenant identity and update channel.
-- `.platform/tenant.lock.json` — the exact upstream tag/commit currently installed.
+Each enrolled tenant repository keeps compatible upstream Git history and commits:
 
-Tenant-owned code belongs only under the protected prefixes declared in `distribution.json`. Runtime secrets stay in Vercel/Convex environment configuration, and business/content state stays in the tenant's Convex project/CMS.
+- `.platform/tenant.json` — non-secret tenant identity and update channel;
+- `.platform/tenant.lock.json` — exact upstream tag/commit currently installed.
 
-When an upstream version is released, the central updater opens a tested pull request in every registered tenant repository. A clean PR can be applied with GitHub's Merge button. If tenant code drift or a merge conflict is detected, the updater blocks the automatic PR rather than overwriting customer work.
+Tenant-owned source belongs only under prefixes declared in `distribution.json`. Runtime secrets stay in tenant deployment secret stores; business/content state stays in that tenant's Convex/CMS/PMS.
+
+An upstream release prepares a tested `platform/update-vX.Y.Z` PR. Application is tenant-owned: `/admin/settings` dispatches the tenant apply workflow, which revalidates the PR, deploys Convex, merges the exact verified SHA, and waits for the exact frontend health revision. Unsafe updates stop instead of overwriting tenant work.
+
+Read `docs/AI-AGENT-ONBOARDING.md` and `docs/PLATFORM-DISTRIBUTION.md` before modifying release/update mechanics.

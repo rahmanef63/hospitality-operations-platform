@@ -6,13 +6,15 @@
     "AdminLoginPage",
     "AdminDashboard",
     "AiSettingsPage",
-    "AnnouncementManager"
+    "AnnouncementManager",
+    "PlatformSettingsPage"
   ],
   "dependencies": [
     "shared/admin",
     "shared/convex",
     "shared/welcome",
     "shared/ai",
-    "shared/announcements"
+    "shared/announcements",
+    "shared/platform"
   ]
 }

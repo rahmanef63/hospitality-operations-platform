@@ -1,5 +1,11 @@
 # Hospitality Operations Platform agent rules
 
+## Start here
+
+- Read `docs/AI-AGENT-ONBOARDING.md` before repository-wide work. Determine upstream vs tenant mode by the presence of `.platform/tenant.json`.
+- In upstream mode, release/source metadata must remain provider-neutral and managed tenant routing must remain outside this repository.
+- In tenant mode, prefer CMS/PMS/runtime configuration and keep provider source overrides inside protected tenant prefixes.
+
 ## Non-negotiable
 
 - Keep core brand assets and collection identity copy location-neutral. Property pages and route SEO may use only owner-verified facts.
@@ -13,8 +19,8 @@
 
 ## Architecture
 
-- Next.js 16 + React 19 + Tailwind 4 frontend on Dokploy.
-- Convex Cloud is active for welcome publishing and the multi-property homestay-management system.
+- Next.js 16 + React 19 + Tailwind 4 frontend, deployable to Vercel or a compatible container runtime.
+- Convex Cloud is the managed backend for CMS, welcome publishing, and multi-property operations.
 - Consumer vertical slices live at `slices/<slug>/`; every slice owns `slice.json`, `slice.manifest.json`, `types.ts`, and `index.ts`.
 - Static public copy remains in `shared/content/config/` and is consumed through the repository boundary.
 - Welcome validation lives in `shared/welcome/`; PMS types and verified seeds live in `shared/pms/`; concierge knowledge lives in `shared/concierge/`; server authentication lives in `shared/admin/`; Next-to-Convex access lives in `shared/convex/`.
@@ -69,4 +75,4 @@ npm run test
 npm run build
 ```
 
-For Convex changes, deploy the backend first, verify Cloud health and protected actions, then deploy the exact frontend revision. Completion requires production authentication, endpoint, draft/publish, responsive UI, health, and exact revision verification.
+For tenant platform updates, the tenant-owned apply workflow must revalidate the exact prepared PR, deploy Convex first, atomically merge that exact PR head, then wait for `/api/health` to report the exact frontend build revision. Never claim one-click completion when deployment credentials, Vercel promotion, or Convex access are unresolved.

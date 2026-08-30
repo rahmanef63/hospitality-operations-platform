@@ -25,6 +25,12 @@ export function isProtected(file, prefixes = distribution().tenantProtectedPrefi
   return prefixes.some((prefix) => file === prefix || file.startsWith(prefix));
 }
 
+export function versionFromUpdateBranch(branch, prefix = distribution().updater.branchPrefix) {
+  if (!branch.startsWith(prefix)) return null;
+  const raw = branch.slice(prefix.length).replace(/^v/, "");
+  try { parseVersion(raw); return raw; } catch { return null; }
+}
+
 export function tagForVersion(version, config = product()) {
   return `${config.release.tagPrefix}${version}`;
 }

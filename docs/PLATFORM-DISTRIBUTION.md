@@ -2,84 +2,115 @@
 
 ## Product model
 
-The canonical source of truth is the private upstream repository `rahmanef63/hospitality-operations-platform`. Every hospitality provider receives an independently owned tenant repository and independently owned Vercel/Convex projects.
+The canonical source of truth is the private upstream repository `rahmanef63/hospitality-operations-platform`. Every provider deployment is an independently owned tenant repository with independently owned Vercel/Convex projects, domains, credentials, and business data.
 
-Do not use private-fork synchronization as the product update mechanism. A fork creates ownership and access coupling that is undesirable when a customer buys or transfers its deployment. Tenant repositories instead retain compatible Git history and a small update contract.
+Do not use private-fork synchronization as the operational update mechanism. Tenant repositories retain compatible Git history but are enrolled explicitly into a private updater control plane so customer ownership and transfer remain independent of the product repository.
 
 ## Versioning
 
-Platform releases use Semantic Versioning and GitHub tags such as `v1.4.0`.
+Platform releases use Semantic Versioning and matching GitHub tags such as `v1.4.0`.
 
-- patch: backwards-compatible fixes
-- minor: backwards-compatible features or migrations
-- major: contract-breaking changes that require an explicit migration plan
-- prerelease tags are delivered only to tenants on a prerelease channel
+- **patch** — backward-compatible fixes;
+- **minor** — backward-compatible features/migrations;
+- **major** — contract-breaking changes requiring an explicit migration plan;
+- prerelease tags are delivered only to tenants enrolled in a prerelease channel.
 
-The package version and `.platform/product.json` version must match before a release can be created.
+`package.json`, `package-lock.json`, and `.platform/product.json` must carry the same version. Run `npm run platform:release:check -- vX.Y.Z` before tagging.
 
-## Tenant boundary
+Patch/minor backend changes must remain compatible with the previous tenant frontend because coordinated application deploys Convex before merging/promoting the frontend. Major releases are not eligible for blind one-click application.
 
-Each tenant repository commits `.platform/tenant.json` and `.platform/tenant.lock.json`. These, plus `tenant/`, `public/tenant/`, `shared/tenant/`, `convex/tenant/`, `.vercel/`, and `.env*`, are tenant-protected overlays.
+## Product/tenant boundary
 
-Provider secrets belong in Vercel/Convex environment variables. Operational data belongs in the provider's Convex deployment. Marketing copy and layout composition should use CMS/PMS configuration rather than source overrides.
+Each tenant repository commits:
 
-If a tenant modifies platform core files outside protected overlays, the automatic updater blocks the one-click update and opens a review issue rather than silently overwriting code.
+- `.platform/tenant.json` — non-secret tenant identity/update channel;
+- `.platform/tenant.lock.json` — exact installed upstream tag/commit.
 
-## Update lifecycle
+Tenant-protected prefixes are declared only in `.platform/distribution.json`; currently they include tenant metadata, `.env*`, `.vercel/`, `tenant/`, `public/tenant/`, `shared/tenant/`, `convex/tenant/`, tenant-owned launcher assets, and reviewed PWA screenshots.
 
-1. Upstream version is bumped with `npm run platform:version -- X.Y.Z`.
-2. `main` passes the full verification suite.
-3. A `vX.Y.Z` tag is pushed.
-4. `Platform release` verifies the exact tag and publishes GitHub release notes.
-5. `Platform tenant sync` reads `.platform/tenants.json`.
-6. A GitHub App obtains a token scoped only to each tenant repository.
-7. The updater merges the new upstream tag into an automation branch in that tenant.
-8. Protected-overlay and core-drift guards run.
-9. The complete tenant tree runs `npm run verify`.
-10. A pull request is opened. The provider receives the normal GitHub notification.
-11. Clicking Merge applies the update. Vercel then builds the provider repository normally.
+Provider secrets belong in Vercel/GitHub/Convex secret stores. Business data belongs in the provider Convex deployment. Public copy/composition should normally use CMS; property and operational facts should use PMS rather than source overrides.
 
-This is deliberately pull-request based. Direct writes to tenant `main` are not permitted by the updater.
+If a tenant modifies product core outside protected overlays, automatic updates stop rather than overwriting the change.
 
-## Updater GitHub App
+## Private updater control plane
 
-Create one dedicated GitHub App, recommended name `Hospitality Platform Updater`, controlled by the upstream operator. Install it on the upstream owner and each managed tenant repository.
+Managed-provider routing is **not stored in the product repository**. The product release workflow dispatches the generic release tag to the separate private `hospitality-platform-updater` control plane.
 
-Repository permissions:
+The private control plane owns only routing/automation metadata such as tenant repository identifiers, update channels, reviewer lists, and updater credentials. It must not contain provider runtime secrets such as Convex deployment keys or Vercel deployment credentials.
 
-- Metadata: Read
-- Contents: Read and write
-- Pull requests: Read and write
-- Issues: Read and write
+Preparation flow:
 
-Store only the App ID and private key in the private upstream repository/organization secrets:
+1. Upstream `main` is verified and versioned.
+2. A matching `vX.Y.Z` tag is pushed.
+3. `Platform release` verifies the exact tag and publishes provider-neutral release notes.
+4. The release workflow dispatches the tag to the private updater control plane.
+5. The control plane selects enabled tenants on compatible channels.
+6. For each tenant it checks the installed lock, protected-path changes, and core drift.
+7. It merges the upstream tag into `platform/update-vX.Y.Z` **without writing tenant `main`**.
+8. The complete merged tenant tree runs `npm run verify`.
+9. A clean update PR is opened/replaced; an unsafe update produces a blocked-review signal instead.
+10. Older open platform-update PRs should be closed when a newer tested release supersedes them.
 
-- `HOSPITALITY_UPDATER_APP_ID`
-- `HOSPITALITY_UPDATER_PRIVATE_KEY`
+The GitHub App/private updater key is held only by the operator control plane. Tenant repositories never receive that private key.
 
-Tenant repositories do not receive the App private key.
+## Tenant-owned apply flow
 
-## Tenant registry
+Prepared PRs are not automatically merged by the upstream operator. Application belongs to the tenant.
 
-Register tenants in `.platform/tenants.json` only after their repository exists and the updater App is installed. Example:
+Preferred path:
 
-```json
-{
-  "id": "hospitality-operations-platform",
-  "owner": "hospitality-operations-platform",
-  "repo": "hospitality-operations-platform",
-  "defaultBranch": "main",
-  "channel": "stable",
-  "enabled": true,
-  "reviewers": []
-}
+```text
+/admin/settings
+  → tenant server reads prepared PR/check state
+  → Update now dispatches .github/workflows/apply-platform-update.yml
+  → workflow revalidates exact PR head and CI
+  → npm run verify on the exact tenant tree
+  → npx convex deploy using tenant CONVEX_DEPLOY_KEY
+  → atomic merge constrained to the verified PR head SHA
+  → Vercel main-branch deployment (or tenant deploy hook)
+  → poll canonical /api/health until buildVersion == merge SHA
 ```
 
-The registry contains repository routing metadata only; it must never contain customer secrets.
+The runtime admin page uses a **tenant-scoped server-only** GitHub automation token. It can read the tenant PR/check state and dispatch the tenant-owned workflow; it is never serialized to browser code. The apply workflow itself uses GitHub's short-lived repository token for the exact merge and tenant repository secrets for deployment.
 
-## Provisioning a new provider
+## Tenant automation configuration
 
-Provision the tenant repository from a released upstream tag so the Git histories remain related, then run:
+### Server runtime
+
+Configure on the tenant application server/Vercel project:
+
+```env
+HOSPITALITY_UPDATE_GITHUB_TOKEN=
+HOSPITALITY_GITHUB_REPOSITORY=owner/repository
+```
+
+`HOSPITALITY_GITHUB_REPOSITORY` can be omitted on Vercel when `VERCEL_GIT_REPO_OWNER` and `VERCEL_GIT_REPO_SLUG` are present.
+
+The fine-grained token should be limited to the tenant repository and only the permissions required to read PR/check/action state and dispatch workflows. Never expose it through `NEXT_PUBLIC_*`.
+
+### Tenant GitHub repository
+
+Secret:
+
+```text
+CONVEX_DEPLOY_KEY
+```
+
+Variables:
+
+```text
+HOSPITALITY_SITE_URL=https://provider.example
+HOSPITALITY_VERCEL_MODE=git
+```
+
+Use `HOSPITALITY_VERCEL_MODE=git` when Vercel is linked to the repository and automatically deploys the tenant default branch. If the tenant intentionally uses a deploy hook, set mode `hook` and add secret `VERCEL_DEPLOY_HOOK_URL`.
+
+The apply workflow fails its preflight before deploying/merging when required deployment configuration is missing.
+
+## Provisioning a provider
+
+1. Create an independently owned private tenant repository from a **released upstream tag**, preserving compatible Git history.
+2. Run:
 
 ```bash
 node scripts/platform/provision-tenant.mjs \
@@ -88,20 +119,48 @@ node scripts/platform/provision-tenant.mjs \
   --commit='<release-commit>'
 ```
 
-Commit the two generated tenant metadata files on top of the release baseline, configure the tenant's Vercel/Convex environments, install the updater App, then add the tenant to the upstream registry.
+3. Commit the generated tenant metadata.
+4. Put provider identity/fallback media only in protected tenant overlays; prefer CMS/PMS for normal operation.
+5. Create/transfer provider-owned Convex and Vercel projects.
+6. Configure runtime/admin secrets and the deployment contract above.
+7. Install/enroll the tenant repository in the private updater control plane.
+8. Run full tenant CI and a non-production deployment before DNS cutover.
+9. Attach the canonical domain only after exact revision, auth, Convex, admin, PWA, and health verification pass.
+
+## Bootstrap for tenants created before Update Center
+
+A tenant provisioned before `/admin/settings` exists needs one controlled bootstrap update. Prepare the normal tested platform PR, configure tenant deployment secrets/variables, deploy Convex, merge the exact verified PR, and verify the exact frontend revision. Do not pretend the old tenant UI can dispatch a workflow it does not contain. After that release is installed, future compatible updates use the normal admin one-click path.
+
+## Update status and one-click semantics
+
+“One-click update” means the administrator makes one explicit decision in `/admin/settings`; it does **not** mean skipping validation.
+
+An update is eligible only when:
+
+- it is a newer compatible SemVer release;
+- the prepared PR targets the tenant default branch;
+- the branch follows the platform updater prefix;
+- CI/check runs are complete and successful;
+- no protected tenant overlay was overwritten;
+- no unresolved core drift/merge conflict exists;
+- tenant deployment preflight is configured;
+- a major-version migration is not being attempted blindly.
+
+The workflow must revalidate these conditions immediately before deployment/merge because status can change after the admin page was rendered.
+
+## Failure handling
+
+- **Preparation failure:** no tenant branch is merged; create/update a blocked-review signal.
+- **Convex deploy failure:** stop before merge.
+- **PR head mismatch:** stop; never merge a SHA different from the one verified/deployed.
+- **Vercel build failure:** do not claim the update live. The previously promoted Vercel deployment should remain active.
+- **Health mismatch:** treat deployment as incomplete even when infrastructure reports success.
+- **Major release:** require explicit migration instructions and manual authorization path.
+
+Automatic destructive rollback is intentionally avoided because schema/data migrations may be irreversible. Prefer backward-compatible expand/migrate/contract releases.
 
 ## Transferability
 
-A customer repository, Vercel project, domain, Convex project, secrets, and business data can be transferred independently. Removing a tenant from the updater registry or uninstalling the GitHub App stops future managed updates without affecting the running customer system.
+A tenant repository, Vercel project, domain, Convex project, credentials, and business data can be transferred independently. Removing the tenant from the private updater registry or uninstalling the updater App stops future managed update preparation without taking down the running customer system.
 
-
-## Updater credentials
-
-
-
-
-## Private updater control plane
-
-The product repository contains no managed-provider registry. A release publishes the generic tag, then dispatches that tag to a separate private updater control-plane repository. Tenant repository identifiers, reviewer lists, and updater credentials live only in that control plane. The control plane checks out the released platform tag and invokes the generic `scripts/platform/sync-tenant.mjs` implementation.
-
-This separation keeps product source, tags, release archives, and normal product release logs provider-neutral while still allowing managed tenant repositories to receive tested update pull requests. Production should use a dedicated GitHub App installed on managed tenant repositories; a narrowly scoped encrypted token is acceptable only during initial bootstrap.
+See `docs/AI-AGENT-ONBOARDING.md` for deterministic agent behavior and `docs/PLATFORM-UPDATE-PROGRESS.md` for current implementation/verification state.
