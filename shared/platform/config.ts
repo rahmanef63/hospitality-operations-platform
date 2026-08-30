@@ -7,7 +7,8 @@ export const PLATFORM_TAG = `${product.release.tagPrefix}${PLATFORM_VERSION}`;
 export const PLATFORM_UPSTREAM = `${product.upstream.owner}/${product.upstream.repo}`;
 export const PLATFORM_UPDATE_BRANCH_PREFIX = distribution.updater.branchPrefix;
 export const PLATFORM_APPLY_WORKFLOW = distribution.updater.tenantApplyWorkflow ?? "apply-platform-update.yml";
-export const PLATFORM_REPOSITORY_MODE = tenantSite.id === "default-tenant" ? "upstream" : "tenant";
+export function platformRepositoryMode(tenantId: string) { return tenantId === "default-tenant" ? "upstream" as const : "tenant" as const; }
+export const PLATFORM_REPOSITORY_MODE = platformRepositoryMode(String(tenantSite.id));
 
 export function platformBuildVersion() {
   return process.env.NEXT_PUBLIC_BUILD_VERSION?.trim()
