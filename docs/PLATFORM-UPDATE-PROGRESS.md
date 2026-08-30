@@ -47,6 +47,8 @@ A platform release must be safe for an AI-agent-operated tenant repository:
 - 2026-08-30: `v0.1.7` tenant PR passed CI and Vercel preview. GitHub rebase-merge API returned `Base branch was modified` despite a clean unchanged base; it was not forced.
 - 2026-08-30: A non-force Git ref update advanced tenant `main` from the verified base SHA to the exact PR head. GitHub automatically marked the PR merged, author remained tenant-owned, and the Git-connected Vercel project automatically started a production deployment from that exact SHA.
 - 2026-08-30: Candidate `v0.1.8` codifies that proven non-force fast-forward algorithm after Convex deploy and exact base/head revalidation.
+- 2026-08-30: `v0.1.7` exact tenant main SHA reached Vercel `READY / PROMOTED` automatically after the fast-forward; author remained the tenant deployment user.
+- 2026-08-30: Exact `v0.1.8` candidate passed full upstream and real-tenant verification: 24 test files / 95 tests in both trees, production builds passed, tenant author was preserved, and protected-overlay hash was unchanged.
 - 2026-08-30: Convex Composio token details and deploy-key listing still fail with `401 MissingAccessToken`; production one-click backend proof remains blocked on a valid Convex management/deploy credential.
 
 ## Release state
