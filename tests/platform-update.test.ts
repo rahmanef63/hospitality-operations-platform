@@ -33,6 +33,7 @@ describe("tenant platform update center", () => {
     expect(merge).toBeGreaterThan(convex);
     expect(health).toBeGreaterThan(merge);
     expect(workflow).toContain("CONVEX_DEPLOY_KEY");
+    expect(workflow).toContain("npm ci --include=dev --legacy-peer-deps");
     expect(workflow).toContain("Major platform updates require an explicit migration workflow");
     expect(workflow).toContain('head_sha="$(cat "$RUNNER_TEMP/head-sha")"');
     expect(workflow).not.toContain('commits/${{ steps.resolve.outputs.head_sha }}/check-runs');

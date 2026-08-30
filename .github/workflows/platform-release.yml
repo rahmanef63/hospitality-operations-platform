@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci --legacy-peer-deps
+      - run: npm ci --include=dev --legacy-peer-deps
       - run: npm run platform:release:check -- ${{ inputs.tag || github.ref_name }}
       - run: npm run verify
 

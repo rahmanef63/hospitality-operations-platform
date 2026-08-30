@@ -110,7 +110,7 @@ jobs:
           if(major(base)!==major(next)) throw new Error('Major platform updates require an explicit migration workflow.');
           NODE
 
-      - run: npm ci --legacy-peer-deps
+      - run: npm ci --include=dev --legacy-peer-deps
       - run: npm run verify
 
       - name: Deploy tenant Convex backend

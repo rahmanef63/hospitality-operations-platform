@@ -51,6 +51,8 @@ A platform release must be safe for an AI-agent-operated tenant repository:
 
 - 2026-08-30: `v0.1.5` preparation reached the real tenant merged tree and exposed a tenant-only TypeScript literal-narrowing issue in repository-mode detection. Patch candidate `v0.1.6` widens tenant IDs before mode comparison; release gating now includes a full temporary merge/verify against the managed tenant tree before tagging.
 
+- 2026-08-30: `v0.1.6` candidate was merged into a temporary clone of the real managed tenant. Protected overlay hash was unchanged; tenant full verify passed with 24 test files / 95 tests and a production build. Updater/apply installs now force dev dependencies for runner determinism.
+
 ## Release state
 
 Current released upstream baseline: `v0.1.5`.
