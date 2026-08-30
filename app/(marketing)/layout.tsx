@@ -1,0 +1,15 @@
+import { GuestConcierge } from "@/features/concierge";
+import { SiteFooter, SiteHeader } from "@/features/site-shell";
+import { getSiteContent } from "@/shared/content";
+
+export default async function MarketingLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const content = await getSiteContent();
+  return (
+    <div className="min-h-screen bg-ivory text-charcoal">
+      {content.publicUi.shell.showHeader ? <SiteHeader navigation={content.navigation} /> : null}
+      {children}
+      {content.publicUi.shell.showFooter ? <SiteFooter footer={content.footer} /> : null}
+      <GuestConcierge navigation={content.navigation} config={content.publicUi.shell.concierge} />
+    </div>
+  );
+}

@@ -1,0 +1,13 @@
+import { tenantSite } from "@/tenant";
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? tenantSite.fallbackUrl;
+export const SITE_NAME = tenantSite.siteName;
+export const SITE_SLOGAN = tenantSite.slogan;
+export const SITE_DESCRIPTION = tenantSite.description;
+export const HOME_SEO_TITLE = tenantSite.homeSeoTitle;
+export const HOME_SEO_DESCRIPTION = tenantSite.homeSeoDescription;
+export const CONTACT_EMAIL = tenantSite.contactEmail;
+export const GOOGLE_SITE_VERIFICATION = tenantSite.googleSiteVerification;
+export const COPYRIGHT_YEAR = tenantSite.copyrightYear;
+export const CONTENT_UPDATED_AT = tenantSite.contentUpdatedAt;
+export const DEFAULT_PROPERTY_SLUG = tenantSite.defaultPropertySlug;
+export const SERVICE_NAME = tenantSite.serviceName;

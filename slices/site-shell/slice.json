@@ -1,0 +1,20 @@
+{
+  "slug": "site-shell",
+  "name": "Hospitality site shell",
+  "version": "1.1.0",
+  "category": "navigation",
+  "description": "Location-neutral navigation, footer, and install/update lifecycle for the Hospitality PWA.",
+  "contract": {
+    "inputs": [
+      "navigation",
+      "footer"
+    ],
+    "outputs": [
+      "SiteHeader",
+      "SiteFooter",
+      "PwaManager"
+    ],
+    "portable": true,
+    "hardcodedUrls": []
+  }
+}

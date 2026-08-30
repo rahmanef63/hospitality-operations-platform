@@ -1,0 +1,16 @@
+export const tenantSite = {
+  id: "default-tenant",
+  namespace: "hospitality-platform",
+  fallbackUrl: "https://example.com",
+  siteName: "Hospitality Operations Platform",
+  slogan: "Operations for independent hospitality",
+  description: "A configurable multi-property hospitality operations platform for independent stays and private accommodation providers.",
+  homeSeoTitle: "Hospitality Operations Platform",
+  homeSeoDescription: "A configurable hospitality platform combining property operations, reservations, guest experience, CMS, finance, and PWA delivery.",
+  contactEmail: "hello@example.com",
+  googleSiteVerification: undefined as string | undefined,
+  copyrightYear: 2026,
+  contentUpdatedAt: new Date("2026-08-30T00:00:00.000Z"),
+  defaultPropertySlug: "primary-property",
+  serviceName: "hospitality-operations-platform",
+} as const;

@@ -1,0 +1,5 @@
+{
+  "slug": "cms", "version": "1.0.0", "entry": "index.ts",
+  "exports": ["CmsShell", "CmsOverview", "CmsSiteEditor", "CmsHomeEditor", "CmsPropertyEditor", "CmsGuideEditor", "CmsBrandEditor"],
+  "dependencies": ["shared/cms", "shared/content", "shared/media"]
+}

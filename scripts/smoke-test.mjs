@@ -1,0 +1,6 @@
+const target=(process.env.SMOKE_URL??"http://127.0.0.1:3000").replace(/\/$/,"");
+const pages=["/","/brand-assets","/welcome?locale=en&name=Smoke","/presentation?locale=en&name=Smoke&tv=1","/admin/login","/api/health","/offline","/sw.js","/manifest.webmanifest","/presentation.webmanifest"];
+for(const route of pages){const response=await fetch(`${target}${route}`,{redirect:"follow"});if(!response.ok)throw new Error(`${route} returned ${response.status}`);console.log(`✓ ${route} ${response.status}`);}
+const health=await (await fetch(`${target}/api/health`)).json();if(health.status!=="ok")throw new Error("health endpoint is invalid");console.log(`✓ health service=${health.service}`);
+const protectedRoutes=["/admin","/admin/calendar","/admin/reservations","/admin/guests","/admin/properties","/admin/units","/admin/amenities","/admin/finance","/admin/tasks","/admin/welcome","/admin/ai","/admin/cms"];
+for(const route of protectedRoutes){const response=await fetch(`${target}${route}`,{redirect:"manual"});const location=response.headers.get("location")??"";if(![307,308].includes(response.status)||!location.includes("/admin/login"))throw new Error(`${route} did not redirect unauthenticated access (${response.status})`);console.log(`✓ ${route} protected ${response.status}`);}

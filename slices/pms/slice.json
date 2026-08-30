@@ -1,0 +1,9 @@
+{
+  "slug": "pms",
+  "version": "1.0.0",
+  "category": "operations",
+  "contract": {
+    "description": "Multi-property homestay operations, inventory, reservations, finance, and tasks.",
+    "publicExports": ["PmsShell", "PageHeader", "StatusBanner"]
+  }
+}

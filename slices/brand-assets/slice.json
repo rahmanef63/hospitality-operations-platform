@@ -1,0 +1,13 @@
+{
+  "slug": "brand-assets",
+  "name": "Hospitality production asset library",
+  "version": "1.0.0",
+  "category": "brand",
+  "description": "Separate downloadable identity files, palette, and location-neutral usage rules.",
+  "contract": {
+    "inputs": ["BrandAsset[]"],
+    "outputs": ["BrandAssetsPage"],
+    "portable": true,
+    "hardcodedUrls": []
+  }
+}

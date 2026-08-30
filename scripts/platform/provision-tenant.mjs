@@ -1,0 +1,10 @@
+import fs from "node:fs";
+import { product, tagForVersion } from "./lib.mjs";
+const args = Object.fromEntries(process.argv.slice(2).map((value) => { const [key, ...rest] = value.replace(/^--/, "").split("="); return [key, rest.join("=")]; }));
+if (!args.id || !args.name) throw new Error("Usage: node scripts/platform/provision-tenant.mjs --id=provider --name='Provider Name'");
+const config = product();
+const tenant = { schemaVersion: 1, id: args.id, displayName: args.name, upstream: `${config.upstream.owner}/${config.upstream.repo}`, channel: args.channel || "stable", defaultBranch: args.branch || "main" };
+const lock = { schemaVersion: 1, upstream: tenant.upstream, version: config.version, tag: tagForVersion(config.version, config), commit: args.commit || null, installedAt: new Date().toISOString() };
+fs.writeFileSync(".platform/tenant.json", `${JSON.stringify(tenant, null, 2)}\n`);
+fs.writeFileSync(".platform/tenant.lock.json", `${JSON.stringify(lock, null, 2)}\n`);
+console.log(JSON.stringify({ tenant: tenant.id, version: lock.version, tag: lock.tag }));

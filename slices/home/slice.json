@@ -1,0 +1,13 @@
+{
+  "slug": "home",
+  "name": "Hospitality home experience",
+  "version": "1.0.0",
+  "category": "marketing",
+  "description": "Editorial multi-property homepage composed from content repository data.",
+  "contract": {
+    "inputs": ["HomeContent", "PropertyContent[]"],
+    "outputs": ["HomePage"],
+    "portable": true,
+    "hardcodedUrls": []
+  }
+}

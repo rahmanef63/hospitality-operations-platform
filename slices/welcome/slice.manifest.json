@@ -1,0 +1,17 @@
+{
+  "slug": "welcome",
+  "version": "1.3.0",
+  "entry": "index.ts",
+  "exports": [
+    "WelcomePage",
+    "PresentationPage",
+    "WelcomePresentation"
+  ],
+  "dependencies": [
+    "shared/brand",
+    "shared/welcome",
+    "shared/media",
+    "shared/pwa",
+    "shared/announcements"
+  ]
+}
