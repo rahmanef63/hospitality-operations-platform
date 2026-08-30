@@ -41,4 +41,13 @@ describe("platform distribution", () => {
     expect(release).toContain("hospitality-platform-updater/dispatches");
     expect(release).not.toContain("HOSPITALITY_MANAGED_TENANTS");
   });
+  it("configures updater Git identity before attempting the tenant merge", async () => {
+    const { readFileSync } = await import("node:fs");
+    const source = readFileSync("scripts/platform/sync-tenant.mjs", "utf8");
+    const identity = source.indexOf('run("git", ["config", "user.name", "Hospitality Platform Updater"]');
+    const merge = source.indexOf('spawnSync("git", ["merge", "--no-ff", "--no-commit", requestedTag]');
+    expect(identity).toBeGreaterThan(-1);
+    expect(merge).toBeGreaterThan(identity);
+  });
+
 });

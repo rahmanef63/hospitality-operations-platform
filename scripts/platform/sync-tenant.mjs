@@ -45,6 +45,8 @@ function notifyBlocked(reason, details = []) {
 try {
   run("gh", ["auth", "setup-git"], { cwd: process.cwd(), stdio: "ignore" });
   run("gh", ["repo", "clone", nwo, target], { cwd: process.cwd() });
+  run("git", ["config", "user.name", "Hospitality Platform Updater"], { cwd: target });
+  run("git", ["config", "user.email", "platform-updater@users.noreply.github.com"], { cwd: target });
   const tenant = readTargetJson(".platform/tenant.json");
   const lock = readTargetJson(".platform/tenant.lock.json");
   const expectedUpstream = `${platform.upstream.owner}/${platform.upstream.repo}`;
@@ -84,8 +86,6 @@ try {
 
   writeTargetJson(".platform/tenant.lock.json", { schemaVersion: 1, upstream: expectedUpstream, version: nextVersion, tag: requestedTag, commit: nextCommit, installedAt: new Date().toISOString() });
   run("git", ["add", "-A"], { cwd: target });
-  run("git", ["config", "user.name", "Hospitality Platform Updater"], { cwd: target });
-  run("git", ["config", "user.email", "platform-updater@users.noreply.github.com"], { cwd: target });
   run("git", ["commit", "-m", `chore(platform): update to ${requestedTag}`], { cwd: target });
 
   const verifyEnv = { ...baseEnv, NEXT_PUBLIC_SITE_URL: "https://tenant.example", NEXT_PUBLIC_CONVEX_URL: "https://example.convex.cloud" };
