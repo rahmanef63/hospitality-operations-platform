@@ -111,6 +111,7 @@ Required repository variables:
 
 - `HOSPITALITY_SITE_URL` — canonical production origin used for exact health verification.
 - `HOSPITALITY_VERCEL_MODE` — `git` when Vercel auto-deploys tenant `main`, or `hook` when a deployment hook is used.
+- `deploymentActor` — private updater control-plane GitHub login for a real tenant deployment user; the updater exports it as `TENANT_DEPLOYMENT_ACTOR` while preparing the PR.
 
 Conditional secret:
 

@@ -36,7 +36,9 @@ If a tenant modifies product core outside protected overlays, automatic updates 
 
 Managed-provider routing is **not stored in the product repository**. The product release workflow dispatches the generic release tag to the separate private `hospitality-platform-updater` control plane.
 
-The private control plane owns only routing/automation metadata such as tenant repository identifiers, update channels, reviewer lists, and updater credentials. It must not contain provider runtime secrets such as Convex deployment keys or Vercel deployment credentials.
+The private control plane owns only routing/automation metadata such as tenant repository identifiers, update channels, reviewer lists, deployment-actor logins, and updater credentials. It must not contain provider runtime secrets such as Convex deployment keys or Vercel deployment credentials.
+
+Each managed tenant declares a `deploymentActor` GitHub login. It must resolve to a real user authorized to deploy that tenant. The updater derives the GitHub noreply email from the user ID, authors the prepared update commit as that tenant actor, and tenant apply uses rebase merge so hosting author/seat policy remains tenant-owned.
 
 Preparation flow:
 
@@ -46,10 +48,11 @@ Preparation flow:
 4. The release workflow dispatches the tag to the private updater control plane.
 5. The control plane selects enabled tenants on compatible channels.
 6. For each tenant it checks the installed lock, protected-path changes, and core drift.
-7. It merges the upstream tag into `platform/update-vX.Y.Z` **without writing tenant `main`**.
-8. The complete merged tenant tree runs `npm run verify`.
-9. A clean update PR is opened/replaced; an unsafe update produces a blocked-review signal instead.
-10. Older open platform-update PRs should be closed when a newer tested release supersedes them.
+7. It resolves the tenant `deploymentActor` to a GitHub user and configures that user as the update commit author.
+8. It merges the upstream tag into `platform/update-vX.Y.Z` **without writing tenant `main`**.
+9. The complete merged tenant tree runs `npm run verify`.
+10. A clean update PR is opened/replaced; an unsafe update produces a blocked-review signal instead.
+11. Older open platform-update PRs should be closed when a newer tested release supersedes them.
 
 The GitHub App/private updater key is held only by the operator control plane. Tenant repositories never receive that private key.
 
@@ -66,7 +69,7 @@ Preferred path:
   → workflow revalidates exact PR head and CI
   → npm run verify on the exact tenant tree
   → npx convex deploy using tenant CONVEX_DEPLOY_KEY
-  → atomic merge constrained to the verified PR head SHA
+  → exact rebase merge constrained to the verified PR head SHA, preserving tenant deployment author
   → Vercel main-branch deployment (or tenant deploy hook)
   → poll canonical /api/health until buildVersion == merge SHA
 ```

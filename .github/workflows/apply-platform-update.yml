@@ -131,7 +131,7 @@ jobs:
         run: |
           set -euo pipefail
           gh api --method PUT "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/merge" \
-            -f sha="${{ steps.resolve.outputs.head_sha }}" -f merge_method=merge \
+            -f sha="${{ steps.resolve.outputs.head_sha }}" -f merge_method=rebase \
             -f commit_title="chore(platform): apply v${EXPECTED_VERSION}" > "$RUNNER_TEMP/merge.json"
           node <<'NODE' >> "$GITHUB_OUTPUT"
           const fs=require('fs');const result=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/merge.json','utf8'));

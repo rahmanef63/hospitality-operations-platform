@@ -10,6 +10,7 @@ const owner = process.env.TENANT_OWNER?.trim();
 const repo = process.env.TENANT_REPO?.trim();
 const baseBranch = process.env.TENANT_DEFAULT_BRANCH?.trim() || "main";
 const token = process.env.TENANT_TOKEN?.trim();
+const requestedDeploymentActor = process.env.TENANT_DEPLOYMENT_ACTOR?.trim();
 const requestedTag = process.env.PLATFORM_TAG?.trim() || tagForVersion(platform.version, platform);
 if (!owner || !repo || !token) throw new Error("TENANT_OWNER, TENANT_REPO, and TENANT_TOKEN are required");
 if (!requestedTag.startsWith(platform.release.tagPrefix)) throw new Error(`Invalid platform tag ${requestedTag}`);
@@ -30,6 +31,15 @@ function readTargetJson(relative) { return JSON.parse(fs.readFileSync(path.join(
 function writeTargetJson(relative, value) { fs.writeFileSync(path.join(target, relative), `${JSON.stringify(value, null, 2)}\n`); }
 function truncate(items, limit = 20) { return items.slice(0, limit).map((item) => `- \`${item}\``).join("\n"); }
 
+function resolveDeploymentActor() {
+  const login = requestedDeploymentActor || owner;
+  const user = JSON.parse(capture("gh", ["api", `users/${login}`], process.cwd()));
+  if (user.type !== "User" || !Number.isInteger(user.id) || !user.login) {
+    throw new Error(`TENANT_DEPLOYMENT_ACTOR must resolve to a GitHub user; ${login} is ${user.type ?? "unknown"}`);
+  }
+  return { login: user.login, email: `${user.id}+${user.login}@users.noreply.github.com` };
+}
+
 function notifyBlocked(reason, details = []) {
   const title = `Platform update ${requestedTag} blocked`;
   const body = [`The automated Hospitality Operations Platform update could not be prepared safely.`, "", `**Reason:** ${reason}`];
@@ -44,9 +54,10 @@ function notifyBlocked(reason, details = []) {
 
 try {
   run("gh", ["auth", "setup-git"], { cwd: process.cwd(), stdio: "ignore" });
+  const deploymentActor = resolveDeploymentActor();
   run("gh", ["repo", "clone", nwo, target], { cwd: process.cwd() });
-  run("git", ["config", "user.name", "Hospitality Platform Updater"], { cwd: target });
-  run("git", ["config", "user.email", "platform-updater@users.noreply.github.com"], { cwd: target });
+  run("git", ["config", "user.name", deploymentActor.login], { cwd: target });
+  run("git", ["config", "user.email", deploymentActor.email], { cwd: target });
   const tenant = readTargetJson(".platform/tenant.json");
   const lock = readTargetJson(".platform/tenant.lock.json");
   const expectedUpstream = `${platform.upstream.owner}/${platform.upstream.repo}`;
@@ -114,7 +125,7 @@ try {
 
   const reviewers = (process.env.TENANT_REVIEWERS ?? "").split(",").map((item) => item.trim()).filter(Boolean);
   if (reviewers.length) run("gh", ["pr", "edit", url, "--repo", nwo, "--add-reviewer", reviewers.join(",")], { cwd: process.cwd(), stdio: "ignore" });
-  console.log(JSON.stringify({ tenant: nwo, from: lock.version, to: nextVersion, branch: updateBranch, pullRequest: url }));
+  console.log(JSON.stringify({ tenant: nwo, from: lock.version, to: nextVersion, branch: updateBranch, pullRequest: url, deploymentActor: deploymentActor.login }));
 } finally {
   fs.rmSync(tempRoot, { recursive: true, force: true });
 }

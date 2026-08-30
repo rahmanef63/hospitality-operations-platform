@@ -35,6 +35,7 @@ describe("platform distribution", () => {
     const sync = fs.readFileSync("scripts/platform/sync-tenant.mjs", "utf8");
     expect(distribution.strategy).toBe("external-control-plane-pr");
     expect(distribution.updater.branchPrefix).toBe("platform/update-");
+    expect(distribution.updater.deploymentActorEnv).toBe("TENANT_DEPLOYMENT_ACTOR");
     expect(sync).toContain("gh\", [\"pr\", \"create");
     expect(sync).not.toContain("push\", \"origin\", `HEAD:refs/heads/${baseBranch}`");
     const release = fs.readFileSync(".github/workflows/platform-release.yml", "utf8");
@@ -47,12 +48,14 @@ describe("platform distribution", () => {
     expect(versionFromUpdateBranch("feature/v1.3.2", "platform/update-")).toBeNull();
   });
 
-  it("configures updater Git identity before attempting the tenant merge", async () => {
+  it("configures tenant deployment actor identity before attempting the tenant merge", async () => {
     const { readFileSync } = await import("node:fs");
     const source = readFileSync("scripts/platform/sync-tenant.mjs", "utf8");
-    const identity = source.indexOf('run("git", ["config", "user.name", "Hospitality Platform Updater"]');
+    const resolve = source.indexOf("const deploymentActor = resolveDeploymentActor()");
+    const identity = source.indexOf('run("git", ["config", "user.name", deploymentActor.login]');
     const merge = source.indexOf('spawnSync("git", ["merge", "--no-ff", "--no-commit", requestedTag]');
-    expect(identity).toBeGreaterThan(-1);
+    expect(resolve).toBeGreaterThan(-1);
+    expect(identity).toBeGreaterThan(resolve);
     expect(merge).toBeGreaterThan(identity);
   });
 
