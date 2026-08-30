@@ -1,6 +1,6 @@
 {
   "name": "hospitality-operations-platform",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "description": "Location-neutral hospitality website for Hospitality Operations Platform.",
   "type": "module",

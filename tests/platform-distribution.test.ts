@@ -33,11 +33,12 @@ describe("platform distribution", () => {
 
   it("uses PR branches rather than tenant main for updates", () => {
     const sync = fs.readFileSync("scripts/platform/sync-tenant.mjs", "utf8");
-    const workflow = fs.readFileSync(".github/workflows/platform-tenant-sync.yml", "utf8");
-    expect(distribution.strategy).toBe("upstream-release-pr");
+    expect(distribution.strategy).toBe("external-control-plane-pr");
     expect(distribution.updater.branchPrefix).toBe("platform/update-");
     expect(sync).toContain("gh\", [\"pr\", \"create");
     expect(sync).not.toContain("push\", \"origin\", `HEAD:refs/heads/${baseBranch}`");
-    expect(workflow).toContain("actions/create-github-app-token@v2");
+    const release = fs.readFileSync(".github/workflows/platform-release.yml", "utf8");
+    expect(release).toContain("hospitality-platform-updater/dispatches");
+    expect(release).not.toContain("HOSPITALITY_MANAGED_TENANTS");
   });
 });

@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing platform tag to publish/sync
+        description: Existing platform tag to publish and dispatch
         required: true
         type: string
 
@@ -50,9 +50,16 @@ jobs:
           gh release view "$TAG" >/dev/null 2>&1 || \
             gh release create "$TAG" --verify-tag --generate-notes --title "Hospitality Operations Platform $TAG"
 
-  tenant-sync:
+  dispatch-updater:
     needs: publish
-    uses: ./.github/workflows/platform-tenant-sync.yml
-    with:
-      tag: ${{ inputs.tag || github.ref_name }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.HOSPITALITY_CONTROL_PLANE_TOKEN }}
+      TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - name: Dispatch release tag to private updater control plane
+        run: |
+          test -n "$GH_TOKEN"
+          gh api repos/rahmanef63/hospitality-platform-updater/dispatches \
+            -f event_type=platform-release \
+            -F client_payload[tag]="$TAG"

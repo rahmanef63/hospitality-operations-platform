@@ -97,4 +97,11 @@ A customer repository, Vercel project, domain, Convex project, secrets, and busi
 
 ## Updater credentials
 
-Production should use a GitHub App installed on managed tenant repositories. During bootstrap, `HOSPITALITY_UPDATER_TOKEN` may be stored as an encrypted upstream Actions secret; migrate to the GitHub App before onboarding third-party providers. Tenant identifiers belong in the encrypted/control-plane configuration, never in source files.
+
+
+
+## Private updater control plane
+
+The product repository contains no managed-provider registry. A release publishes the generic tag, then dispatches that tag to a separate private updater control-plane repository. Tenant repository identifiers, reviewer lists, and updater credentials live only in that control plane. The control plane checks out the released platform tag and invokes the generic `scripts/platform/sync-tenant.mjs` implementation.
+
+This separation keeps product source, tags, release archives, and normal product release logs provider-neutral while still allowing managed tenant repositories to receive tested update pull requests. Production should use a dedicated GitHub App installed on managed tenant repositories; a narrowly scoped encrypted token is acceptable only during initial bootstrap.

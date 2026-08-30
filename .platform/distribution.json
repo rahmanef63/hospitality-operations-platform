@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "strategy": "upstream-release-pr",
+  "strategy": "external-control-plane-pr",
   "tenantProtectedPrefixes": [
     ".env",
     ".vercel/",
