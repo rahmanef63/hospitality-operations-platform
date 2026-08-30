@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import { describe, expect, it } from "vitest";
+import { platformRepositoryMode } from "../shared/platform/config";
 import { compareSemver, updateVersionFromRef } from "../shared/platform/version";
 
 describe("tenant platform update center", () => {
@@ -7,6 +8,11 @@ describe("tenant platform update center", () => {
     expect(updateVersionFromRef("platform/update-v1.4.2", "platform/update-")).toBe("1.4.2");
     expect(updateVersionFromRef("feature/foo", "platform/update-")).toBeUndefined();
     expect(compareSemver("1.4.2", "1.4.1")).toBeGreaterThan(0);
+  });
+
+  it("widens tenant identifiers before repository-mode detection", () => {
+    expect(platformRepositoryMode("default-tenant")).toBe("upstream");
+    expect(platformRepositoryMode("provider-owned-tenant")).toBe("tenant");
   });
 
   it("keeps update credentials server-only", () => {
@@ -27,6 +33,7 @@ describe("tenant platform update center", () => {
     expect(merge).toBeGreaterThan(convex);
     expect(health).toBeGreaterThan(merge);
     expect(workflow).toContain("CONVEX_DEPLOY_KEY");
+    expect(workflow).toContain("npm ci --include=dev --legacy-peer-deps");
     expect(workflow).toContain("Major platform updates require an explicit migration workflow");
     expect(workflow).toContain('head_sha="$(cat "$RUNNER_TEMP/head-sha")"');
     expect(workflow).not.toContain('commits/${{ steps.resolve.outputs.head_sha }}/check-runs');

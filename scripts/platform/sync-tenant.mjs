@@ -90,7 +90,7 @@ try {
   run("git", ["commit", "-m", `chore(platform): update to ${requestedTag}`], { cwd: target });
 
   const verifyEnv = { ...baseEnv, NEXT_PUBLIC_SITE_URL: "https://tenant.example", NEXT_PUBLIC_CONVEX_URL: "https://example.convex.cloud" };
-  run("npm", ["ci", "--legacy-peer-deps"], { cwd: target, env: verifyEnv });
+  run("npm", ["ci", "--include=dev", "--legacy-peer-deps"], { cwd: target, env: verifyEnv });
   run("npm", ["run", "verify"], { cwd: target, env: verifyEnv });
   run("git", ["push", "--force-with-lease", "origin", `HEAD:refs/heads/${updateBranch}`], { cwd: target });
 

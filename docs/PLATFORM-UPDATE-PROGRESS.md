@@ -49,10 +49,14 @@ A platform release must be safe for an AI-agent-operated tenant repository:
 
 - 2026-08-30: `v0.1.4` upstream release succeeded but tenant preparation correctly stopped on a policy false positive: `.env.example` matched the old `.env` protected prefix. Runtime `.env*` files are already Git-ignored; patch candidate `v0.1.5` removes only that over-broad tracked-prefix rule so the non-secret upstream environment contract can update safely.
 
+- 2026-08-30: `v0.1.5` preparation reached the real tenant merged tree and exposed a tenant-only TypeScript literal-narrowing issue in repository-mode detection. Patch candidate `v0.1.6` widens tenant IDs before mode comparison; release gating now includes a full temporary merge/verify against the managed tenant tree before tagging.
+
+- 2026-08-30: `v0.1.6` candidate was merged into a temporary clone of the real managed tenant. Protected overlay hash was unchanged; tenant full verify passed with 24 test files / 95 tests and a production build. Updater/apply installs now force dev dependencies for runner determinism.
+
 ## Release state
 
-Current released upstream baseline: `v0.1.4`.
+Current released upstream baseline: `v0.1.5`.
 
-Current release candidate: `v0.1.5` — patch the `.env.example` tenant-boundary false positive so the Update Center release can be prepared for existing tenants.
+Current release candidate: `v0.1.6` — tenant-mode type widening plus real-tenant pre-release verification.
 
-`v0.1.5` is not released until full local verification, hosted CI, provider-neutral release audit, and updater/tenant PR verification succeed.
+`v0.1.6` is not released until upstream full verification, a temporary real-tenant merge/full verify, hosted CI, provider-neutral release audit, and updater/tenant PR verification succeed.
