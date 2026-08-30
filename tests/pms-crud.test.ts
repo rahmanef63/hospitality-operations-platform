@@ -2,34 +2,28 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { convexTest, type TestConvex } from "convex-test";
 import { internal } from "@/convex/_generated/api";
 import schema from "@/convex/schema";
+import { createTestProperty, TEST_ACTOR_HASH } from "./fixtures/pms";
 
 const modules = import.meta.glob("../convex/**/*.{ts,js}");
-const actorEmailHash = "integration-actor-hash-000000000000000000000000";
+const actorEmailHash = TEST_ACTOR_HASH;
 type TestBackend = ReturnType<typeof convexTest<typeof schema.tables>>;
 
-async function seeded(t: TestConvex<typeof schema>) {
-  await t.mutation(internal.pms.seed.rumaKamyna, { actorEmailHash });
-  const catalog = await t.query(internal.pms.catalog.list, {});
-  const property = catalog.properties[0]!;
-  return { catalog, property };
-}
+async function seeded(t: TestConvex<typeof schema>) { return createTestProperty(t); }
 
 describe("multi-property PMS CRUD", () => {
   let t: TestBackend;
   beforeEach(() => { t = convexTest(schema, modules); });
 
-  it("seeds only the owner-confirmed Ruma Kamyna facts and supports property and amenity CRUD", async () => {
+  it("supports property and amenity CRUD from an explicitly created generic property", async () => {
     const { catalog, property } = await seeded(t);
     expect(property).toMatchObject({
-      slug: "ruma-kamyna",
-      name: "Ruma Kamyna",
+      slug: "test-property",
+      name: "Test Property",
       bedroomCount: 3,
       currency: "IDR",
       publicationStatus: "published",
     });
-    expect(catalog.amenities.map((amenity) => amenity.key).sort()).toEqual([
-      "gym", "jacuzzi", "mountain-view", "swimming-pool",
-    ]);
+    expect(catalog.amenities.map((amenity) => amenity.key).sort()).toEqual(["garden-view", "gym", "pool", "spa"]);
     expect(property).not.toHaveProperty("bathroomCount");
     expect(property).not.toHaveProperty("maxGuests");
     expect(property).not.toHaveProperty("baseNightlyRate");
@@ -41,16 +35,16 @@ describe("multi-property PMS CRUD", () => {
       propertyType: property.propertyType,
       status: property.status,
       publicationStatus: property.publicationStatus,
-      locationLabel: "Megamendung, Puncak Bogor",
-      locality: "Megamendung",
-      region: "Jawa Barat",
-      postalCode: "16770",
+      locationLabel: "Test District",
+      locality: "Test City",
+      region: "Test Region",
+      postalCode: "10000",
       countryCode: "ID",
       timezone: "Asia/Jakarta",
       currency: "IDR",
       bedroomCount: 3,
       publicSummary: "Verified operational summary.",
-      publicPath: "/stays/ruma-kamyna",
+      publicPath: "/stays/test-property",
       actorEmailHash,
     });
     const createdAmenity = await t.mutation(internal.pms.catalog.upsertAmenity, {
@@ -146,7 +140,7 @@ describe("multi-property PMS CRUD", () => {
       guestPreferredLocale: "ja",
     });
     const context = await t.query(internal.welcomeReservations.getContext, { reservationId: reservation.id });
-    expect(context).toMatchObject({ guestName: "Test Guest", propertyName: "Ruma Kamyna", locale: "ja" });
+    expect(context).toMatchObject({ guestName: "Test Guest", propertyName: "Test Property", locale: "ja" });
     expect(context).not.toHaveProperty("totalAmount");
     expect(context).not.toHaveProperty("notes");
     await t.mutation(internal.pms.reservations.archive, { id: reservation.id, actorEmailHash });
@@ -174,7 +168,7 @@ describe("multi-property PMS CRUD", () => {
     });
     const task = await t.mutation(internal.pms.tasks.upsert, {
       propertyId: property.id,
-      title: "Inspect jacuzzi",
+      title: "Inspect guest area",
       category: "inspection",
       priority: "high",
       status: "open",
@@ -182,7 +176,7 @@ describe("multi-property PMS CRUD", () => {
       actorEmailHash,
     });
     expect((await t.query(internal.pms.finance.list, {})).totals.payments).toBe(500_000);
-    expect((await t.query(internal.pms.tasks.list, {}))[0]?.title).toBe("Inspect jacuzzi");
+    expect((await t.query(internal.pms.tasks.list, {}))[0]?.title).toBe("Inspect guest area");
     await t.mutation(internal.pms.finance.archive, { id: payment.id, actorEmailHash });
     await t.mutation(internal.pms.tasks.archive, { id: task.id, actorEmailHash });
     expect((await t.query(internal.pms.finance.list, {})).transactions).toHaveLength(0);

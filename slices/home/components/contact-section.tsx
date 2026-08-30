@@ -70,7 +70,7 @@ export function ContactSection({ content, property }: ContactSectionProps) {
           {mapEmbedUrl ? (
             <iframe
               src={mapEmbedUrl}
-              title={`Official Google Maps location for ${property.name} in Megamendung`}
+              title={`Official Google Maps location for ${property.name}`}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               allowFullScreen

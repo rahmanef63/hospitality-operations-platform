@@ -70,7 +70,7 @@
 }
 
 .scroll-parallax-section {
-  view-timeline-name: --kamyna-parallax;
+  view-timeline-name: --hospitality-parallax;
   view-timeline-axis: block;
 }
 
@@ -137,7 +137,7 @@
 
     .scroll-parallax-bg {
       animation-name: scroll-parallax-bg;
-      animation-timeline: --kamyna-parallax;
+      animation-timeline: --hospitality-parallax;
       animation-range: entry 0% exit 100%;
     }
   }

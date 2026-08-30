@@ -79,7 +79,7 @@ export function GuestConcierge({ navigation, config }: GuestConciergeProps) {
         type="button"
         onClick={() => setOpen(true)}
         aria-expanded={open}
-        aria-controls="kamyna-concierge-dialog"
+        aria-controls="hospitality-concierge-dialog"
         className="fixed bottom-6 right-6 z-[80] hidden min-h-13 items-center gap-3 border border-charcoal bg-charcoal px-5 text-xs font-bold tracking-[.1em] text-ivory uppercase shadow-[0_18px_45px_rgba(45,43,39,0.24)] transition hover:bg-olive md:flex"
       >
         <MessageCircle className="size-4" aria-hidden="true" />
@@ -95,16 +95,16 @@ export function GuestConcierge({ navigation, config }: GuestConciergeProps) {
             className="fixed inset-0 z-[91] cursor-default bg-charcoal/26 backdrop-blur-[2px]"
           />
           <section
-            id="kamyna-concierge-dialog"
+            id="hospitality-concierge-dialog"
             role="dialog"
             aria-modal="true"
-            aria-labelledby="kamyna-concierge-title"
+            aria-labelledby="hospitality-concierge-title"
             className="concierge-panel fixed z-[95] flex flex-col overflow-hidden border border-charcoal/15 bg-paper shadow-[0_30px_90px_rgba(45,43,39,0.3)]"
           >
             <header className="flex items-start justify-between gap-5 border-b border-charcoal/12 bg-charcoal px-5 py-4 text-ivory">
               <div>
                 <p className="text-[0.62rem] font-bold tracking-[.16em] text-warm-sand uppercase">{config.eyebrow}</p>
-                <h2 id="kamyna-concierge-title" className="mt-1 font-serif text-2xl leading-none">{config.title}</h2>
+                <h2 id="hospitality-concierge-title" className="mt-1 font-serif text-2xl leading-none">{config.title}</h2>
               </div>
               <button
                 type="button"
@@ -172,11 +172,11 @@ export function GuestConcierge({ navigation, config }: GuestConciergeProps) {
                 void sendMessage(input);
               }}
             >
-              <label className="sr-only" htmlFor="kamyna-concierge-input">Ask Ruma Kamyna</label>
+              <label className="sr-only" htmlFor="hospitality-concierge-input">Ask Property</label>
               <div className="grid grid-cols-[1fr_auto] border border-charcoal/18 bg-white">
                 <input
                   ref={inputRef}
-                  id="kamyna-concierge-input"
+                  id="hospitality-concierge-input"
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
                   maxLength={400}

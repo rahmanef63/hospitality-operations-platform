@@ -188,8 +188,8 @@ export async function handlePmsAdmin(ctx: ActionCtx, body: Record<string, unknow
       });
     case "task.archive":
       return ctx.runMutation(internal.pms.tasks.archive, { id: idValue<"tasks">(payload, "id"), actorEmailHash });
-    case "seed.ruma-kamyna":
-      return ctx.runMutation(internal.pms.seed.rumaKamyna, { actorEmailHash });
+    case "seed.initial-property":
+      return ctx.runMutation(internal.pms.seed.initialProperty, { actorEmailHash });
     default:
       throw new Error("Unknown PMS action.");
   }

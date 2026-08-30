@@ -81,7 +81,7 @@ export async function translateWelcomeAction(formData: FormData) {
     const sourceConfig = overview.configs[sourceValue];
     const source = sourceConfig?.version
       ? sourceConfig.draft
-      : property.slug === "ruma-kamyna"
+      : property.slug === "primary-property"
         ? DEFAULT_WELCOME_CONTENT[sourceValue]
         : defaultWelcomeContent(sourceValue, property.name);
     const translations = await translateWelcomeContent({

@@ -8,7 +8,7 @@ function constantTimeTextEqual(left: string, right: string): boolean {
 }
 
 export function authorizeAdminRequest(request: Request): boolean {
-  const expected = process.env.KAMYNA_CONVEX_ADMIN_SECRET;
+  const expected = process.env.HOSPITALITY_CONVEX_ADMIN_SECRET;
   const authorization = request.headers.get("authorization");
   if (!expected || !authorization?.startsWith("Bearer ")) return false;
   return constantTimeTextEqual(authorization.slice(7), expected);

@@ -5,14 +5,14 @@ export const PRESENTATION_MEDIA_OPTIONS: ReadonlyArray<{
   label: string;
   src: string;
 }> = [
-  { key: "livingCourtyard", label: "Living courtyard", src: "/media/kamyna/living-courtyard.webp" },
-  { key: "bedroomRetreat", label: "Bedroom retreat", src: "/media/kamyna/bedroom-retreat.webp" },
-  { key: "poolCourtyard", label: "Pool courtyard", src: "/media/kamyna/pool-courtyard.webp" },
-  { key: "welcomeDetails", label: "Welcome details", src: "/media/kamyna/welcome-details.webp" },
-  { key: "livingDining", label: "Living and dining", src: "/media/kamyna/living-dining.webp" },
-  { key: "spaBath", label: "Spa bath", src: "/media/kamyna/spa-bath.webp" },
-  { key: "diningTable", label: "Dining table", src: "/media/kamyna/dining-table.webp" },
-  { key: "materialPalette", label: "Material palette", src: "/media/kamyna/material-palette.webp" },
+  { key: "livingCourtyard", label: "Living courtyard", src: "/media/hospitality/living-courtyard.webp" },
+  { key: "bedroomRetreat", label: "Bedroom retreat", src: "/media/hospitality/bedroom-retreat.webp" },
+  { key: "poolCourtyard", label: "Pool courtyard", src: "/media/hospitality/pool-courtyard.webp" },
+  { key: "welcomeDetails", label: "Welcome details", src: "/media/hospitality/welcome-details.webp" },
+  { key: "livingDining", label: "Living and dining", src: "/media/hospitality/living-dining.webp" },
+  { key: "spaBath", label: "Spa bath", src: "/media/hospitality/spa-bath.webp" },
+  { key: "diningTable", label: "Dining table", src: "/media/hospitality/dining-table.webp" },
+  { key: "materialPalette", label: "Material palette", src: "/media/hospitality/material-palette.webp" },
 ];
 
 export const PRESENTATION_SLIDE_LABELS = {

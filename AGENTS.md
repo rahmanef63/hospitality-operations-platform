@@ -1,4 +1,4 @@
-# Kamyna Living agent rules
+# Hospitality Operations Platform agent rules
 
 ## Non-negotiable
 
@@ -39,7 +39,7 @@
 - Check reservation and availability date ranges for overlap before writes.
 - Store money as whole currency units, paired with an explicit ISO currency code. Never infer pricing from listings or competitors.
 - Public property facts must come from active, published PMS records and fall back only to owner-verified static values. Never expose internal notes, financial fields, guest data, or operational tasks publicly.
-- Ruma Kamyna seed facts are limited to 3 bedrooms, swimming pool, gym, jacuzzi, mountain view, and previously verified location/contact values.
+- The upstream platform must not contain provider property facts or provider-specific seeds. Initial property data belongs only in protected tenant overlays or runtime administration.
 
 ## Concierge and navigation
 

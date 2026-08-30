@@ -4,7 +4,7 @@ export const LOFI_TRACKS = [
   {
     key: "still-morning",
     title: "Still Morning",
-    artist: "Kamyna Living Studio",
+    artist: "Hospitality Platform Studio",
     src: "/audio/still-morning.mp3",
     durationSeconds: 53.37,
     license: "CC0 1.0 Universal",
@@ -14,7 +14,7 @@ export const LOFI_TRACKS = [
   {
     key: "mountain-air",
     title: "Mountain Air",
-    artist: "Kamyna Living Studio",
+    artist: "Hospitality Platform Studio",
     src: "/audio/mountain-air.mp3",
     durationSeconds: 50.57,
     license: "CC0 1.0 Universal",
@@ -24,7 +24,7 @@ export const LOFI_TRACKS = [
   {
     key: "night-courtyard",
     title: "Night Courtyard",
-    artist: "Kamyna Living Studio",
+    artist: "Hospitality Platform Studio",
     src: "/audio/night-courtyard.mp3",
     durationSeconds: 56.5,
     license: "CC0 1.0 Universal",

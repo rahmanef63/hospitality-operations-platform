@@ -14,8 +14,8 @@ import { getPropertyBySlug } from "@/shared/content";
 import { PRESENTATION_SLIDE_KEYS, validateAnnouncementRule, validateAnnouncementSettings, validateGuestVisibilitySettings } from "@/shared/announcements";
 
 function safePropertySlug(value: FormDataEntryValue | null) {
-  const slug = String(value ?? "ruma-kamyna").trim().toLowerCase();
-  return /^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$/.test(slug) ? slug : "ruma-kamyna";
+  const slug = String(value ?? "primary-property").trim().toLowerCase();
+  return /^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$/.test(slug) ? slug : "primary-property";
 }
 
 function adminUrl(propertySlug: string, status?: string, error?: string) {

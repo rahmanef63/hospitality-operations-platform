@@ -6,8 +6,8 @@ import type { ReservationWelcomeLink } from "./types";
 import { createGuestWelcomeToken } from "./token";
 
 export function getGuestWelcomeSecret(): string {
-  const value = process.env.KAMYNA_GUEST_LINK_SECRET?.trim();
-  if (!value || value.length < 32) throw new Error("KAMYNA_GUEST_LINK_SECRET is not configured correctly.");
+  const value = process.env.HOSPITALITY_GUEST_LINK_SECRET?.trim();
+  if (!value || value.length < 32) throw new Error("HOSPITALITY_GUEST_LINK_SECRET is not configured correctly.");
   return value;
 }
 
@@ -36,7 +36,7 @@ export function buildReservationWelcomeLinks(
     links.push({
       reservationId: reservation.id,
       reference: reservation.reference,
-      propertySlug: property?.slug ?? "ruma-kamyna",
+      propertySlug: property?.slug ?? "primary-property",
       guestName: reservation.guestName,
       ...(guest?.email ? { guestEmail: guest.email } : {}),
       ...(guest?.phone ? { guestPhone: guest.phone } : {}),

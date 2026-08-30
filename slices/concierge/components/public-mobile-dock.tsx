@@ -69,7 +69,7 @@ export function PublicMobileDock({
       <button
         type="button"
         aria-expanded={chatOpen}
-        aria-controls="kamyna-concierge-dialog"
+        aria-controls="hospitality-concierge-dialog"
         onClick={onChatOpen}
         className={`flex min-h-14 flex-col items-center justify-center gap-1 px-1 text-[0.58rem] font-semibold tracking-[.04em] transition ${
           chatOpen ? "text-charcoal" : "text-charcoal/58"

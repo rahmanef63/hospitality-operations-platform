@@ -13,7 +13,7 @@ type WakeLockSentinelLike = { released: boolean; release: () => Promise<void> };
 type WakeLockNavigator = Navigator & { wakeLock?: { request: (type: "screen") => Promise<WakeLockSentinelLike> } };
 type LockableOrientation = ScreenOrientation & { lock?: (orientation: "landscape") => Promise<void> };
 type FullscreenTarget = HTMLElement & { requestFullscreen?: (options?: FullscreenOptions) => Promise<void> };
-const INSTALL_EVENT = "kamyna:pwa-install-request";
+const INSTALL_EVENT = "hospitality:pwa-install-request";
 
 function installedDisplayMode() {
   return window.matchMedia("(display-mode: standalone)").matches

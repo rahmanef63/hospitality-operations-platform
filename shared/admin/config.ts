@@ -17,17 +17,17 @@ function requireValue(name: string, minimumLength = 1): string {
 }
 
 export function getAdminRuntimeConfig(): AdminRuntimeConfig {
-  const email = requireValue("KAMYNA_ADMIN_EMAIL").toLowerCase();
-  if (!/^\S+@\S+\.\S+$/.test(email)) throw new Error("KAMYNA_ADMIN_EMAIL is invalid.");
+  const email = requireValue("HOSPITALITY_ADMIN_EMAIL").toLowerCase();
+  if (!/^\S+@\S+\.\S+$/.test(email)) throw new Error("HOSPITALITY_ADMIN_EMAIL is invalid.");
   const siteUrl = new URL(requireValue("NEXT_PUBLIC_SITE_URL"));
   if (process.env.NODE_ENV === "production" && siteUrl.protocol !== "https:") {
     throw new Error("NEXT_PUBLIC_SITE_URL must use HTTPS in production.");
   }
   return {
     email,
-    password: requireValue("KAMYNA_ADMIN_PASSWORD", 16),
-    sessionSecret: requireValue("KAMYNA_ADMIN_SESSION_SECRET", 32),
-    convexAdminSecret: requireValue("KAMYNA_CONVEX_ADMIN_SECRET", 32),
+    password: requireValue("HOSPITALITY_ADMIN_PASSWORD", 16),
+    sessionSecret: requireValue("HOSPITALITY_ADMIN_SESSION_SECRET", 32),
+    convexAdminSecret: requireValue("HOSPITALITY_CONVEX_ADMIN_SECRET", 32),
     siteOrigin: siteUrl.origin,
   };
 }

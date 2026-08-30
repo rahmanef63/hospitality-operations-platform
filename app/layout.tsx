@@ -42,8 +42,8 @@ export const metadata: Metadata = {
   publisher: SITE_NAME,
   category: "hospitality",
   keywords: [
-    "Kamyna Living",
-    "Ruma Kamyna",
+    "Hospitality Operations Platform",
+    "Property",
     "private stays",
     "design-led accommodation",
     "quiet hospitality",
@@ -57,11 +57,10 @@ export const metadata: Metadata = {
   formatDetection: { address: false, email: false, telephone: false },
   icons: {
     icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico", sizes: "any" },
+      { url: "/tenant/brand/favicon.svg", type: "image/svg+xml" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
-    other: [{ rel: "mask-icon", url: "/brand/mask-icon.svg", color: "#2D2B27" }],
+    apple: [{ url: "/tenant/brand/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    other: [{ rel: "mask-icon", url: "/tenant/brand/mask-icon.svg", color: "#2D2B27" }],
   },
   manifest: "/manifest.webmanifest",
   robots: {
@@ -84,7 +83,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
     images: [
       {
-        url: socialImages.kamynaLiving,
+        url: socialImages.site,
         width: 1200,
         height: 630,
         alt: `${SITE_NAME} | ${SITE_SLOGAN}`,
@@ -95,7 +94,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${SITE_NAME} | ${SITE_SLOGAN}`,
     description: SITE_DESCRIPTION,
-    images: [socialImages.kamynaLiving],
+    images: [socialImages.site],
   },
   appleWebApp: {
     capable: true,

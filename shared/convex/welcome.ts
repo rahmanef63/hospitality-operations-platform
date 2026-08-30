@@ -16,14 +16,14 @@ function defaultConfig(locale: WelcomeLocale): WelcomeConfigState {
   return { locale, draft: DEFAULT_WELCOME_CONTENT[locale], version: 0 };
 }
 
-export async function getPublishedWelcome(locale: WelcomeLocale, propertySlug = WELCOME_PROPERTY_SLUG) {
+export async function getPublishedWelcome(locale: WelcomeLocale, propertySlug: string = WELCOME_PROPERTY_SLUG) {
   return getConvexClient().query(api.welcome.getPublished, {
     propertySlug,
     locale,
   });
 }
 
-export async function getWelcomeAdminOverview(propertySlug = WELCOME_PROPERTY_SLUG): Promise<WelcomeAdminOverview> {
+export async function getWelcomeAdminOverview(propertySlug: string = WELCOME_PROPERTY_SLUG): Promise<WelcomeAdminOverview> {
   const response = await adminFetch<{
     configs: WelcomeConfigState[];
     events: WelcomeAdminOverview["events"];

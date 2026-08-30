@@ -58,7 +58,7 @@ function PropertyForm({ property, action }: { property?: PmsProperty; action: Pm
 
       <FormSection title="Lokasi dan administrasi" description="Nilai ini membantu operasi, SEO lokal, mata uang, dan penghitungan reservasi." icon="map">
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          <Field label="Label lokasi" className="sm:col-span-2"><TextInput name="locationLabel" defaultValue={value.locationLabel} maxLength={160} placeholder="Megamendung, Puncak Bogor" /></Field>
+          <Field label="Label lokasi" className="sm:col-span-2"><TextInput name="locationLabel" defaultValue={value.locationLabel} maxLength={160} placeholder="City, destination" /></Field>
           <Field label="Alamat jalan" className="sm:col-span-2"><TextInput name="addressLine" defaultValue={value.addressLine} maxLength={240} /></Field>
           <Field label="Kota / kecamatan"><TextInput name="locality" defaultValue={value.locality} maxLength={100} /></Field>
           <Field label="Provinsi"><TextInput name="region" defaultValue={value.region} maxLength={100} /></Field>

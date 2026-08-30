@@ -12,7 +12,7 @@ function composition(value: { order: string[]; hidden: string[] }, allowed: Set<
   if (value.hidden.some((item) => !allowed.has(item))) throw new Error(`${label} hidden tidak valid.`);
 }
 function mediaPath(value: string, label: string) {
-  if (!value.startsWith("/media/kamyna/")) throw new Error(`${label} media tidak valid.`);
+  if (!value.startsWith("/tenant/media/")) throw new Error(`${label} media tidak valid.`);
 }
 function href(value: string, label: string) {
   if (!(value.startsWith("/") && !value.startsWith("//")) && !value.startsWith("https://") && !value.startsWith("mailto:")) throw new Error(`${label} href tidak valid.`);

@@ -1,9 +1,9 @@
 {
   "slug": "concierge",
-  "name": "Kamyna guest concierge",
+  "name": "Hospitality guest concierge",
   "version": "1.0.0",
   "category": "guest-experience",
-  "description": "Verified-information chatbot and mobile navigation for public Kamyna routes.",
+  "description": "Verified-information chatbot and mobile navigation for public Hospitality routes.",
   "contract": {
     "inputs": ["navigation"],
     "outputs": ["GuestConcierge"],

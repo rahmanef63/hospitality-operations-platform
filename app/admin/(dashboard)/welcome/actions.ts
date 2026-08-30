@@ -7,8 +7,8 @@ import { upsertWelcome } from "@/shared/convex";
 import { isWelcomeLocale, validateWelcomeContent } from "@/shared/welcome";
 
 function safePropertySlug(value: FormDataEntryValue | null) {
-  const slug = String(value ?? "ruma-kamyna").trim().toLowerCase();
-  return /^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$/.test(slug) ? slug : "ruma-kamyna";
+  const slug = String(value ?? "primary-property").trim().toLowerCase();
+  return /^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$/.test(slug) ? slug : "primary-property";
 }
 
 export async function updateWelcomeAction(formData: FormData) {

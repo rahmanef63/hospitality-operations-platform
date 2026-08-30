@@ -1,14 +1,13 @@
-const fallbackUrl = "https://kamynaliving.com";
-
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? fallbackUrl;
-export const SITE_NAME = "Kamyna Living";
-export const SITE_SLOGAN = "Homes for slower living";
-export const SITE_DESCRIPTION =
-  "A growing collection of private stays shaped by quiet design, thoughtful hospitality, and unhurried time.";
-export const HOME_SEO_TITLE = "Kamyna Living | Private Villa Stays in Puncak, Bogor";
-export const HOME_SEO_DESCRIPTION =
-  "Discover Kamyna Living, a quiet collection of private villa stays beginning with Ruma Kamyna in Megamendung, Puncak, Bogor, Jawa Barat.";
-export const CONTACT_EMAIL = "hello@kamynaliving.com";
-export const GOOGLE_SITE_VERIFICATION = "E6-55-Sl0x-BwAAgBwYg8MTz4HBUVlc3ZlFkKmtFVBs";
-export const COPYRIGHT_YEAR = 2026;
-export const CONTENT_UPDATED_AT = new Date("2026-08-28T00:00:00.000Z");
+import { tenantSite } from "@/tenant";
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? tenantSite.fallbackUrl;
+export const SITE_NAME = tenantSite.siteName;
+export const SITE_SLOGAN = tenantSite.slogan;
+export const SITE_DESCRIPTION = tenantSite.description;
+export const HOME_SEO_TITLE = tenantSite.homeSeoTitle;
+export const HOME_SEO_DESCRIPTION = tenantSite.homeSeoDescription;
+export const CONTACT_EMAIL = tenantSite.contactEmail;
+export const GOOGLE_SITE_VERIFICATION = tenantSite.googleSiteVerification;
+export const COPYRIGHT_YEAR = tenantSite.copyrightYear;
+export const CONTENT_UPDATED_AT = tenantSite.contentUpdatedAt;
+export const DEFAULT_PROPERTY_SLUG = tenantSite.defaultPropertySlug;
+export const SERVICE_NAME = tenantSite.serviceName;

@@ -3,8 +3,8 @@ import { PWA_ICONS, PWA_PRESENTATION_SCREENSHOT } from "@/shared/pwa/manifest-as
 
 const manifest = {
   id: "/presentation",
-  name: "Kamyna Guest Presentation · TV",
-  short_name: "Kamyna TV",
+  name: "Hospitality Guest Presentation · TV",
+  short_name: "Hospitality TV",
   description: `${SITE_DESCRIPTION} Fullscreen guest presentation for shared displays.`,
   lang: "en",
   dir: "ltr",
@@ -23,17 +23,12 @@ const manifest = {
   screenshots: [PWA_PRESENTATION_SCREENSHOT],
   shortcuts: [
     {
-      name: "Kamyna Living home",
+      name: "Hospitality Operations Platform home",
       short_name: "Home",
       url: "/",
       icons: [PWA_ICONS[0]],
     },
-    {
-      name: "Ruma Kamyna",
-      short_name: "Ruma Kamyna",
-      url: "/stays/ruma-kamyna",
-      icons: [PWA_ICONS[0]],
-    },
+
   ],
 };
 

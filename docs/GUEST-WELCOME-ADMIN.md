@@ -27,14 +27,14 @@ Arabic renders with `dir="rtl"`; every other current locale is LTR. Every langua
 3. `/admin/welcome` loads actual reservations and generates an opaque encrypted link for each eligible stay.
 4. The token contains an encrypted reservation identifier, issue time, and expiry; it is authenticated with AES-256-GCM and expires 30 days after checkout.
 5. `/welcome` verifies the token server-side, then reads a bounded context through a protected Convex action: guest name, property slug/name, optional unit, dates, status, and locale.
-6. The property slug selects the correct welcome configuration, making the flow reusable for future Kamyna properties.
+6. The property slug selects the correct welcome configuration, making the flow reusable for future Hospitality properties.
 
 Raw reservation IDs, financial values, internal notes, guest contacts, and API secrets never appear in a guest token response.
 
 Legacy preview remains available for authenticated editorial review:
 
 ```text
-/welcome?property=ruma-kamyna&locale=ja&name=Guest
+/welcome?property=primary-property&locale=ja&name=Guest
 ```
 
 Production sharing should use the encrypted link shown beside an actual reservation.
@@ -54,7 +54,7 @@ Supported fixed providers are OpenAI, OpenRouter, Anthropic, and Google Gemini. 
 ```text
 Browser form
   → authenticated Next.js Server Action
-  → AES-256-GCM encryption using KAMYNA_AI_ENCRYPTION_KEY
+  → AES-256-GCM encryption using HOSPITALITY_AI_ENCRYPTION_KEY
   → protected Convex HTTP action
   → encryptedApiKey stored in aiProviderSettings
 ```
@@ -73,8 +73,8 @@ It does not contain guest names, emails, phone numbers, reservation IDs, dates, 
 ## Server-only environment
 
 ```env
-KAMYNA_GUEST_LINK_SECRET=
-KAMYNA_AI_ENCRYPTION_KEY=
+HOSPITALITY_GUEST_LINK_SECRET=
+HOSPITALITY_AI_ENCRYPTION_KEY=
 ```
 
 Both values must be strong random secrets of at least 32 characters. They belong only in the Dokploy runtime environment, never in Docker build arguments, client bundles, Git, or Convex documents. Rotating the guest-link secret invalidates previously shared links. Rotating the AI encryption key requires re-entering the BYOK API key.

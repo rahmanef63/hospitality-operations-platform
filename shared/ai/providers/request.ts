@@ -25,7 +25,7 @@ export async function requestStructuredTranslation(input: {
     const response = await postProviderJson("https://openrouter.ai/api/v1/chat/completions", {
       Authorization: `Bearer ${input.apiKey}`,
       "HTTP-Referer": SITE_URL,
-      "X-Title": "Kamyna Living Admin",
+      "X-Title": "Hospitality Operations Admin",
     }, {
       model: input.model,
       messages: [{ role: "system", content: input.system }, { role: "user", content: input.user }],

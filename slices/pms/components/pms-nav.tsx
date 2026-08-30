@@ -135,7 +135,7 @@ export function PmsMobileDock({ sessionEmail }: { sessionEmail: string }) {
           >
             <header className="flex items-center justify-between gap-4 border-b border-charcoal/12 px-4 py-4">
               <div>
-                <p className="text-[0.58rem] font-bold tracking-[.16em] text-umber uppercase">Kamyna Homestay OS</p>
+                <p className="text-[0.58rem] font-bold tracking-[.16em] text-umber uppercase">Hospitality Operations</p>
                 <h2 id="pms-more-title" className="mt-1 font-serif text-2xl">Modul lainnya</h2>
               </div>
               <button type="button" onClick={() => setMoreOpen(false)} className="flex size-11 items-center justify-center border border-charcoal/16">

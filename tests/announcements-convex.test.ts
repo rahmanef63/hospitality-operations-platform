@@ -11,14 +11,14 @@ describe("Convex announcement CRUD", () => {
   it("seeds reviewed greetings idempotently and publishes only active locale rules", async () => {
     const t = convexTest(schema, modules);
     await expect(t.mutation(internal.announcements.ensureDefaults, {
-      propertySlug: "ruma-kamyna", actorEmailHash,
+      propertySlug: "primary-property", actorEmailHash,
     })).resolves.toEqual({ settingsCreated: true, rulesCreated: 8 });
     await expect(t.mutation(internal.announcements.ensureDefaults, {
-      propertySlug: "ruma-kamyna", actorEmailHash,
+      propertySlug: "primary-property", actorEmailHash,
     })).resolves.toEqual({ settingsCreated: false, rulesCreated: 0 });
 
-    const publicId = await t.query(api.announcements.getPublic, { propertySlug: "ruma-kamyna", locale: "id" });
-    const publicArabic = await t.query(api.announcements.getPublic, { propertySlug: "ruma-kamyna", locale: "ar" });
+    const publicId = await t.query(api.announcements.getPublic, { propertySlug: "primary-property", locale: "id" });
+    const publicArabic = await t.query(api.announcements.getPublic, { propertySlug: "primary-property", locale: "ar" });
     expect(publicId.configured).toBe(true);
     expect(publicId.settings).toMatchObject({ prayerEnabled: false, prayerMethod: "singapore", musicEnabled: true });
     expect(publicId.rules).toHaveLength(4);
@@ -28,13 +28,13 @@ describe("Convex announcement CRUD", () => {
   it("creates, updates, and archives a prayer-time rule with audited settings", async () => {
     const t = convexTest(schema, modules);
     await t.mutation(internal.announcements.upsertSettings, {
-      propertySlug: "ruma-kamyna", prayerEnabled: true, prayerMethod: "singapore",
+      propertySlug: "primary-property", prayerEnabled: true, prayerMethod: "singapore",
       madhab: "shafi", announcementVolume: 0.8, musicEnabled: true, musicVolume: 0.12,
       musicTrackKey: "mountain-air", actorEmailHash,
     });
 
     await t.mutation(internal.announcements.upsertExperience, {
-      propertySlug: "ruma-kamyna",
+      propertySlug: "primary-property",
       welcomeShowBrand: true,
       welcomeShowLanguage: false,
       welcomeShowAnnouncement: true,
@@ -58,21 +58,21 @@ describe("Convex announcement CRUD", () => {
     });
 
     const created = await t.mutation(internal.announcements.upsertRule, {
-      propertySlug: "ruma-kamyna", name: "Maghrib greeting", locale: "id", kind: "prayer",
+      propertySlug: "primary-property", name: "Maghrib greeting", locale: "id", kind: "prayer",
       message: "Waktu {{prayer}}, {{tamu}}.", enabled: true, speak: true, prayer: "maghrib",
       offsetMinutes: 0, displayMinutes: 10, priority: 100, actorEmailHash,
     });
     expect(created).toMatchObject({ kind: "prayer", prayer: "maghrib", enabled: true });
     const updated = await t.mutation(internal.announcements.upsertRule, {
-      ruleId: created.id as Id<"announcementRules">, propertySlug: "ruma-kamyna", name: "Maghrib reminder", locale: "id", kind: "prayer",
+      ruleId: created.id as Id<"announcementRules">, propertySlug: "primary-property", name: "Maghrib reminder", locale: "id", kind: "prayer",
       message: "Waktu {{prayer}}, {{tamu}}.", enabled: true, speak: false, prayer: "maghrib",
       offsetMinutes: 2, displayMinutes: 8, priority: 90, actorEmailHash,
     });
     expect(updated).toMatchObject({ name: "Maghrib reminder", speak: false, offsetMinutes: 2 });
     await t.mutation(internal.announcements.archiveRule, {
-      ruleId: created.id as Id<"announcementRules">, propertySlug: "ruma-kamyna", actorEmailHash,
+      ruleId: created.id as Id<"announcementRules">, propertySlug: "primary-property", actorEmailHash,
     });
-    const overview = await t.query(internal.announcements.getAdminOverview, { propertySlug: "ruma-kamyna" });
+    const overview = await t.query(internal.announcements.getAdminOverview, { propertySlug: "primary-property" });
     expect(overview.rules).toHaveLength(0);
     expect(overview.settings).toMatchObject({
       musicTrackKey: "mountain-air",

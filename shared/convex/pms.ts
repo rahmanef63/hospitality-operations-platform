@@ -2,7 +2,7 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { api } from "@/convex/_generated/api";
 import {
-  RUMA_KAMYNA_PUBLIC_FALLBACK,
+  PUBLIC_PROPERTY_FALLBACK,
   type PmsBookingData,
   type PmsCalendarData,
   type PmsCatalog,
@@ -73,13 +73,13 @@ export async function getPmsTasks(propertyId?: string): Promise<PmsTask[]> {
   return pmsAdminRequest("task.list", propertyId ? { propertyId } : {});
 }
 
-export async function seedRumaKamyna(actorEmailHash: string) {
+export async function seedInitialProperty(actorEmailHash: string) {
   return pmsAdminRequest<{
     propertyId: string;
     propertyCreated: boolean;
     amenitiesCreated: number;
     amenitiesUpdated: number;
-  }>("seed.ruma-kamyna", { actorEmailHash });
+  }>("seed.initial-property", { actorEmailHash });
 }
 
 export async function getPublicPropertyFacts(slug: string): Promise<PublicPropertyFacts | null> {
@@ -99,5 +99,5 @@ export async function getPublicPropertyFacts(slug: string): Promise<PublicProper
   } catch {
     // The public route keeps an owner-reviewed fallback if Convex is temporarily unavailable.
   }
-  return slug === RUMA_KAMYNA_PUBLIC_FALLBACK.slug ? RUMA_KAMYNA_PUBLIC_FALLBACK : null;
+  return PUBLIC_PROPERTY_FALLBACK && slug === PUBLIC_PROPERTY_FALLBACK.slug ? PUBLIC_PROPERTY_FALLBACK : null;
 }

@@ -12,10 +12,10 @@ describe("multilingual Convex welcome and AI settings", () => {
     const t = convexTest(schema, modules);
     await expect(t.mutation(internal.welcome.ensureDefaults, { actorEmailHash })).resolves.toEqual({ created: 20 });
     await expect(t.mutation(internal.welcome.ensureDefaults, { actorEmailHash })).resolves.toEqual({ created: 0 });
-    const overview = await t.query(internal.welcome.getAdminOverview, { propertySlug: "ruma-kamyna" });
+    const overview = await t.query(internal.welcome.getAdminOverview, { propertySlug: "primary-property" });
     expect(overview.configs).toHaveLength(WELCOME_LOCALES.length);
     expect(overview.configs.map((config) => config.locale).sort()).toEqual([...WELCOME_LOCALES].sort());
-    const arabic = await t.query(api.welcome.getPublished, { propertySlug: "ruma-kamyna", locale: "ar" });
+    const arabic = await t.query(api.welcome.getPublished, { propertySlug: "primary-property", locale: "ar" });
     expect(arabic?.content.headline).toContain("{{guest}}");
   });
 

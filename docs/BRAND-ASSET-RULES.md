@@ -2,8 +2,8 @@
 
 ## Identity roles
 
-- Use **Kamyna Living** for the collection, company, partnerships, and portfolio surfaces.
-- Use **Ruma Kamyna** for the first property's guest-facing experience.
+- Use **Hospitality Operations Platform** for the collection, company, partnerships, and portfolio surfaces.
+- Use **Property** for the first property's guest-facing experience.
 - Use the botanical mark alone only when the identity is already obvious.
 - Use the RK monogram for small property applications, not as the collection master mark.
 
@@ -21,9 +21,9 @@ Do not stretch, rotate, outline, recolor arbitrarily, add shadows, or rebuild th
 
 ## File map
 
-- `kamyna-living-wordmark.svg`: collection master.
-- `ruma-kamyna-lockup.svg`: primary property lockup.
-- `ruma-kamyna-horizontal.svg`: wide property format.
+- `hospitality-operations-platform-wordmark.svg`: collection master.
+- `primary-property-lockup.svg`: primary property lockup.
+- `primary-property-horizontal.svg`: wide property format.
 - `rk-monogram.svg`: compact property mark.
 - `botanical-mark.svg`: supporting emblem.
 - `botanical-pattern.svg`: repeating surface.

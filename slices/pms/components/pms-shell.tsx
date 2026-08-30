@@ -9,7 +9,7 @@ export function PmsShell({ children, sessionEmail }: PmsShellProps) {
       <aside className="sticky top-0 hidden h-screen flex-col bg-charcoal text-ivory lg:flex">
         <div className="flex min-h-24 items-center border-b border-ivory/12 px-7">
           <div>
-            <p className="font-serif text-3xl leading-none">Kamyna</p>
+            <p className="font-serif text-3xl leading-none">Hospitality</p>
             <p className="mt-1.5 text-[.58rem] font-semibold tracking-[.2em] text-warm-sand uppercase">Homestay OS</p>
           </div>
         </div>
@@ -44,7 +44,7 @@ export function PmsShell({ children, sessionEmail }: PmsShellProps) {
 
       <div className="sticky top-0 z-40 flex min-h-16 items-center justify-between gap-4 border-b border-charcoal/12 bg-charcoal px-4 text-ivory lg:hidden">
         <div>
-          <p className="font-serif text-2xl leading-none">Kamyna</p>
+          <p className="font-serif text-2xl leading-none">Hospitality</p>
           <p className="mt-1 text-[.52rem] font-semibold tracking-[.18em] text-warm-sand uppercase">Homestay OS</p>
         </div>
         <Link href="/admin/reservations?new=1#new-reservation" className="flex min-h-11 items-center gap-2 rounded-[.3rem] border border-ivory/18 px-3 text-[.6rem] font-semibold tracking-[.08em] uppercase">

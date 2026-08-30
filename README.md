@@ -1,6 +1,6 @@
 # Hospitality Operations Platform
 
-Versioned multi-property hospitality operations platform combining PMS, CMS, reservations, finance, operational tasks, guest experience, PWA, and tenant-safe distribution. **Kamyna Living / Ruma Kamyna** is the first reference tenant and production proving ground; provider deployments are independently owned tenant repositories and cloud projects.
+Versioned multi-property hospitality operations platform combining PMS, CMS, reservations, finance, operational tasks, guest experience, PWA, and tenant-safe distribution. **Hospitality Operations Platform / Property** is the first reference tenant and production proving ground; provider deployments are independently owned tenant repositories and cloud projects.
 
 The canonical product source is `rahmanef63/hospitality-operations-platform`. Tenant repositories receive tested SemVer update pull requests and keep provider secrets, business data, branding overlays, and deployment ownership separate from this upstream repository.
 
@@ -10,7 +10,7 @@ The canonical product source is `rahmanef63/hospitality-operations-platform`. Te
 - Draft/publish public CMS backed by Convex, with tagged Next.js server caches and dynamic owner-verified property facts.
 - Convex Cloud for properties, units, amenities, guests, reservations, availability, finance, tasks, 20-language welcome publishing, property-scoped announcement schedules, encrypted BYOK AI metadata, login throttling, and audit history.
 - Signed server-only single-admin session using an HttpOnly cookie.
-- Docker standalone frontend on Dokploy; managed Convex Cloud backend.
+- Next.js frontend with managed Convex Cloud backend; deployable to Vercel or a compatible container runtime.
 - Installable PWA with bounded app-owned cache cleanup, public auto-update, offline fallback, configurable TV slideshow, bundled CC0 lo-fi music, and fullscreen controls.
 - Location-aware SEO, canonical/hreflang links, image sitemap, structured data, social cards, and Google verification.
 
@@ -29,8 +29,8 @@ See `docs/PLATFORM-DISTRIBUTION.md` for provisioning, transfer, release, and upd
 
 | Route | Purpose |
 |---|---|
-| `/` | Kamyna Living collection homepage |
-| `/stays/ruma-kamyna` | Dynamic Ruma Kamyna property detail |
+| `/` | Hospitality Operations Platform collection homepage |
+| `/stays/primary-property` | Dynamic Property property detail |
 | `/brand-assets` | Production identity downloads |
 | `/guides/*` | Noindex local-guide scaffolds |
 | `/welcome` | Personalized private guest welcome page |
@@ -70,19 +70,19 @@ npm run dev
 Public runtime values:
 
 ```env
-NEXT_PUBLIC_SITE_URL=https://kamynaliving.com
+NEXT_PUBLIC_SITE_URL=https://example.com
 NEXT_PUBLIC_CONVEX_URL=https://<deployment>.convex.cloud
 ```
 
 Server-only credentials:
 
 ```env
-KAMYNA_ADMIN_EMAIL=
-KAMYNA_ADMIN_PASSWORD=
-KAMYNA_ADMIN_SESSION_SECRET=
-KAMYNA_CONVEX_ADMIN_SECRET=
-KAMYNA_GUEST_LINK_SECRET=
-KAMYNA_AI_ENCRYPTION_KEY=
+HOSPITALITY_ADMIN_EMAIL=
+HOSPITALITY_ADMIN_PASSWORD=
+HOSPITALITY_ADMIN_SESSION_SECRET=
+HOSPITALITY_CONVEX_ADMIN_SECRET=
+HOSPITALITY_GUEST_LINK_SECRET=
+HOSPITALITY_AI_ENCRYPTION_KEY=
 ```
 
 `CONVEX_DEPLOY_KEY` is deployment-only and must never enter browser code or Docker build arguments.
@@ -92,7 +92,7 @@ KAMYNA_AI_ENCRYPTION_KEY=
 - The manifest uses a stable app identity, fullscreen-to-standalone fallback, phone/TV-safe orientation, 1024 px launcher assets, screenshots, and shortcuts.
 - Private welcome links expose **TV mode** from the admin, which opens the dedicated `/presentation` route. The full-viewport `/welcome` page supports time-aware visual and opt-in voice announcements. The presentation supports fullscreen, remote/keyboard navigation, wake lock, an icon-only opt-in ambient-music control, safe-area layout, and reduced-motion fallback.
 - The service worker never caches admin, API, or tokenized private welcome responses. It caches only public shell/media assets and `/offline`.
-- A waiting worker auto-activates on public routes, removes obsolete `kamyna-pwa-*` caches and Kamyna-owned public client state, then reloads once. Admin routes require an explicit restart to avoid losing form work and preserve the signed HttpOnly session.
+- A waiting worker auto-activates on public routes, removes obsolete `hospitality-pwa-*` caches and Hospitality-owned public client state, then reloads once. Admin routes require an explicit restart to avoid losing form work and preserve the signed HttpOnly session.
 - Browser and TV operating-system install support varies. Compatible browsers receive a native Install action; unsupported browsers receive manual Add to Home screen guidance.
 
 See `docs/PWA-TV.md` for the complete lifecycle and verification contract. Audio provenance and display controls are documented in `docs/AUDIO-LICENSES.md` and `docs/GUEST-EXPERIENCE-CONTROLS.md`.
@@ -102,7 +102,7 @@ See `docs/PWA-TV.md` for the complete lifecycle and verification contract. Audio
 - Public desktop keeps the editorial header navigation and adds only a floating concierge launcher at the lower-right.
 - Public mobile replaces the burger menu with a safe-area bottom dock for Stays, Philosophy, About, Enquire, and Chat.
 - Admin desktop uses a persistent grouped sidebar; admin mobile uses a safe-area dock plus a bounded “Lainnya” sheet for secondary modules.
-- Kamyna Concierge is deterministic rather than generative: it answers only from verified property facts, never invents price or availability, does not retain conversations, and hands unresolved questions to the verified host contact.
+- Hospitality Concierge is deterministic rather than generative: it answers only from verified property facts, never invents price or availability, does not retain conversations, and hands unresolved questions to the verified host contact.
 
 ## Data authority
 
@@ -118,7 +118,7 @@ See `docs/PWA-TV.md` for the complete lifecycle and verification contract. Audio
 - `shared/ai/`: BYOK encryption, fixed provider adapters, and PII-free template translation.
 - `shared/convex/`: server bridge to Convex public and protected surfaces. Published CMS content is cached for days and invalidated on Publish; public PMS facts are cached for hours and invalidated on operational writes.
 
-Ruma Kamyna is initialized with 3 bedrooms, swimming pool, gym, jacuzzi, and mountain view. Bathrooms, capacity, rates, policies, and historical operations remain empty until real values are provided. Generated imagery keeps its visible concept disclosure.
+The upstream platform ships with no provider property, amenity, rate, guest, reservation, or operational seed. Provider facts are created only inside each tenant deployment or protected tenant overlay.
 
 ## Quality gates
 
@@ -131,6 +131,6 @@ The repository enforces strict TypeScript, zero-warning ESLint, in-memory Convex
 
 ## Deployment
 
-Use the `/sc-all` hybrid topology: deploy the Convex Cloud backend first through `sc-convex-cloud`, seed verified property facts idempotently, then deploy the exact Git revision to Dokploy without replacing existing environment values.
+Deploy Convex functions and provider environment values before promoting the matching frontend revision. Tenant repositories own their Vercel/Convex projects, domains, and secrets independently of upstream.
 
 See `docs/CMS.md`, `docs/PMS.md`, `docs/ADMIN-UX-PLAN.md`, `docs/GUEST-WELCOME-ADMIN.md`, and `docs/ARCHITECTURE.md`.

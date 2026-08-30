@@ -10,8 +10,8 @@ type InstallPromptEvent = Event & {
   userChoice: Promise<InstallChoice>;
 };
 
-const DISMISS_KEY = "kamyna:pwa-install-dismissed-at";
-const INSTALL_REQUEST_EVENT = "kamyna:pwa-install-request";
+const DISMISS_KEY = "hospitality:pwa-install-dismissed-at";
+const INSTALL_REQUEST_EVENT = "hospitality:pwa-install-request";
 
 function isInstalledMode() {
   return window.matchMedia("(display-mode: standalone)").matches
@@ -30,11 +30,11 @@ function clearStorageByPrefix(storage: Storage, prefixes: readonly string[]) {
 }
 
 function cleanupPublicClientState() {
-  clearStorageByPrefix(window.localStorage, ["kamyna:", "kamyna-pwa-"]);
-  clearStorageByPrefix(window.sessionStorage, ["kamyna:", "kamyna-pwa-"]);
+  clearStorageByPrefix(window.localStorage, ["hospitality:", "hospitality-pwa-"]);
+  clearStorageByPrefix(window.sessionStorage, ["hospitality:", "hospitality-pwa-"]);
   for (const part of document.cookie.split(";")) {
     const name = part.split("=")[0]?.trim();
-    if (!name || !(name.startsWith("kamyna-public-") || name.startsWith("kamyna-pwa-"))) continue;
+    if (!name || !(name.startsWith("hospitality-public-") || name.startsWith("hospitality-pwa-"))) continue;
     document.cookie = `${name}=; Max-Age=0; Path=/; SameSite=Lax`;
   }
 }
@@ -47,7 +47,7 @@ function readWorkerVersion(worker: ServiceWorker): Promise<string | undefined> {
       window.clearTimeout(timeout);
       resolve(typeof event.data?.version === "string" ? event.data.version : undefined);
     };
-    worker.postMessage({ type: "KAMYNA_GET_VERSION" }, [channel.port2]);
+    worker.postMessage({ type: "HOSPITALITY_GET_VERSION" }, [channel.port2]);
   });
 }
 
@@ -95,7 +95,7 @@ export function PwaManager() {
         installPromptRef.current = event as InstallPromptEvent;
         const autoPromptAllowed = !["/welcome", "/presentation"].includes(window.location.pathname)
           && !window.location.pathname.startsWith("/admin")
-          && !document.querySelector("[data-kamyna-offline]");
+          && !document.querySelector("[data-hospitality-offline]");
         if (autoPromptAllowed) setInstallPrompt(event as InstallPromptEvent);
       }
     };
@@ -106,7 +106,7 @@ export function PwaManager() {
       setInstallDismissed(true);
     };
     const activationMessage = (event: MessageEvent) => {
-      if (event.data?.type !== "KAMYNA_SW_ACTIVATED") return;
+      if (event.data?.type !== "HOSPITALITY_SW_ACTIVATED") return;
       if (restartingRef.current) reloadLatest();
       else if (event.data.version !== PWA_BUILD_VERSION) setUpdateReady(true);
     };
@@ -183,7 +183,7 @@ export function PwaManager() {
     }
     if (!current.waiting) await current.update().catch(() => undefined);
     if (current.waiting) {
-      current.waiting.postMessage({ type: "KAMYNA_SKIP_WAITING", automatic });
+      current.waiting.postMessage({ type: "HOSPITALITY_SKIP_WAITING", automatic });
       window.setTimeout(reloadLatest, 5000);
       return;
     }
@@ -212,8 +212,8 @@ export function PwaManager() {
       <div className="flex items-start gap-3">
         <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-olive/10 text-olive">{updateReady ? <RefreshCw className={`size-5 ${restarting ? "animate-spin" : ""}`} aria-hidden="true" /> : <Download className="size-5" aria-hidden="true" />}</span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold">{updateReady ? "Versi baru Kamyna siap" : showManual ? "Pasang dari menu browser" : "Pasang Kamyna sebagai aplikasi"}</p>
-          <p className="mt-1 text-xs leading-6 text-ink-soft">{updateReady ? isAdminRoute() ? "Build baru siap. Restart manual menjaga sesi dan data admin tetap utuh." : "Aplikasi akan restart otomatis, mengaktifkan build terbaru, dan membersihkan cache serta state publik Kamyna versi lama." : showManual ? "Pilih Install app atau Add to Home screen. Dukungan pemasangan pada browser TV berbeda-beda." : "Dapatkan jendela standalone, launcher icon, offline fallback, dan pengalaman layar penuh yang lebih bersih."}</p>
+          <p className="text-sm font-bold">{updateReady ? "Versi baru Hospitality siap" : showManual ? "Pasang dari menu browser" : "Pasang Hospitality sebagai aplikasi"}</p>
+          <p className="mt-1 text-xs leading-6 text-ink-soft">{updateReady ? isAdminRoute() ? "Build baru siap. Restart manual menjaga sesi dan data admin tetap utuh." : "Aplikasi akan restart otomatis, mengaktifkan build terbaru, dan membersihkan cache serta state publik Hospitality versi lama." : showManual ? "Pilih Install app atau Add to Home screen. Dukungan pemasangan pada browser TV berbeda-beda." : "Dapatkan jendela standalone, launcher icon, offline fallback, dan pengalaman layar penuh yang lebih bersih."}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {updateReady ? <button type="button" onClick={() => void restartWithLatest(false)} disabled={restarting} className="cta-solid min-h-11 disabled:opacity-60">{restarting ? "Updating…" : isAdminRoute() ? "Restart sekarang" : "Update sekarang"}</button> : showInstall ? <button type="button" onClick={promptInstall} className="cta-solid min-h-11">Install app</button> : null}
             {!updateReady ? <button type="button" onClick={dismissInstall} className="cta-outline min-h-11">Nanti</button> : null}

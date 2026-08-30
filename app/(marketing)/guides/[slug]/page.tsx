@@ -2,14 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { GuidePage } from "@/features/guides";
 import { SITE_NAME, SITE_URL } from "@/shared/config/site";
-import { getAreaGuideBySlug, getPropertyBySlug, getSiteContent, listAreaGuides } from "@/shared/content";
+import { getAreaGuideBySlug, getPropertyBySlug, getSiteContent } from "@/shared/content";
 import { socialImages } from "@/shared/media";
 import { buildAreaGuideSchema, JsonLd } from "@/shared/seo";
-
-export async function generateStaticParams() {
-  const guides = await listAreaGuides();
-  return guides.map((guide) => ({ slug: guide.slug }));
-}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -32,10 +27,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       url: `${SITE_URL}${url}`,
       images: [
         {
-          url: socialImages.rumaKamyna,
+          url: socialImages.property,
           width: 1200,
           height: 630,
-          alt: "Ruma Kamyna in Megamendung, Puncak Bogor",
+          alt: "Hospitality property guide",
         },
       ],
     },
@@ -43,10 +38,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       card: "summary_large_image",
       title: guide.seoTitle,
       description: guide.seoDescription,
-      images: [socialImages.rumaKamyna],
+      images: [socialImages.property],
     },
   };
 }
+
+export const instant = false;
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

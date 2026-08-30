@@ -24,7 +24,7 @@ export function useLofiMusic(input: { enabled: boolean; volume: number; track: L
       mediaSession.metadata = new MediaMetadata({
         title: input.track.title,
         artist: input.track.artist,
-        album: "Kamyna Lo-fi Collection",
+        album: "Hospitality Lo-fi Collection",
       });
     }
     return audio;

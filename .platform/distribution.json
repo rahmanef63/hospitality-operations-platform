@@ -9,7 +9,12 @@
     "tenant/",
     "public/tenant/",
     "shared/tenant/",
-    "convex/tenant/"
+    "convex/tenant/",
+    "public/favicon.ico",
+    "public/favicon.svg",
+    "public/apple-touch-icon.png",
+    "app/icon.svg",
+    "public/pwa/screenshots/"
   ],
   "requiredTenantFiles": [
     ".platform/tenant.json",

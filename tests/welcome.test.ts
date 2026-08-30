@@ -47,14 +47,14 @@ describe("guest welcome content", () => {
     const content = defaultWelcomeContent("en", "Ruma Sejuk");
     expect(content.signature).toContain("Ruma Sejuk");
     expect(content.headline).toContain(WELCOME_GUEST_TOKEN);
-    expect(content.body).not.toContain("Ruma Kamyna");
+    expect(content.body).not.toContain("Property");
   });
 
   it("validates required fields and bounded content", () => {
     expect(validateWelcomeContent({ headline: " ", body: "Body", signature: "Signature" }).ok).toBe(false);
-    expect(validateWelcomeContent({ headline: "Welcome", body: "A calm arrival.", signature: "Ruma Kamyna" })).toEqual({
+    expect(validateWelcomeContent({ headline: "Welcome", body: "A calm arrival.", signature: "Property" })).toEqual({
       ok: true,
-      value: { headline: "Welcome", body: "A calm arrival.", signature: "Ruma Kamyna" },
+      value: { headline: "Welcome", body: "A calm arrival.", signature: "Property" },
     });
   });
 });

@@ -1,4 +1,4 @@
-# Kamyna Presentation and PWA
+# Hospitality Presentation and PWA
 
 ## Dedicated TV endpoint
 
@@ -6,7 +6,7 @@ The TV experience lives only at `/presentation`. The standard `/welcome` guest p
 
 The presentation provides:
 
-- four full-bleed slides using reviewed Kamyna concept media;
+- four full-bleed slides using reviewed Hospitality concept media;
 - visible concept disclosure on every media slide;
 - previous, slideshow/pause, next, install, and fullscreen controls;
 - Arrow, Page Up/Down, Home/End, Enter, Space, media-key, and `F` remote/keyboard controls;
@@ -19,7 +19,7 @@ Fullscreen remains user-gesture gated in ordinary browser tabs. Installed compat
 
 ## Two install identities
 
-Kamyna publishes two manifests:
+Hospitality publishes two manifests:
 
 - `/manifest.webmanifest` keeps the existing root/mobile app at `/`, standalone and portrait-oriented;
 - `/presentation.webmanifest` is linked only from `/presentation`, starts at `/presentation?tv=1`, and requests landscape fullscreen with standalone/minimal fallbacks.
@@ -38,13 +38,13 @@ Each build embeds one build ID in the app and worker. The client checks for upda
 
 On public routes, a waiting worker is activated automatically. The update sequence is deliberately bounded:
 
-1. send `KAMYNA_SKIP_WAITING`;
+1. send `HOSPITALITY_SKIP_WAITING`;
 2. activate the new worker;
-3. delete only obsolete Cache Storage entries whose name starts with `kamyna-pwa-`;
-4. clear only Kamyna-owned public `localStorage`/`sessionStorage` keys and non-HttpOnly public cookies using the `kamyna:` / `kamyna-pwa-` / `kamyna-public-` prefixes;
+3. delete only obsolete Cache Storage entries whose name starts with `hospitality-pwa-`;
+4. clear only Hospitality-owned public `localStorage`/`sessionStorage` keys and non-HttpOnly public cookies using the `hospitality:` / `hospitality-pwa-` / `hospitality-public-` prefixes;
 5. claim active windows and reload once under the new controller.
 
-`/admin/*` never auto-restarts. Admin receives a manual restart action so unsaved forms are not interrupted. The signed `__Host-kamyna-admin` HttpOnly cookie is never targeted or cleared. Unrelated cookies, storage, caches, and browser data are untouched.
+`/admin/*` never auto-restarts. Admin receives a manual restart action so unsaved forms are not interrupted. The signed `__Host-hop-admin` HttpOnly cookie is never targeted or cleared. Unrelated cookies, storage, caches, and browser data are untouched.
 
 ## Verification
 
@@ -52,7 +52,7 @@ Run `npm run verify` and `npm run smoke`, then check `/presentation` at 1920×10
 
 ## Presentation audio
 
-The `/presentation` controls include an icon-only lo-fi toggle and the keyboard shortcut `M`. Audio starts muted and plays only after a user gesture. The selected same-origin MP3 is chosen per property in admin, loops locally, supports PWA byte-range playback, and stops when the component is removed. All bundled tracks are original sample-free Kamyna recordings dedicated under CC0 1.0; see `docs/AUDIO-LICENSES.md`.
+The `/presentation` controls include an icon-only lo-fi toggle and the keyboard shortcut `M`. Audio starts muted and plays only after a user gesture. The selected same-origin MP3 is chosen per property in admin, loops locally, supports PWA byte-range playback, and stops when the component is removed. All bundled tracks are original sample-free Hospitality recordings dedicated under CC0 1.0; see `docs/AUDIO-LICENSES.md`.
 
 The regular `/welcome` route has a separate icon-only announcement mute control. This does not turn the presentation music on or off. Both routes remain usable when their respective browser audio APIs are unavailable.
 

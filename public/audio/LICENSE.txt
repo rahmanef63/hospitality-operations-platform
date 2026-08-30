@@ -1,14 +1,14 @@
-Kamyna Living Lo-fi Collection
+Hospitality Operations Platform Lo-fi Collection
 
 Tracks:
 - Still Morning (still-morning.mp3)
 - Mountain Air (mountain-air.mp3)
 - Night Courtyard (night-courtyard.mp3)
 
-Creator: Kamyna Living Studio
+Creator: Hospitality Operations Platform Studio
 Source: deterministic additive synthesis and generated noise; no third-party samples.
 License: CC0 1.0 Universal
 License URL: https://creativecommons.org/publicdomain/zero/1.0/
 
-To the extent possible under law, Kamyna Living dedicates these recordings and
+To the extent possible under law, Hospitality Operations Platform dedicates these recordings and
 underlying generated compositions to the public domain under CC0 1.0 Universal.

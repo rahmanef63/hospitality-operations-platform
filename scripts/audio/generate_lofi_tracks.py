@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate deterministic, sample-free Kamyna lo-fi loops.
+"""Generate deterministic, sample-free Hospitality Platform lo-fi loops.
 
 The output contains only synthesized oscillators and generated noise. No third-party
 samples are used. The released MP3 files are dedicated under CC0 1.0; see

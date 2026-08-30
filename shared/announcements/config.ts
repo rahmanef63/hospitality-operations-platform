@@ -1,3 +1,4 @@
+import { tenantSite } from "@/tenant/site";
 import { defaultPresentationSlides } from "./experience";
 import type { AnnouncementRule, AnnouncementSettings, PrayerMethod } from "./types";
 
@@ -18,7 +19,7 @@ export const PRAYER_METHOD_OPTIONS = [
   { value: "turkey", label: "Turkey · approximation" },
 ] as const;
 
-export function defaultAnnouncementSettings(propertySlug = "ruma-kamyna"): AnnouncementSettings {
+export function defaultAnnouncementSettings(propertySlug: string = tenantSite.defaultPropertySlug): AnnouncementSettings {
   return {
     propertySlug,
     prayerEnabled: false,
@@ -54,7 +55,7 @@ const rule = (
   endTime: string,
 ): AnnouncementRule => ({
   id,
-  propertySlug: "ruma-kamyna",
+  propertySlug: tenantSite.defaultPropertySlug,
   locale,
   name,
   kind: "time_window",

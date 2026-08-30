@@ -47,18 +47,18 @@ describe("Convex Cloud activation", () => {
   it("never exposes admin credentials as public Docker build arguments", () => {
     const dockerfile = read("Dockerfile");
     expect(dockerfile).toContain("ARG NEXT_PUBLIC_CONVEX_URL");
-    expect(dockerfile).not.toContain("ARG KAMYNA_ADMIN_PASSWORD");
-    expect(dockerfile).not.toContain("ARG KAMYNA_ADMIN_SESSION_SECRET");
-    expect(dockerfile).not.toContain("ARG KAMYNA_CONVEX_ADMIN_SECRET");
-    expect(dockerfile).not.toContain("ARG KAMYNA_AI_ENCRYPTION_KEY");
-    expect(dockerfile).not.toContain("ARG KAMYNA_GUEST_LINK_SECRET");
+    expect(dockerfile).not.toContain("ARG HOSPITALITY_ADMIN_PASSWORD");
+    expect(dockerfile).not.toContain("ARG HOSPITALITY_ADMIN_SESSION_SECRET");
+    expect(dockerfile).not.toContain("ARG HOSPITALITY_CONVEX_ADMIN_SECRET");
+    expect(dockerfile).not.toContain("ARG HOSPITALITY_AI_ENCRYPTION_KEY");
+    expect(dockerfile).not.toContain("ARG HOSPITALITY_GUEST_LINK_SECRET");
   });
 
   it("keeps the admin UI free from direct secret and deploy-key access", () => {
     const clientSource = read("slices/admin/components/welcome-editor.tsx");
     expect(clientSource).not.toContain("process.env");
     expect(clientSource).not.toContain("CONVEX_DEPLOY_KEY");
-    expect(clientSource).not.toContain("KAMYNA_ADMIN_PASSWORD");
+    expect(clientSource).not.toContain("HOSPITALITY_ADMIN_PASSWORD");
     expect(read("slices/pms/components/property-manager.tsx")).not.toContain("process.env");
     expect(read("slices/admin/components/ai-settings-page.tsx")).not.toContain("process.env");
     expect(read("slices/admin/components/ai-settings-page.tsx")).not.toContain("encryptedApiKey");

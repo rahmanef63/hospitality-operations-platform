@@ -10,7 +10,7 @@ import {
   Plus,
   UserRound,
 } from "lucide-react";
-import { formatCurrency, formatPmsDate, formatPmsDateTime, type PmsDashboard } from "@/shared/pms";
+import { HAS_INITIAL_PROPERTY_SEED, INITIAL_PROPERTY_SEED, formatCurrency, formatPmsDate, formatPmsDateTime, type PmsDashboard } from "@/shared/pms";
 import type { PmsFormAction, PmsPageState } from "../types";
 import { EmptyState } from "./manager-primitives";
 import { PageHeader } from "./page-header";
@@ -76,9 +76,9 @@ export function PmsDashboardPage({ dashboard, today, backendError, state, formAc
         eyebrow={`Operations overview · ${formatPmsDate(today)}`}
         title="Apa yang perlu diperhatikan hari ini."
         description="Ringkasan langsung menuju tindakan: kedatangan, keberangkatan, saldo, tugas, dan akses cepat untuk membuat data operasional baru."
-        action={dashboard.properties.length === 0 ? (
-          <form action={formAction}><input type="hidden" name="operation" value="seed.ruma-kamyna" /><input type="hidden" name="returnTo" value="/admin" /><button type="submit" className="cta-solid">Siapkan Ruma Kamyna</button></form>
-        ) : <Link href="/admin/reservations?new=1#new-reservation" className="cta-solid"><Plus className="size-4" aria-hidden="true" />Reservasi baru</Link>}
+        action={dashboard.properties.length === 0 ? (HAS_INITIAL_PROPERTY_SEED && INITIAL_PROPERTY_SEED ? (
+          <form action={formAction}><input type="hidden" name="operation" value="seed.initial-property" /><input type="hidden" name="returnTo" value="/admin" /><button type="submit" className="cta-solid">Siapkan {INITIAL_PROPERTY_SEED.name}</button></form>
+        ) : <Link href="/admin/properties?new=1" className="cta-solid"><Plus className="size-4" aria-hidden="true" />Tambah properti</Link>) : <Link href="/admin/reservations?new=1#new-reservation" className="cta-solid"><Plus className="size-4" aria-hidden="true" />Reservasi baru</Link>}
       />
       <div className="mx-auto max-w-[92rem] space-y-8 px-4 pt-8 sm:px-8 lg:px-12">
         <StatusBanner status={state.status} error={state.error || (backendError ? "service" : undefined)} />
@@ -110,7 +110,7 @@ export function PmsDashboardPage({ dashboard, today, backendError, state, formAc
                 <span className="flex size-10 items-center justify-center rounded-full bg-olive/10 text-olive"><House className="size-4" aria-hidden="true" /></span>
                 <span><span className="block text-sm font-bold">{property.name}</span><span className="mt-1 block text-xs text-ink-soft">/{property.slug} · {property.bedroomCount ?? "—"} kamar · {property.amenityCount} fasilitas</span></span><MoveRight className="size-4 text-charcoal/32" aria-hidden="true" />
               </Link>
-            ))}</div> : <div className="p-5"><EmptyState title="Belum ada properti">Jalankan inisialisasi Ruma Kamyna.</EmptyState></div>}
+            ))}</div> : <div className="p-5"><EmptyState title="Belum ada properti">Tambahkan properti pertama untuk memulai operasi.</EmptyState></div>}
           </div>
 
           <div className="overflow-hidden rounded-[.55rem] border border-charcoal/12 bg-white">

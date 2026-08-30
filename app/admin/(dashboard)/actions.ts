@@ -7,7 +7,7 @@ import { pmsAdminRequest } from "@/shared/convex";
 import { formBoolean, formText, optionalFormNumber, optionalFormText } from "@/shared/pms";
 
 const operations = {
-  "seed.ruma-kamyna": [],
+  "seed.initial-property": [],
   "property.upsert": [
     "id", "slug", "name", "propertyType", "status", "publicationStatus", "locationLabel",
     "addressLine", "locality", "region", "postalCode", "countryCode", "timezone", "currency",
@@ -59,8 +59,8 @@ function isOperation(value: string): value is Operation {
 function safeReturnTo(value: string) {
   try {
     if (!value.startsWith("/admin") || value.startsWith("//")) return "/admin";
-    const url = new URL(value, "https://kamyna.internal");
-    if (url.origin !== "https://kamyna.internal" || !url.pathname.startsWith("/admin")) return "/admin";
+    const url = new URL(value, "https://hospitality.internal");
+    if (url.origin !== "https://hospitality.internal" || !url.pathname.startsWith("/admin")) return "/admin";
     return `${url.pathname}${url.search}`;
   } catch {
     return "/admin";
@@ -68,7 +68,7 @@ function safeReturnTo(value: string) {
 }
 
 function resultUrl(returnTo: string, key: "status" | "error", value: string) {
-  const url = new URL(returnTo, "https://kamyna.internal");
+  const url = new URL(returnTo, "https://hospitality.internal");
   url.searchParams.set(key, value);
   return `${url.pathname}${url.search}`;
 }
@@ -104,6 +104,6 @@ export async function pmsAction(formData: FormData) {
   }
   updateTag("public-property-facts");
   revalidatePath("/admin", "layout");
-  revalidatePath("/stays/ruma-kamyna");
+  revalidatePath("/stays/[slug]", "page");
   redirect(resultUrl(returnTo, "status", "saved"));
 }

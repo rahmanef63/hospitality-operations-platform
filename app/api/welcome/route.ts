@@ -7,9 +7,9 @@ import { resolveGuestWelcomeRequest } from "@/shared/welcome/resolve";
 async function buildResponse(input: { locale?: unknown; name?: unknown; token?: unknown; property?: unknown }) {
   const resolved = await resolveGuestWelcomeRequest(input);
   if (!resolved.valid) return { status: 404, payload: { ok: false, error: "Welcome link is invalid or expired." } };
-  const propertySlug = resolved.propertySlug ?? "ruma-kamyna";
+  const propertySlug = resolved.propertySlug ?? "primary-property";
   const property = await getPropertyBySlug(propertySlug);
-  const propertyName = resolved.context?.propertyName ?? property?.name ?? "Ruma Kamyna";
+  const propertyName = resolved.context?.propertyName ?? property?.name ?? "Property";
   let source: "convex" | "fallback" = "convex";
   let version = 0;
   let publishedAt: number | undefined;

@@ -4,8 +4,8 @@ import { getAdminRuntimeConfig } from "./config";
 import { verifyAdminSessionToken, type AdminSessionClaims } from "./token";
 
 export const ADMIN_COOKIE_NAME = process.env.NODE_ENV === "production"
-  ? "__Host-kamyna-admin"
-  : "kamyna-admin";
+  ? "__Host-hop-admin"
+  : "hop-admin";
 
 export function getAdminCookieOptions() {
   return {

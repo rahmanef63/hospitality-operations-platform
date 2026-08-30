@@ -65,9 +65,9 @@ Register tenants in `.platform/tenants.json` only after their repository exists 
 
 ```json
 {
-  "id": "kamyna-living",
-  "owner": "kamyna-living",
-  "repo": "kamyna-living",
+  "id": "hospitality-operations-platform",
+  "owner": "hospitality-operations-platform",
+  "repo": "hospitality-operations-platform",
   "defaultBranch": "main",
   "channel": "stable",
   "enabled": true,

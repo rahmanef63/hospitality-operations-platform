@@ -26,7 +26,7 @@ export {
   getPmsTasks,
   getPublicPropertyFacts,
   pmsAdminRequest,
-  seedRumaKamyna,
+  seedInitialProperty,
 } from "./pms";
 
 export { getAiSecret, getAiSettings, recordAiEvent, upsertAiSettings } from "./ai";

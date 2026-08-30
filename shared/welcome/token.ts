@@ -31,7 +31,7 @@ export function createGuestWelcomeToken(
   const claims: GuestWelcomeClaims = { version: 1, reservationId, issuedAt: now, expiresAt };
   const iv = randomBytes(12);
   const cipher = createCipheriv("aes-256-gcm", keyFromSecret(secret), iv);
-  cipher.setAAD(Buffer.from("kamyna-guest-welcome-v1"));
+  cipher.setAAD(Buffer.from("hospitality-guest-welcome-v1"));
   const ciphertext = Buffer.concat([cipher.update(JSON.stringify(claims), "utf8"), cipher.final()]);
   return ["v1", encode(iv), encode(cipher.getAuthTag()), encode(ciphertext)].join(".");
 }
@@ -45,7 +45,7 @@ export function verifyGuestWelcomeToken(
   if (version !== "v1" || !ivValue || !tagValue || !ciphertextValue || extra) return null;
   try {
     const decipher = createDecipheriv("aes-256-gcm", keyFromSecret(secret), decode(ivValue));
-    decipher.setAAD(Buffer.from("kamyna-guest-welcome-v1"));
+    decipher.setAAD(Buffer.from("hospitality-guest-welcome-v1"));
     decipher.setAuthTag(decode(tagValue));
     const payload = Buffer.concat([decipher.update(decode(ciphertextValue)), decipher.final()]).toString("utf8");
     const claims = JSON.parse(payload) as GuestWelcomeClaims;

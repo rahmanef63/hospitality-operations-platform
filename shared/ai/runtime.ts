@@ -4,8 +4,8 @@ import { decryptApiKey } from "./crypto";
 import type { AiProvider } from "./types";
 
 export function getAiEncryptionSecret(): string {
-  const value = process.env.KAMYNA_AI_ENCRYPTION_KEY?.trim();
-  if (!value || value.length < 32) throw new Error("KAMYNA_AI_ENCRYPTION_KEY is not configured correctly.");
+  const value = process.env.HOSPITALITY_AI_ENCRYPTION_KEY?.trim();
+  if (!value || value.length < 32) throw new Error("HOSPITALITY_AI_ENCRYPTION_KEY is not configured correctly.");
   return value;
 }
 

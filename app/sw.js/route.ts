@@ -44,7 +44,7 @@ async function cleanObsoleteCaches() {
 
 async function notifyActivation() {
   const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
-  for (const client of windows) client.postMessage({ type: "KAMYNA_SW_ACTIVATED", version: CONFIG.version });
+  for (const client of windows) client.postMessage({ type: "HOSPITALITY_SW_ACTIVATED", version: CONFIG.version });
 }
 
 self.addEventListener("install", (event) => {
@@ -60,8 +60,8 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("message", (event) => {
-  if (event.data?.type === "KAMYNA_SKIP_WAITING") self.skipWaiting();
-  if (event.data?.type === "KAMYNA_GET_VERSION" && event.ports?.[0]) {
+  if (event.data?.type === "HOSPITALITY_SKIP_WAITING") self.skipWaiting();
+  if (event.data?.type === "HOSPITALITY_GET_VERSION" && event.ports?.[0]) {
     event.ports[0].postMessage({ version: CONFIG.version });
   }
 });
@@ -74,6 +74,7 @@ function isPrivateRequest(url) {
 
 function isCacheableAsset(pathname) {
   return pathname.startsWith("/_next/static/")
+    || pathname.startsWith("/tenant/")
     || pathname.startsWith("/icons/")
     || pathname.startsWith("/brand/")
     || pathname.startsWith("/media/")

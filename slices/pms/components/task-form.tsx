@@ -91,7 +91,7 @@ export function TaskForm({
       </FormSection>
       <FormSection title="Pekerjaan dan prioritas" description="Tag konsisten membuat board operasional lebih cepat dipindai." icon="flag">
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          <Field label="Judul" className="sm:col-span-2" required><TextInput name="title" defaultValue={task?.title} required maxLength={140} placeholder="Contoh: Inspeksi jacuzzi sebelum check-in" /></Field>
+          <Field label="Judul" className="sm:col-span-2" required><TextInput name="title" defaultValue={task?.title} required maxLength={140} placeholder="Contoh: Inspeksi area tamu sebelum check-in" /></Field>
           <Field label="Kategori"><TagSelect name="category" options={taskCategoryOptions} defaultValue={task?.category ?? "housekeeping"} /></Field>
           <Field label="Prioritas"><TagSelect name="priority" options={taskPriorityOptions} defaultValue={task?.priority ?? "normal"} /></Field>
           <Field label="Status"><TagSelect name="status" options={taskStatusOptions} defaultValue={task?.status ?? "open"} /></Field>

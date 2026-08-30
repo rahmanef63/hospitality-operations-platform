@@ -28,8 +28,8 @@ describe("mobile composition and scroll motion", () => {
   it("uses native scroll timelines instead of per-frame React state", () => {
     expect(motion).toContain("animation-timeline: view(block)");
     expect(motion).toContain("animation-timeline: scroll(root block)");
-    expect(motion).toContain("view-timeline-name: --kamyna-parallax");
-    expect(motion).toContain("animation-timeline: --kamyna-parallax");
+    expect(motion).toContain("view-timeline-name: --hospitality-parallax");
+    expect(motion).toContain("animation-timeline: --hospitality-parallax");
     expect(motion).not.toContain("hero-scroll-zoom");
     expect(motion).not.toContain("scrollY");
     expect(publicComponents).not.toContain("addEventListener(\"scroll\"");

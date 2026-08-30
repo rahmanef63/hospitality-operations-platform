@@ -1,4 +1,4 @@
-# Kamyna Admin UI/UX Plan
+# Hospitality Admin UI/UX Plan
 
 ## Goal
 

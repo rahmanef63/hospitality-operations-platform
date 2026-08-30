@@ -1,4 +1,4 @@
-# Kamyna guest audio and licenses
+# Hospitality guest audio and licenses
 
 ## Bundled lo-fi collection
 
@@ -6,9 +6,9 @@ The presentation ships with three original loops:
 
 | Key | Title | Creator | Duration | File |
 |---|---|---|---:|---|
-| `still-morning` | Still Morning | Kamyna Living Studio | 53.37 s | `/audio/still-morning.mp3` |
-| `mountain-air` | Mountain Air | Kamyna Living Studio | 50.57 s | `/audio/mountain-air.mp3` |
-| `night-courtyard` | Night Courtyard | Kamyna Living Studio | 56.50 s | `/audio/night-courtyard.mp3` |
+| `still-morning` | Still Morning | Hospitality Operations Platform Studio | 53.37 s | `/audio/still-morning.mp3` |
+| `mountain-air` | Mountain Air | Hospitality Operations Platform Studio | 50.57 s | `/audio/mountain-air.mp3` |
+| `night-courtyard` | Night Courtyard | Hospitality Operations Platform Studio | 56.50 s | `/audio/night-courtyard.mp3` |
 
 Every track is generated deterministically from oscillators, envelopes, generated noise, and synthesized percussion. No third-party sample, recording, melody, or streaming service is used. The generator is committed at `scripts/audio/generate_lofi_tracks.py`.
 
@@ -19,7 +19,7 @@ The recordings and generated compositions are dedicated under **CC0 1.0 Universa
 - Admin selects one track per property under `/admin/welcome`.
 - Music is disabled or enabled per property and has a bounded `0–0.5` volume setting.
 - `/presentation` starts with audio muted and does not call `play()` until a user presses the icon-only music control or the `M` key.
-- The selected track loops locally and is cached by the Kamyna service worker for offline presentation use.
+- The selected track loops locally and is cached by the Hospitality service worker for offline presentation use.
 - `/welcome` uses speech synthesis only for configured announcements and also starts muted.
 
 ## Adding another track

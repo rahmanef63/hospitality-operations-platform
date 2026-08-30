@@ -1,8 +1,8 @@
-# Kamyna Public CMS
+# Hospitality Public CMS
 
 ## Scope
 
-`/admin/cms` controls authored public frontend content for the Kamyna portfolio. The existing Homestay OS sidebar/dock remains the primary navigation; entering CMS adds a secondary desktop sidebar and a second mobile dock above the primary one.
+`/admin/cms` controls authored public frontend content for the Hospitality portfolio. The existing Homestay OS sidebar/dock remains the primary navigation; entering CMS adds a secondary desktop sidebar and a second mobile dock above the primary one.
 
 The CMS controls:
 

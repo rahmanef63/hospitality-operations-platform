@@ -13,11 +13,11 @@ export async function generateMetadata(): Promise<Metadata> {
   const seo = content.publicUi.home;
   return {
     title: { absolute: seo.seoTitle }, description: seo.seoDescription,
-    keywords: ["Kamyna Living", "Ruma Kamyna", "private villa Puncak", "villa Megamendung", "private villa Bogor", "villa Jawa Barat"],
+    keywords: ["hospitality operations", "property management", "guest experience", "private accommodation"],
     alternates: { canonical: "/", languages: { en: "/", "x-default": "/" } },
     openGraph: { type: "website", locale: "en_US", siteName: SITE_NAME, title: seo.seoTitle, description: seo.seoDescription, url: SITE_URL,
-      images: [{ url: socialImages.kamynaLiving, width: 1200, height: 630, alt: "Kamyna Living private villa stays in Puncak, Bogor" }] },
-    twitter: { card: "summary_large_image", title: seo.seoTitle, description: seo.seoDescription, images: [socialImages.kamynaLiving] },
+      images: [{ url: socialImages.site, width: 1200, height: 630, alt: `${SITE_NAME} hospitality platform` }] },
+    twitter: { card: "summary_large_image", title: seo.seoTitle, description: seo.seoDescription, images: [socialImages.site] },
   };
 }
 

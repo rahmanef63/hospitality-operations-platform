@@ -22,7 +22,7 @@ function AmenityForm({ amenity, catalog, action }: { amenity?: PmsAmenity; catal
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           <Field label="Properti" required><TagSelect name="propertyId" options={propertyOptions(catalog)} defaultValue={propertyId} required /></Field>
           <Field label="Nama fasilitas" required><TextInput name="name" defaultValue={amenity?.name} required maxLength={100} /></Field>
-          <Field label="Key" required hint="Gunakan lowercase-kebab-case."><TextInput name="key" defaultValue={amenity?.key} required maxLength={64} placeholder="swimming-pool" pattern="[a-z0-9-]+" /></Field>
+          <Field label="Key" required hint="Gunakan lowercase-kebab-case."><TextInput name="key" defaultValue={amenity?.key} required maxLength={64} placeholder="pool" pattern="[a-z0-9-]+" /></Field>
           <Field label="Kategori"><TagSelect name="category" options={amenityCategoryOptions} defaultValue={amenity?.category ?? "other"} /></Field>
           <Field label="Deskripsi" className="sm:col-span-2"><TextArea name="description" defaultValue={amenity?.description} maxLength={500} /></Field>
         </div>
@@ -85,7 +85,7 @@ export function AmenityManager({ catalog, openCreate, state, backendError, formA
               >
                 <AmenityForm amenity={amenity} catalog={catalog} action={formAction} />
               </RecordPanel>
-            )) : <div className="p-5"><EmptyState title="Belum ada fasilitas"><span>Inisialisasi Ruma Kamyna dari Dashboard untuk memuat fasilitas terverifikasi.</span></EmptyState></div>}
+            )) : <div className="p-5"><EmptyState title="Belum ada fasilitas"><span>Inisialisasi properti awal dari Dashboard untuk memuat fasilitas terverifikasi.</span></EmptyState></div>}
           </div>
         </section>
 

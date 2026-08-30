@@ -1,6 +1,6 @@
 {
   "slug": "admin",
-  "name": "Kamyna guest experience admin",
+  "name": "Hospitality guest experience admin",
   "version": "2.1.0",
   "category": "operations",
   "description": "Authenticated guest-experience dashboard for reservation-linked multilingual welcomes, time-aware announcements, presentation composition, CC0 lo-fi music, and encrypted BYOK translation.",

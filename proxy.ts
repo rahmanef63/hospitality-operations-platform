@@ -3,15 +3,15 @@ import { NextResponse } from "next/server";
 import { verifyAdminSessionToken } from "@/shared/admin/token";
 
 const ADMIN_COOKIE_NAME = process.env.NODE_ENV === "production"
-  ? "__Host-kamyna-admin"
-  : "kamyna-admin";
+  ? "__Host-hospitality-admin"
+  : "hospitality-admin";
 
 export function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const loginPath = path === "/admin/login";
   const token = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
-  const secret = process.env.KAMYNA_ADMIN_SESSION_SECRET;
-  const configuredEmail = process.env.KAMYNA_ADMIN_EMAIL?.trim().toLowerCase();
+  const secret = process.env.HOSPITALITY_ADMIN_SESSION_SECRET;
+  const configuredEmail = process.env.HOSPITALITY_ADMIN_EMAIL?.trim().toLowerCase();
   const session = token && secret ? verifyAdminSessionToken(token, secret) : null;
   const authenticated = Boolean(session && configuredEmail && session.email === configuredEmail);
 

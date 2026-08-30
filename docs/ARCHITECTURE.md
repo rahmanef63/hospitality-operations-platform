@@ -2,69 +2,53 @@
 
 ## Runtime
 
-Kamyna Living is a Next.js 16 standalone application on Dokploy with a managed Convex Cloud backend. Marketing content stays static-first, while verified property facts and all operational records are dynamic.
+Hospitality Operations Platform is a Next.js 16 application backed by Convex Cloud. It combines public CMS delivery with multi-property operations while keeping provider identity, property facts, secrets, and deployment ownership outside the upstream core.
 
 ```text
-shared/content/config/*        shared/pms/*                 convex/pms/*
-        ↓                           ↓                            ↓
-StaticContentRepository      typed domain boundary      Convex Cloud tables/functions
-        ↓                           ↓                            ↓
-marketing storytelling       public facts + forms       PMS, reporting, audit, conflicts
-        └──────────────────── Next.js App Router ────────────────────┘
+tenant/*                     shared/*                    convex/*
+provider identity/config → generic domain boundary → managed backend functions
+         \                       |                         /
+          └────────────── Next.js App Router ────────────┘
 ```
 
-## Brand and property hierarchy
+## Product and tenant boundary
 
-- **Kamyna Living**: collection and portfolio identity.
-- **Ruma Kamyna**: first property in Megamendung, Puncak Bogor.
-- **return to stillness**: shared brand idea.
-
-Core identity assets remain location-neutral. Every operational record is keyed by `propertyId`, so new properties do not require a schema fork.
+- **Hospitality Operations Platform**: versioned upstream product source.
+- **Tenant repository**: independently owned provider repository receiving tested upstream release PRs.
+- **Provider deployment**: independently owned Vercel/Convex projects, domains, data, and secrets.
+- `tenant/**` and `public/tenant/**` are protected overlays and are never overwritten by the automated updater.
+- The upstream default tenant is deliberately empty of real property records and business facts.
 
 ## Slice boundaries
 
-- `site-shell`: public desktop header and footer.
-- `concierge`: public mobile dock, desktop chat launcher, and verified-information concierge UI.
+- `site-shell`: public navigation, PWA lifecycle, footer.
 - `home`: collection homepage.
-- `property`: reusable property storytelling plus verified dynamic facts.
-- `brand-assets`: production identity downloads.
-- `guides`: location-aware drafts kept noindex until verified.
-- `welcome`: private guest welcome experience.
-- `admin`: authentication and welcome editor.
+- `property`: reusable property storytelling plus verified operational facts.
+- `brand-assets`: provider-managed identity downloads.
+- `guides`: provider-managed local editorial content.
+- `welcome`: private guest welcome and presentation experience.
+- `admin`: authentication, AI/BYOK, and welcome administration.
 - `pms`: portfolio dashboard and operational CRUD UI.
+- `cms`: draft/publish public content management.
 
-## Convex domains
+## Data authority
 
-The backend owns two bounded domains:
+Operational truth lives in Convex: properties, units, amenities, guests, reservations, availability blocks, transactions, tasks, audit events, welcome publishing, announcements, and CMS snapshots. Browser components never receive backend deployment credentials or admin secrets.
 
-1. Welcome publishing, login throttling, and welcome audit history.
-2. Multi-property operations: properties, units, amenities, guests, reservations, availability blocks, transactions, tasks, and PMS audit events.
-
-Only `welcome.getPublished` and `pms.public.getProperty` are public read-only functions. All admin functions are `internalQuery` or `internalMutation`, reached through protected Convex HTTP actions after authorization. Browser components never receive deploy credentials or admin secrets.
+Public editorial content uses an atomic draft/publish CMS snapshot. Public property facts use a separate read-only projection so marketing edits cannot silently change operational truth.
 
 ## Write path
 
 ```text
-HTML admin form
-  → authenticated Next.js Server Action
-  → allowlisted payload conversion
-  → HTTPS bearer-authorized Convex HTTP action
-  → validated internal mutation
-  → soft archive / write + audit event
+authenticated admin form
+  → signed Next.js server action
+  → protected Convex HTTP action
+  → internal Convex query/mutation
+  → audit event
 ```
 
-Every Server Action verifies the signed admin cookie again. Convex independently verifies the inter-service secret. Admin and guest-welcome routes are excluded from the sitemap and marked noindex.
+## Tenant distribution
 
-## Inventory and availability
+Upstream uses Semantic Version releases. Managed tenant repositories receive update branches and pull requests only after protected-overlay checks, core-drift checks, merge checks, and the full tenant verification suite pass. Unsafe updates create a blocked-update issue rather than overwriting provider changes.
 
-Properties can be sold as whole villas or divided into optional units. A property bedroom count is a public fact, not an assumption that rooms are separately bookable. Property-level reservations and blocks conflict with every unit; unit-level records conflict with that unit and any property-level record. Overlap checks run inside the mutation.
-
-## Public facts and SEO
-
-The Ruma Kamyna route combines static editorial storytelling with active, published facts from Convex. A reviewed fallback keeps the same confirmed facts available if the backend is temporarily unavailable. JSON-LD adds room and amenity features while continuing to omit unknown rates, capacity, bathrooms, ratings, and policies.
-
-## Navigation and responsive behavior
-
-Marketing pages preserve full-bleed mobile composition and reduced-motion-safe scroll timelines. Desktop retains the editorial header; mobile uses a five-item safe-area dock and reserves matching footer space. The concierge is mounted only in the marketing layout, uses a mobile bottom sheet or desktop lower-right panel, posts sanitized questions to `/api/concierge`, and returns deterministic replies derived from the public PMS projection plus verified contact/location configuration. Conversations are not stored.
-
-The management UI uses the same typography and palette but prioritizes dense, keyboard-accessible forms, 44px controls, horizontal safety, and stable server-rendered interactions. Desktop uses a persistent grouped sidebar. Mobile uses a primary dock plus a bounded “Lainnya” sheet for secondary modules, site access, and logout.
+See `docs/PLATFORM-DISTRIBUTION.md` for the full release contract.

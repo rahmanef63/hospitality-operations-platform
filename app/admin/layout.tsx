@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Admin",
-  description: "Kamyna Living guest experience administration.",
+  description: "Hospitality Operations Platform guest experience administration.",
   robots: { index: false, follow: false, noarchive: true, googleBot: { index: false, follow: false } },
 };
 

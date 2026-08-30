@@ -13,9 +13,10 @@ describe("published public CMS", () => {
     expect(document.site.publicUi.home.sections.order).toEqual([
       "hero", "introduction", "collection", "rituals", "philosophy", "contact",
     ]);
-    expect(document.site.publicUi.properties["ruma-kamyna"]?.sections.order).toHaveLength(8);
-    expect(document.site.publicUi.brandAssets.assets).toHaveLength(7);
-    expect(document.site.publicUi.shell.concierge.enabled).toBe(true);
+    expect(document.site.properties).toEqual([]);
+    expect(document.site.publicUi.properties).toEqual({});
+    expect(document.site.publicUi.brandAssets.assets).toHaveLength(4);
+    expect(document.site.publicUi.shell.concierge.enabled).toBe(false);
   });
 
   it("rejects unsafe navigation hrefs and invalid public media", () => {

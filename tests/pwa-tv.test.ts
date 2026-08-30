@@ -37,7 +37,7 @@ describe("TV presentation and PWA lifecycle", () => {
     const source = await response.text();
     expect(response.headers.get("cache-control")).toContain("no-store");
     expect(response.headers.get("service-worker-allowed")).toBe("/");
-    expect(source).toContain("KAMYNA_SKIP_WAITING");
+    expect(source).toContain("HOSPITALITY_SKIP_WAITING");
     expect(source).toContain('key.startsWith(CONFIG.cachePrefix + "-")');
     expect(source).toContain('url.pathname.startsWith("/admin")');
     expect(source).toContain('url.pathname.startsWith("/api")');
@@ -62,15 +62,15 @@ describe("TV presentation and PWA lifecycle", () => {
     expect(manager).toContain("beforeinstallprompt");
     expect(manager).toContain("updatefound");
     expect(manager).toContain("controllerchange");
-    expect(manager).toContain("KAMYNA_SKIP_WAITING");
-    expect(manager).toContain("KAMYNA_GET_VERSION");
+    expect(manager).toContain("HOSPITALITY_SKIP_WAITING");
+    expect(manager).toContain("HOSPITALITY_GET_VERSION");
     expect(manager).toContain("cleanupPublicClientState");
     expect(manager).toContain('window.location.pathname.startsWith("/admin")');
     expect(manager).toContain('window.setTimeout(() => void restartWithLatest(true), 900)');
-    expect(manager).toContain('name.startsWith("kamyna-public-")');
-    expect(manager).toContain('name.startsWith("kamyna-pwa-")');
+    expect(manager).toContain('name.startsWith("hospitality-public-")');
+    expect(manager).toContain('name.startsWith("hospitality-pwa-")');
     expect(manager).not.toContain("localStorage.clear()");
-    expect(manager).not.toContain('document.cookie = "__Host-kamyna-admin');
+    expect(manager).not.toContain('document.cookie = "__Host-hop-admin');
     expect(manager).toContain('updateViaCache: "none"');
   });
 

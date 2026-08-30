@@ -17,7 +17,7 @@ function fallbackOverview(propertyName: string): WelcomeAdminOverview {
   return {
     configs: Object.fromEntries(WELCOME_LOCALES.map((locale) => [locale, {
       locale,
-      draft: propertyName === "Ruma Kamyna" ? DEFAULT_WELCOME_CONTENT[locale] : defaultWelcomeContent(locale, propertyName),
+      draft: propertyName === "Property" ? DEFAULT_WELCOME_CONTENT[locale] : defaultWelcomeContent(locale, propertyName),
       version: 0,
     }])) as WelcomeAdminOverview["configs"],
     events: [],
@@ -45,9 +45,9 @@ export default async function Page({ searchParams }: {
   let backendError = false;
   try { [catalog, booking] = await Promise.all([getPmsCatalog(), getPmsBookingData()]); } catch { backendError = true; }
   const selectedProperty = catalog.properties.find((property) => property.slug === params.property)
-    ?? catalog.properties.find((property) => property.slug === "ruma-kamyna")
+    ?? catalog.properties.find((property) => property.slug === "primary-property")
     ?? catalog.properties[0]
-    ?? { slug: "ruma-kamyna", name: "Ruma Kamyna", timezone: "Asia/Jakarta" };
+    ?? { slug: "primary-property", name: "Property", timezone: "Asia/Jakarta" };
   const propertyContent = await getPropertyBySlug(selectedProperty.slug);
   const announcementTimezone = "timezone" in selectedProperty ? selectedProperty.timezone : propertyContent?.timezone ?? "Asia/Jakarta";
   const announcementCoordinates = propertyContent?.location.geo;

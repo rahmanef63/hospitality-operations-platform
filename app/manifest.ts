@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { SITE_DESCRIPTION, SITE_NAME } from "@/shared/config/site";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_SLOGAN } from "@/shared/config/site";
 import { PWA_ICONS, PWA_SCREENSHOTS } from "@/shared/pwa/manifest-assets";
 
 type ExtendedManifest = MetadataRoute.Manifest & {
@@ -19,8 +19,8 @@ type ExtendedManifest = MetadataRoute.Manifest & {
 export default function manifest(): ExtendedManifest {
   return {
     id: "/",
-    name: `${SITE_NAME} | Homes for slower living`,
-    short_name: "Kamyna",
+    name: `${SITE_NAME} | ${SITE_SLOGAN}`,
+    short_name: "Hospitality",
     description: SITE_DESCRIPTION,
     lang: "en",
     dir: "ltr",
@@ -43,15 +43,9 @@ export default function manifest(): ExtendedManifest {
         short_name: "Presentation",
         description: "Open the fullscreen guest presentation.",
         url: "/presentation?tv=1",
-        icons: [{ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+        icons: [PWA_ICONS[0]],
       },
-      {
-        name: "Ruma Kamyna",
-        short_name: "Ruma Kamyna",
-        description: "Open the Ruma Kamyna property page.",
-        url: "/stays/ruma-kamyna",
-        icons: [{ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
-      },
+
     ],
   };
 }

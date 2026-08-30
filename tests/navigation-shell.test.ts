@@ -41,7 +41,8 @@ describe("public and admin navigation shells", () => {
     expect(concierge).toContain("config.title");
     expect(concierge).toContain("<PublicMobileDock");
     expect(concierge).toContain("hidden min-h-13");
-    expect(api).toContain('"Cache-Control": "no-store"');
+    expect(api).toContain('"Cache-Control"');
+    expect(api).toContain('"no-store"');
     expect(api).toContain("getPublicPropertyFacts");
     expect(api).not.toContain("OPENAI");
   });

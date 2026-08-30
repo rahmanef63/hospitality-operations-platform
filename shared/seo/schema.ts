@@ -1,5 +1,5 @@
 import type { AreaGuideContent, PropertyContent } from "@/shared/content";
-import { RUMA_KAMYNA_MAPS_PROFILE_URL } from "@/shared/config/ruma-kamyna";
+import { PRIMARY_PROPERTY_MAPS_PROFILE_URL } from "@/shared/config/primary-property";
 import type { PublicPropertyFacts } from "@/shared/pms";
 import {
   CONTENT_UPDATED_AT,
@@ -17,7 +17,7 @@ const organizationId = `${SITE_URL}/#organization`;
 const websiteId = `${SITE_URL}/#website`;
 const brandId = `${SITE_URL}/#brand`;
 const dateModified = CONTENT_UPDATED_AT.toISOString();
-const officialProfileUrls = [RUMA_KAMYNA_MAPS_PROFILE_URL] as const;
+const officialProfileUrls = PRIMARY_PROPERTY_MAPS_PROFILE_URL ? [PRIMARY_PROPERTY_MAPS_PROFILE_URL] : [];
 
 function imageObject(image: { src: string; width: number; height: number; alt: string }) {
   return {
@@ -40,8 +40,8 @@ export function buildGlobalSchema() {
         "@id": organizationId,
         name: SITE_NAME,
         url: SITE_URL,
-        logo: absolute("/icons/icon-512.png"),
-        image: absolute(socialImages.kamynaLiving),
+        logo: absolute("/tenant/icons/icon-512.png"),
+        image: absolute(socialImages.site),
         description: SITE_DESCRIPTION,
         slogan: SITE_SLOGAN,
         sameAs: officialProfileUrls,
@@ -62,7 +62,7 @@ export function buildGlobalSchema() {
         name: SITE_NAME,
         url: SITE_URL,
         slogan: SITE_SLOGAN,
-        logo: absolute("/brand/kamyna-living-wordmark.svg"),
+        logo: absolute("/tenant/brand/master-wordmark.svg"),
       },
     ],
   };
@@ -88,7 +88,7 @@ export function buildHomeSchema(properties: PropertyContent[]) {
       {
         "@type": "ItemList",
         "@id": `${SITE_URL}/#stays`,
-        name: "Kamyna Living private villa stays",
+        name: "Published hospitality properties",
         numberOfItems: properties.length,
         itemListElement: properties.map((property, index) => ({
           "@type": "ListItem",
@@ -220,7 +220,7 @@ export function buildBrandAssetsSchema() {
     "@id": `${url}/#webpage`,
     url,
     name: `Brand assets | ${SITE_NAME}`,
-    description: "Official, location-neutral identity files for Kamyna Living and Ruma Kamyna.",
+    description: "Provider-managed identity assets for the current tenant deployment.",
     inLanguage: "en",
     dateModified,
     isPartOf: { "@id": websiteId },

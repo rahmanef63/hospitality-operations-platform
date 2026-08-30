@@ -24,7 +24,7 @@ export function useAnnouncementExperience(input: {
   const [muted, setMuted] = useState(true);
   const [supported, setSupported] = useState(false);
   const spokenRef = useRef<string | undefined>(undefined);
-  const storageKey = `kamyna:welcome-audio:${input.program.settings.propertySlug}`;
+  const storageKey = `hospitality:welcome-audio:${input.program.settings.propertySlug}`;
   const active = useMemo(() => input.enabled === false || !now ? undefined : resolveActiveAnnouncement(input.program, {
     now,
     guestName: input.guestName,

@@ -1,99 +1,53 @@
-# Kamyna Homestay Management System
+# Hospitality Operations PMS
 
 ## Purpose
 
-The operations system is designed for the whole Kamyna Living portfolio. Ruma Kamyna in Megamendung is the first active property, but every operational record is keyed by `propertyId` so another villa, homestay, guesthouse, apartment, or multi-unit property can be added without changing the schema.
-
-The owner-confirmed Ruma Kamyna facts are seeded idempotently:
-
-- 3 bedrooms;
-- swimming pool;
-- gym;
-- jacuzzi;
-- mountain view.
-
-No bathroom count, guest capacity, rate, deposit, minimum stay, check-in time, cancellation policy, or historic booking data is seeded.
+The operations system supports multiple independent hospitality properties. Every operational record is keyed by `propertyId`; the upstream platform does not ship any real provider property, amenity, guest, reservation, rate, payment, or task data.
 
 ## Admin routes
 
 | Route | Responsibility |
 |---|---|
-| `/admin` | Portfolio dashboard, arrivals, departures, tasks, financial summary, activity |
-| `/admin/calendar` | Date-range availability, reservations, and owner/maintenance blocks |
-| `/admin/reservations` | Reservation lifecycle and stay totals |
+| `/admin` | Portfolio operations dashboard |
+| `/admin/calendar` | Availability and inventory blocks |
+| `/admin/reservations` | Reservation lifecycle and derived totals |
 | `/admin/guests` | Private guest directory |
 | `/admin/properties` | Multi-property configuration and public facts |
 | `/admin/units` | Whole-property or separately bookable inventory |
 | `/admin/amenities` | Property facilities and public visibility |
-| `/admin/finance` | Payments, refunds, expenses, and reservation balances |
-| `/admin/tasks` | Housekeeping, maintenance, inspection, and guest requests |
-| `/admin/welcome` | Reservation-linked welcome links and 20-language publishing |
-| `/admin/ai` | Encrypted BYOK provider and draft-only auto-translation |
-| `/admin/cms/*` | Draft/publish public content management with a secondary sidebar/dock |
+| `/admin/finance` | Payments, refunds, expenses, and balances |
+| `/admin/tasks` | Housekeeping, maintenance, inspections, and guest requests |
+| `/admin/welcome` | Localized guest-experience publishing and announcements |
 
-All routes share the existing signed admin session and remain `noindex`. Desktop exposes them in a persistent grouped sidebar; mobile exposes primary modules in a safe-area dock and the remaining modules in a bounded “Lainnya” sheet.
-
-
-## Admin interaction model
-
-The admin UI follows the implementation plan in `docs/ADMIN-UX-PLAN.md`. Relationships and enums use accessible icon tags, list surfaces support local search/filtering, reservations and blocks share a responsive month calendar, and reservation totals are previews of server-authoritative calculations rather than editable ledger fields.
+All routes share the signed admin session and remain `noindex`.
 
 ## Convex data model
 
-- `properties`: property identity, location, currency, optional facts, operational/publication state.
-- `units`: optional bookable inventory under a property. Bedroom count does not imply separate room inventory.
+- `properties`: identity, location, currency, optional verified facts, operational/publication state.
+- `units`: optional bookable inventory under a property.
 - `amenities`: facilities with active, featured, and public-visible flags.
-- `guests`: private contact, preferred welcome language, and service notes.
-- `reservations`: source, lifecycle status, dates, selected welcome language, optional counts and amounts.
+- `guests`: private contact and service notes.
+- `reservations`: source, lifecycle status, dates, optional counts and derived amounts.
 - `availabilityBlocks`: owner use, maintenance, closure, or other blocked inventory.
 - `transactions`: payments, refunds, and expenses.
 - `tasks`: operational work linked to property, unit, or reservation.
-- `pmsAuditEvents`: bounded operational audit trail without raw admin email.
+- audit tables: bounded administrative and operational audit history.
 
-Deletes are soft archives. List queries exclude archived documents, preserving referential history.
+Deletes use soft archives. List queries exclude archived documents while preserving referential history.
 
 ## Reservation and availability invariants
 
-- Check-in and check-out use `YYYY-MM-DD` and check-out must be later than check-in.
-- A stay is limited to 1–366 nights.
-- `tentative`, `confirmed`, and `checked_in` reservations block inventory.
-- A property-level reservation or block conflicts with every unit in that property.
-- A unit-level reservation or block conflicts with the same unit and any property-level record.
-- Reservation and availability mutations reject overlapping dates inside the transaction.
-- Rates, totals, guest counts, and financial values are optional. Empty values remain absent rather than becoming estimates.
+- Check-in/check-out use `YYYY-MM-DD`, with check-out later than check-in.
+- Blocking ranges use half-open intervals so same-day checkout/check-in is possible.
+- Active reservation states and active blocks cannot overlap the same inventory.
+- Property-level records conflict with all units in that property; unit-level records conflict with the same unit and property-level records.
+- Pricing, capacity, bathroom counts, fees, and other optional facts remain absent until entered by the provider.
+- Server-side mutations recompute authoritative totals and currency from linked property/unit configuration.
 
 ## Security boundary
 
-Browser components never call Convex mutations directly. Every write follows:
+Browser components do not call protected Convex mutations directly. Server actions verify the signed admin session, protected Convex HTTP actions independently authorize the server-to-server credential, and public projections exclude guest, finance, task, and internal-note data.
 
-```text
-admin form
-  → signed Next.js Server Action
-  → protected Convex HTTP action
-  → internal Convex query/mutation
-  → audit event
-```
+## Public synchronization
 
-The Convex admin secret is server-only, the deploy key is deployment-only, and neither belongs in Docker build arguments or browser bundles.
-
-## Public concierge integration
-
-`/api/concierge` reads the same public property projection as the stay page. It may surface bedrooms, active public amenities, verified address, official Maps, and host contact. It must not expose internal notes, finance, guests, reservations, tasks, or unverified operational fields, and it stores no conversation history.
-
-## Public property facts
-
-The property page reads only active, published facts and amenities through the public read-only `pms.public.getProperty` query. This public projection is held behind a tagged Next.js server cache and invalidated when PMS writes occur, so normal page requests do not query Convex repeatedly. If Convex is temporarily unavailable, the page uses a reviewed Ruma Kamyna fallback containing the same five owner-confirmed facts. Public JSON-LD adds `numberOfRooms` and `amenityFeature`, but omits pricing, capacity, bathrooms, ratings, availability, and policies until confirmed.
-
-## Cross-module integrations
-
-- Guest preferred language becomes the default on a new reservation; a reservation may override it without changing the guest profile.
-- Reservation welcome links use authenticated encryption and expire 30 days after checkout. The public token resolves only a bounded context: guest name, property/unit, stay dates, status, and locale.
-- `/admin/welcome` reads live reservations and contacts, while `/welcome` resolves its property and published template from the reservation.
-- Finance derives currency from the linked reservation/property; tasks derive property/unit from linked reservations; calendar and reservations share one availability projection.
-- No module auto-creates payments, tasks, reservations, units, or property facts without an explicit admin action.
-
-## Guest announcement domain
-
-The `announcementSettings`, `announcementRules`, and `announcementAuditEvents` tables add property-scoped scheduling without putting guest or reservation data into reusable templates. Rules can be created, updated, paused, prioritized, or archived from `/admin/welcome`; deletion uses archive semantics. Public reads return only active rules for the requested property and locale.
-
-Prayer-time rules are computed from verified property coordinates, the property timezone, an explicit calculation method, and an explicit Asr madhab. The feature is off by default and does not guess a location. Announcement speech and the procedural ambient layer are muted until the viewer acts.
+The public property page combines provider-authored CMS content with active published operational facts. Tenant repositories may provide a reviewed fallback only inside the protected tenant overlay; the generic upstream fallback is empty.

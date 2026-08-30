@@ -7,7 +7,7 @@ import { defaultCmsDocument } from "@/shared/cms";
 import { ensureCmsDocument, publishCms } from "@/shared/convex/cms";
 
 function cmsUrl(path: string, status?: string, error?: string) {
-  const url = new URL(path, "https://kamyna.internal");
+  const url = new URL(path, "https://hospitality.internal");
   if (status) url.searchParams.set("status", status);
   if (error) url.searchParams.set("error", error);
   return `${url.pathname}${url.search}`;

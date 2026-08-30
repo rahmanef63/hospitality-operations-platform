@@ -11,11 +11,11 @@ export function AdminLoginPage({ error }: AdminLoginPageProps) {
   return (
     <main id="main-content" className="grid min-h-screen lg:grid-cols-[.92fr_1.08fr]">
       <section className="surface-grain hidden min-h-screen flex-col justify-between bg-charcoal p-14 text-ivory lg:flex">
-        <p className="kicker text-warm-sand">Kamyna Living · Private administration</p>
+        <p className="kicker text-warm-sand">Hospitality Operations · Private administration</p>
         <div className="max-w-xl">
           <p className="font-serif text-8xl leading-[.82] tracking-[-.05em]">A quieter way to welcome.</p>
           <p className="mt-10 max-w-md text-base leading-8 text-ivory/75">
-            Kelola pesan sambutan tamu Ruma Kamyna tanpa mengubah website publik atau data properti lain.
+            Kelola operasi, konten, dan pengalaman tamu tanpa mengekspos data privat.
           </p>
         </div>
         <div className="flex items-center gap-3 text-xs tracking-[.15em] text-ivory/65 uppercase">
@@ -29,7 +29,7 @@ export function AdminLoginPage({ error }: AdminLoginPageProps) {
           <div className="flex size-12 items-center justify-center border border-charcoal/20 bg-warm-sand/35">
             <LockKeyhole className="size-5" aria-hidden="true" />
           </div>
-          <p className="kicker mt-10 text-umber">Ruma Kamyna admin</p>
+          <p className="kicker mt-10 text-umber">Operations admin</p>
           <h1 className="mt-5 font-serif text-6xl leading-[.9] tracking-[-.04em] sm:text-7xl">Sign in.</h1>
           <p className="mt-6 max-w-sm text-sm leading-7 text-ink-soft">
             Gunakan kredensial admin yang tersimpan di environment production.

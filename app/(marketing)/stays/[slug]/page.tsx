@@ -2,14 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PropertyPage } from "@/features/property";
 import { SITE_NAME, SITE_URL } from "@/shared/config/site";
-import { getPropertyBySlug, getSiteContent, listAreaGuides, listProperties } from "@/shared/content";
+import { getPropertyBySlug, getSiteContent, listAreaGuides } from "@/shared/content";
 import { getPublicPropertyFacts } from "@/shared/convex";
 import { buildPropertySchema, JsonLd } from "@/shared/seo";
-
-export async function generateStaticParams() {
-  const properties = await listProperties();
-  return properties.map((property) => ({ slug: property.slug }));
-}
 
 export async function generateMetadata({
   params,
@@ -37,7 +32,7 @@ export async function generateMetadata({
           url: property.socialImage,
           width: 1200,
           height: 630,
-          alt: `${property.name}, private villa in Megamendung, Puncak Bogor`,
+          alt: `${property.name} hospitality property`,
         },
       ],
     },
