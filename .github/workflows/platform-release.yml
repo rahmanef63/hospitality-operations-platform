@@ -1,0 +1,58 @@
+name: Platform release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing platform tag to publish/sync
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    if: github.repository == 'rahmanef63/hospitality-operations-platform'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SITE_URL: https://tenant.example
+      NEXT_PUBLIC_CONVEX_URL: https://example.convex.cloud
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.tag || github.ref_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --legacy-peer-deps
+      - run: npm run platform:release:check -- ${{ inputs.tag || github.ref_name }}
+      - run: npm run verify
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create GitHub release if needed
+        run: |
+          gh release view "$TAG" >/dev/null 2>&1 || \
+            gh release create "$TAG" --verify-tag --generate-notes --title "Hospitality Operations Platform $TAG"
+
+  tenant-sync:
+    needs: publish
+    uses: ./.github/workflows/platform-tenant-sync.yml
+    with:
+      tag: ${{ inputs.tag || github.ref_name }}
+    secrets: inherit
