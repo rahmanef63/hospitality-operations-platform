@@ -51,6 +51,6 @@ authenticated admin form
 
 Upstream uses Semantic Version releases. The private updater control plane prepares tenant PRs only after protected-overlay, core-drift, merge, and full tenant verification checks pass. Managed routing never lives in product source.
 
-Application is tenant-owned: `/admin/settings` dispatches the tenant apply workflow, which revalidates the exact PR head, deploys Convex first, rebase-merges that SHA while preserving the tenant deployment actor, then waits for `/api/health` to report the exact Vercel build revision. Major releases require an explicit migration path.
+Application is tenant-owned: `/admin/settings` dispatches the tenant apply workflow, which revalidates the exact PR head, deploys Convex first, non-force fast-forwards the default branch to that SHA while preserving the tenant deployment actor and upstream ancestry, then waits for `/api/health` to report the exact Vercel build revision. Major releases require an explicit migration path.
 
 See `docs/AI-AGENT-ONBOARDING.md` and `docs/PLATFORM-DISTRIBUTION.md` for the full contract.

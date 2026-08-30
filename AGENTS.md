@@ -15,7 +15,7 @@
 - The canonical product source is `rahmanef63/hospitality-operations-platform`; tenant repositories are independently owned deployment repositories, not alternate product sources of truth.
 - Platform updates must be versioned and delivered as tested tenant pull requests. Never push platform updates directly to a tenant default branch.
 - Tenant-owned paths declared in `.platform/distribution.json` are immutable from automated upstream sync. Core-code drift outside those paths must block one-click updates instead of being overwritten.
-- Managed update commits must resolve `TENANT_DEPLOYMENT_ACTOR` to a real tenant GitHub user. Preserve that author through rebase merge so hosting deployment policy never depends on an upstream developer seat.
+- Managed update commits must resolve `TENANT_DEPLOYMENT_ACTOR` to a real tenant GitHub user. Preserve that author by non-force fast-forwarding the tenant default branch to the exact verified update head; hosting deployment policy must never depend on an upstream developer seat.
 - Do not deep-import another slice. Import only through its `index.ts` barrel.
 
 ## Architecture

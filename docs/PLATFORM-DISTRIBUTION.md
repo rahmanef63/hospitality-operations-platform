@@ -38,7 +38,7 @@ Managed-provider routing is **not stored in the product repository**. The produc
 
 The private control plane owns only routing/automation metadata such as tenant repository identifiers, update channels, reviewer lists, deployment-actor logins, and updater credentials. It must not contain provider runtime secrets such as Convex deployment keys or Vercel deployment credentials.
 
-Each managed tenant declares a `deploymentActor` GitHub login. It must resolve to a real user authorized to deploy that tenant. The updater derives the GitHub noreply email from the user ID, authors the prepared update commit as that tenant actor, and tenant apply uses rebase merge so hosting author/seat policy remains tenant-owned.
+Each managed tenant declares a `deploymentActor` GitHub login. It must resolve to a real user authorized to deploy that tenant. The updater derives the GitHub noreply email from the user ID, authors the prepared update commit as that tenant actor, and tenant apply uses a non-force fast-forward of the default branch to that exact verified update commit so hosting author/seat policy and upstream ancestry remain tenant-owned.
 
 Preparation flow:
 
@@ -69,12 +69,12 @@ Preferred path:
   → workflow revalidates exact PR head and CI
   → npm run verify on the exact tenant tree
   → npx convex deploy using tenant CONVEX_DEPLOY_KEY
-  → exact rebase merge constrained to the verified PR head SHA, preserving tenant deployment author
+  → non-force fast-forward default branch to the verified PR head SHA, preserving tenant deployment author and upstream ancestry
   → Vercel main-branch deployment (or tenant deploy hook)
   → poll canonical /api/health until buildVersion == merge SHA
 ```
 
-The runtime admin page uses a **tenant-scoped server-only** GitHub automation token. It can read the tenant PR/check state and dispatch the tenant-owned workflow; it is never serialized to browser code. The apply workflow itself uses GitHub's short-lived repository token for the exact merge and tenant repository secrets for deployment.
+The runtime admin page uses a **tenant-scoped server-only** GitHub automation token. It can read the tenant PR/check state and dispatch the tenant-owned workflow; it is never serialized to browser code. The apply workflow itself uses GitHub's short-lived repository token for the exact non-force ref update and tenant repository secrets for deployment.
 
 ## Tenant automation configuration
 
@@ -132,7 +132,7 @@ node scripts/platform/provision-tenant.mjs \
 
 ## Bootstrap for tenants created before Update Center
 
-A tenant provisioned before `/admin/settings` exists needs one controlled bootstrap update. Prepare the normal tested platform PR, configure tenant deployment secrets/variables, deploy Convex, merge the exact verified PR, and verify the exact frontend revision. Do not pretend the old tenant UI can dispatch a workflow it does not contain. After that release is installed, future compatible updates use the normal admin one-click path.
+A tenant provisioned before `/admin/settings` exists needs one controlled bootstrap update. Prepare the normal tested platform PR, configure tenant deployment secrets/variables, deploy Convex, non-force fast-forward the default branch to the exact verified PR head, and verify the exact frontend revision. Do not pretend the old tenant UI can dispatch a workflow it does not contain. After that release is installed, future compatible updates use the normal admin one-click path.
 
 ## Update status and one-click semantics
 
