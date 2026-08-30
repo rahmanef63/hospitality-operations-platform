@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "hospitality-operations-platform",
+  "name": "Hospitality Operations Platform",
+  "version": "0.1.0",
+  "upstream": {
+    "owner": "rahmanef63",
+    "repo": "hospitality-operations-platform",
+    "defaultBranch": "main"
+  },
+  "release": {
+    "channel": "stable",
+    "tagPrefix": "v"
+  }
+}

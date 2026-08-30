@@ -1,5 +1,5 @@
 {
-  "name": "kamyna-living",
+  "name": "hospitality-operations-platform",
   "version": "0.1.0",
   "private": true,
   "description": "Location-neutral hospitality website for Kamyna Living.",
@@ -23,7 +23,10 @@
     "audit": "npm run check:stack-pin && npm run audit:file-size && npm run audit:slices && npm run audit:manifest && npm run audit:rr-rules && npm run audit:brand-copy",
     "verify": "npm run audit && npm run typecheck && npm run lint && npm run test && npm run build",
     "smoke": "node scripts/smoke-test.mjs",
-    "audit:manifest": "node scripts/validation/audit-project-manifest.mjs"
+    "audit:manifest": "node scripts/validation/audit-project-manifest.mjs",
+    "platform:release:check": "node scripts/platform/check-release.mjs",
+    "platform:version": "node scripts/platform/set-version.mjs",
+    "platform:tenant:provision": "node scripts/platform/provision-tenant.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.0",

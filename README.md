@@ -1,6 +1,8 @@
-# Kamyna Living
+# Hospitality Operations Platform
 
-Multi-property hospitality website and homestay-management system for the Kamyna collection. **Ruma Kamyna** in Megamendung, Puncak Bogor is the first active property; the brand identity remains location-neutral for future properties.
+Versioned multi-property hospitality operations platform combining PMS, CMS, reservations, finance, operational tasks, guest experience, PWA, and tenant-safe distribution. **Kamyna Living / Ruma Kamyna** is the first reference tenant and production proving ground; provider deployments are independently owned tenant repositories and cloud projects.
+
+The canonical product source is `rahmanef63/hospitality-operations-platform`. Tenant repositories receive tested SemVer update pull requests and keep provider secrets, business data, branding overlays, and deployment ownership separate from this upstream repository.
 
 ## Runtime
 
@@ -11,6 +13,17 @@ Multi-property hospitality website and homestay-management system for the Kamyna
 - Docker standalone frontend on Dokploy; managed Convex Cloud backend.
 - Installable PWA with bounded app-owned cache cleanup, public auto-update, offline fallback, configurable TV slideshow, bundled CC0 lo-fi music, and fullscreen controls.
 - Location-aware SEO, canonical/hreflang links, image sitemap, structured data, social cards, and Google verification.
+
+## Versioned tenant distribution
+
+- Upstream releases are tagged with Semantic Versioning (`vX.Y.Z`).
+- Managed tenant repositories are registered after the dedicated updater GitHub App is installed.
+- Each update is merged into an automation branch, validated against tenant overlay guards, built/tested, then opened as a pull request.
+- Provider operators receive the normal GitHub PR/reviewer notification and apply a clean update by merging the PR.
+- Core-code drift or merge conflicts block automation rather than overwriting customer work.
+- Arbitrary unknown clones cannot be notified by GitHub; installing the updater App is the explicit enrollment mechanism for managed updates.
+
+See `docs/PLATFORM-DISTRIBUTION.md` for provisioning, transfer, release, and update details.
 
 ## Routes
 
