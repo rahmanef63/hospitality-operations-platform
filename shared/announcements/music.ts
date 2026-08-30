@@ -1,10 +1,11 @@
+import { tenantBrandIdentity } from "@/tenant";
 import type { LofiTrack, LofiTrackKey } from "./types";
 
 export const LOFI_TRACKS = [
   {
     key: "still-morning",
     title: "Still Morning",
-    artist: "Hospitality Platform Studio",
+    artist: `${tenantBrandIdentity.masterName} Studio`,
     src: "/audio/still-morning.mp3",
     durationSeconds: 53.37,
     license: "CC0 1.0 Universal",
@@ -14,7 +15,7 @@ export const LOFI_TRACKS = [
   {
     key: "mountain-air",
     title: "Mountain Air",
-    artist: "Hospitality Platform Studio",
+    artist: `${tenantBrandIdentity.masterName} Studio`,
     src: "/audio/mountain-air.mp3",
     durationSeconds: 50.57,
     license: "CC0 1.0 Universal",
@@ -24,7 +25,7 @@ export const LOFI_TRACKS = [
   {
     key: "night-courtyard",
     title: "Night Courtyard",
-    artist: "Hospitality Platform Studio",
+    artist: `${tenantBrandIdentity.masterName} Studio`,
     src: "/audio/night-courtyard.mp3",
     durationSeconds: 56.5,
     license: "CC0 1.0 Universal",

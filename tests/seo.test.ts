@@ -6,16 +6,20 @@ import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
 import { SITE_NAME, SITE_URL } from "@/shared/config/site";
 import { properties } from "@/shared/content/config/properties";
+import { areaGuides } from "@/shared/content/config/guides";
 import { socialImages } from "@/shared/media";
 import { buildGlobalSchema, buildHomeSchema, buildPropertySchema } from "@/shared/seo";
 import { TEST_PROPERTY_CONTENT, allTestMedia } from "./fixtures/content";
 import { TEST_PUBLIC_PROPERTY_FACTS } from "./fixtures/public-property";
 vi.mock("next/cache",()=>({cacheLife:vi.fn(),cacheTag:vi.fn()}));
-const publicRoot=path.resolve(process.cwd(),"public");const absolutePath=(src:string)=>path.join(publicRoot,src.replace(/^\//,""));const graph=(schema:unknown)=>(schema as {"@graph":Record<string,unknown>[]})["@graph"];const nodeByType=(schema:unknown,type:string)=>graph(schema).find(node=>node["@type"]===type);
-describe("generic search and sharing surfaces",()=>{
+const publicRoot=path.resolve(process.cwd(),"public");
+const absolutePath=(src:string)=>path.join(publicRoot,src.replace(/^\//,""));
+const graph=(schema:unknown)=>(schema as {"@graph":Record<string,unknown>[]})["@graph"];
+const nodeByType=(schema:unknown,type:string)=>graph(schema).find(node=>node["@type"]===type);
+describe("tenant-aware search and sharing surfaces",()=>{
  it("uses tenant-provided canonical origin",()=>{expect(SITE_URL).toMatch(/^https:\/\//);expect(SITE_NAME).toBeTruthy();});
- it("publishes canonical discovery routes without inventing properties",async()=>{const robotsFile=robots();expect(robotsFile.sitemap).toBe(`${SITE_URL}/sitemap.xml`);const entries=await sitemap();const urls=entries.map(e=>e.url);expect(urls).toContain(SITE_URL);expect(properties).toHaveLength(0);expect(urls.some(url=>url.includes("/stays/"))).toBe(false);});
+ it("publishes canonical discovery routes for configured public content",async()=>{const robotsFile=robots();expect(robotsFile.sitemap).toBe(`${SITE_URL}/sitemap.xml`);const urls=(await sitemap()).map(e=>e.url);expect(urls).toContain(SITE_URL);for(const property of properties)expect(urls).toContain(`${SITE_URL}/stays/${property.slug}`);for(const guide of areaGuides.filter(guide=>guide.indexable))expect(urls).toContain(`${SITE_URL}/guides/${guide.slug}`);});
  it("ships complete PWA and tenant social metadata",()=>{const webManifest=manifest();expect(webManifest.start_url).toBe("/");expect(webManifest.icons).toHaveLength(5);for(const src of Object.values(socialImages))expect(existsSync(absolutePath(src))).toBe(true);});
- it("ships generic media with real dimensions and files",()=>{for(const asset of allTestMedia()){expect(asset.width).toBeGreaterThan(0);expect(asset.height).toBeGreaterThan(0);expect(asset.alt.length).toBeGreaterThan(5);expect(existsSync(absolutePath(asset.src))).toBe(true);for(const variant of asset.variants??[])expect(existsSync(absolutePath(variant.src))).toBe(true);}});
+ it("ships configured media with real dimensions and files",()=>{for(const asset of allTestMedia()){expect(asset.width).toBeGreaterThan(0);expect(asset.height).toBeGreaterThan(0);expect(asset.alt.length).toBeGreaterThan(5);expect(existsSync(absolutePath(asset.src))).toBe(true);for(const variant of asset.variants??[])expect(existsSync(absolutePath(variant.src))).toBe(true);}});
  it("builds global and property schema from supplied tenant data",()=>{const global=buildGlobalSchema();const home=buildHomeSchema([]);const stay=buildPropertySchema(TEST_PROPERTY_CONTENT,TEST_PUBLIC_PROPERTY_FACTS);const organization=nodeByType(global,"Organization")!;const lodging=nodeByType(stay,"LodgingBusiness")!;expect(organization.name).toBe(SITE_NAME);expect(nodeByType(home,"CollectionPage")).toBeTruthy();expect(lodging.name).toBe("Test Property");expect(lodging.parentOrganization).toEqual({"@id":`${SITE_URL}/#organization`});expect(lodging.numberOfRooms).toBe(3);expect((lodging.amenityFeature as Array<Record<string,unknown>>).map(x=>x.name)).toEqual(["Pool","Gym","Spa","Garden view"]);expect(lodging).not.toHaveProperty("telephone");});
 });

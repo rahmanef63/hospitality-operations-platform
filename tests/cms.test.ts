@@ -13,10 +13,10 @@ describe("published public CMS", () => {
     expect(document.site.publicUi.home.sections.order).toEqual([
       "hero", "introduction", "collection", "rituals", "philosophy", "contact",
     ]);
-    expect(document.site.properties).toEqual([]);
-    expect(document.site.publicUi.properties).toEqual({});
-    expect(document.site.publicUi.brandAssets.assets).toHaveLength(4);
-    expect(document.site.publicUi.shell.concierge.enabled).toBe(false);
+    const propertySlugs = new Set(document.site.properties.map((property) => property.slug));
+    for (const slug of Object.keys(document.site.publicUi.properties)) expect(propertySlugs.has(slug)).toBe(true);
+    expect(document.site.publicUi.brandAssets.assets.length).toBeGreaterThan(0);
+    expect(typeof document.site.publicUi.shell.concierge.enabled).toBe("boolean");
   });
 
   it("rejects unsafe navigation hrefs and invalid public media", () => {

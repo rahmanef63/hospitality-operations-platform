@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { convexTest } from "convex-test";
 import { api, internal } from "@/convex/_generated/api";
 import schema from "@/convex/schema";
-import { WELCOME_LOCALES } from "@/shared/welcome";
+import { WELCOME_LOCALES, WELCOME_PROPERTY_SLUG } from "@/shared/welcome";
 
 const modules = import.meta.glob("../convex/**/*.{ts,js}");
 const actorEmailHash = "welcome-test-actor-hash-000000000000000000000000";
@@ -12,10 +12,10 @@ describe("multilingual Convex welcome and AI settings", () => {
     const t = convexTest(schema, modules);
     await expect(t.mutation(internal.welcome.ensureDefaults, { actorEmailHash })).resolves.toEqual({ created: 20 });
     await expect(t.mutation(internal.welcome.ensureDefaults, { actorEmailHash })).resolves.toEqual({ created: 0 });
-    const overview = await t.query(internal.welcome.getAdminOverview, { propertySlug: "primary-property" });
+    const overview = await t.query(internal.welcome.getAdminOverview, { propertySlug: WELCOME_PROPERTY_SLUG });
     expect(overview.configs).toHaveLength(WELCOME_LOCALES.length);
     expect(overview.configs.map((config) => config.locale).sort()).toEqual([...WELCOME_LOCALES].sort());
-    const arabic = await t.query(api.welcome.getPublished, { propertySlug: "primary-property", locale: "ar" });
+    const arabic = await t.query(api.welcome.getPublished, { propertySlug: WELCOME_PROPERTY_SLUG, locale: "ar" });
     expect(arabic?.content.headline).toContain("{{guest}}");
   });
 
