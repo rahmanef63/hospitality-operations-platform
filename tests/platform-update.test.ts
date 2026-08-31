@@ -22,6 +22,15 @@ describe("tenant platform update center", () => {
     expect(source).not.toContain("NEXT_PUBLIC_HOSPITALITY_UPDATE_GITHUB_TOKEN");
   });
 
+  it("typechecks Convex with the tenant import boundary", () => {
+    const config = fs.readFileSync("convex/tsconfig.json", "utf8");
+    const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
+    expect(config).toContain('"baseUrl": ".."');
+    expect(config).toContain('"@/*": ["./*"]');
+    expect(packageJson.scripts["typecheck:convex"]).toContain("convex/tsconfig.json");
+    expect(packageJson.scripts.verify).toContain("npm run typecheck:convex");
+  });
+
   it("deploys Convex before exact non-force fast-forward and verifies frontend revision", () => {
     const workflow = fs.readFileSync(".github/workflows/apply-platform-update.yml", "utf8");
     const verify = workflow.indexOf("npm run verify");
