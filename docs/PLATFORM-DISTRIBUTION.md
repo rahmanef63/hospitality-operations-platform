@@ -28,7 +28,7 @@ Each tenant repository commits:
 
 Tenant-protected **tracked** prefixes are declared only in `.platform/distribution.json`; they include tenant metadata, `.vercel/`, `tenant/`, `public/tenant/`, `shared/tenant/`, `convex/tenant/`, tenant-owned launcher assets, and reviewed PWA screenshots. Runtime `.env*` files are excluded from Git by `.gitignore`; `.env.example` is intentionally upstream-owned because it is the non-secret environment contract and must evolve with platform releases.
 
-Provider secrets belong in Vercel/GitHub/Convex secret stores. Business data belongs in the provider Convex deployment. Public copy/composition should normally use CMS; property and operational facts should use PMS rather than source overrides.
+Private application runtime secrets belong in Convex; deployment/workflow secrets belong in tenant GitHub Actions. Vercel should normally hold only public runtime configuration. Business data belongs in the provider Convex deployment. Public copy/composition should normally use CMS; property and operational facts should use PMS rather than source overrides.
 
 If a tenant modifies product core outside protected overlays, automatic updates stop rather than overwriting the change.
 
@@ -63,40 +63,50 @@ Prepared PRs are not automatically merged by the upstream operator. Application 
 Preferred path:
 
 ```text
-/admin/settings
-  → tenant server reads prepared PR/check state
-  → Update now dispatches .github/workflows/apply-platform-update.yml
+private updater prepares tested PR
+  → tenant GitHub Actions worker reads PR/check state with its short-lived GITHUB_TOKEN
+  → worker mirrors only non-secret update status into tenant Convex
+  → /admin/settings reads that status through the authenticated Convex session
+  → Update now queues the exact PR/version in Convex
+  → worker leases the request and dispatches .github/workflows/apply-platform-update.yml
   → workflow revalidates exact PR head and CI
   → npm run verify on the exact tenant tree
   → npx convex deploy using tenant CONVEX_DEPLOY_KEY
-  → non-force fast-forward default branch to the verified PR head SHA, preserving tenant deployment author and upstream ancestry
+  → non-force fast-forward default branch to the verified PR head SHA
   → Vercel main-branch deployment (or tenant deploy hook)
   → poll canonical /api/health until buildVersion == merge SHA
 ```
 
-The runtime admin page uses a **tenant-scoped server-only** GitHub automation token. It can read the tenant PR/check state and dispatch the tenant-owned workflow; it is never serialized to browser code. The apply workflow itself uses GitHub's short-lived repository token for the exact non-force ref update and tenant repository secrets for deployment.
+This preferred path requires **no GitHub credential in Next/Vercel**. The scheduled tenant worker runs every five minutes (and can be dispatched manually for diagnostics), uses GitHub's short-lived repository token, and shares one random worker token only with the tenant Convex deployment. A tenant-owned GitHub App or fine-grained token remains an optional direct-dispatch fallback for deployments that intentionally want immediate GitHub API calls from Next.
+
+Admin credential verification, signed-session verification, guest-link cryptography, BYOK AI encryption/decryption, and the update-worker queue secret are Convex-owned. The Next/Vercel runtime receives only public deployment configuration and opaque cookies/results.
 
 ## Tenant automation configuration
 
-### Server runtime
+### Convex deployment
 
-Configure on the tenant application server/Vercel project:
+Configure private runtime values in the tenant Convex environment, not Vercel:
 
-```env
-HOSPITALITY_UPDATE_GITHUB_TOKEN=
-HOSPITALITY_GITHUB_REPOSITORY=owner/repository
+```text
+HOSPITALITY_ADMIN_EMAIL
+HOSPITALITY_ADMIN_PASSWORD
+HOSPITALITY_ADMIN_SESSION_SECRET
+HOSPITALITY_GUEST_LINK_SECRET
+HOSPITALITY_AI_ENCRYPTION_KEY
+HOSPITALITY_UPDATE_WORKFLOW_TOKEN
 ```
 
-`HOSPITALITY_GITHUB_REPOSITORY` can be omitted on Vercel when `VERCEL_GIT_REPO_OWNER` and `VERCEL_GIT_REPO_SLUG` are present.
+### Optional direct Next dispatch
 
-The fine-grained token should be limited to the tenant repository and only the permissions required to read PR/check/action state and dispatch workflows. Never expose it through `NEXT_PUBLIC_*`.
+Queue mode needs no GitHub secret in Vercel. If direct mode is intentionally enabled, prefer a tenant-owned GitHub App via `HOSPITALITY_UPDATE_GITHUB_APP_ID` + `HOSPITALITY_UPDATE_GITHUB_APP_PRIVATE_KEY`; a tenant-scoped `HOSPITALITY_UPDATE_GITHUB_TOKEN` is the fallback. `HOSPITALITY_GITHUB_REPOSITORY` is optional on Vercel when Git system variables resolve the repository.
 
 ### Tenant GitHub repository
 
-Secret:
+Secrets:
 
 ```text
 CONVEX_DEPLOY_KEY
+HOSPITALITY_UPDATE_WORKFLOW_TOKEN
 ```
 
 Variables:
@@ -104,6 +114,7 @@ Variables:
 ```text
 HOSPITALITY_SITE_URL=https://provider.example
 HOSPITALITY_VERCEL_MODE=git
+HOSPITALITY_CONVEX_SITE_URL=https://tenant-deployment.convex.site
 ```
 
 Use `HOSPITALITY_VERCEL_MODE=git` when Vercel is linked to the repository and automatically deploys the tenant default branch. If the tenant intentionally uses a deploy hook, set mode `hook` and add secret `VERCEL_DEPLOY_HOOK_URL`.

@@ -1,52 +1,27 @@
 import { httpRouter } from "convex/server";
-import { httpAction, type ActionCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
-import { authorizeAdminRequest } from "./lib/admin";
+import { adminAction, adminSessionLogin, adminSessionVerify } from "./httpSecurity";
+import { adminWelcomeTokens, welcomeTokenResolve } from "./httpGuest";
+import { aiSettingsTest, aiSettingsUpsert, aiTranslate } from "./httpAi";
+import { platformAdminQueue, platformAdminStatus, platformWorkerAck, platformWorkerSync } from "./httpPlatform";
 import { handlePmsAdmin } from "./pms/dispatch";
 import { welcomeLocaleValue } from "./welcomeLocale";
 
 const http = httpRouter();
-const MAX_BODY_BYTES = 65_536;
 
-function json(payload: unknown, status = 200) {
-  return new Response(JSON.stringify(payload), {
-    status,
-    headers: {
-      "Cache-Control": "no-store",
-      "Content-Type": "application/json; charset=utf-8",
-      "X-Content-Type-Options": "nosniff",
-    },
-  });
-}
-
-async function readJson(request: Request): Promise<Record<string, unknown>> {
-  const contentLength = Number(request.headers.get("content-length") ?? "0");
-  if (Number.isFinite(contentLength) && contentLength > MAX_BODY_BYTES) {
-    throw new Error("Request body is too large.");
-  }
-  const body: unknown = await request.json();
-  if (!body || typeof body !== "object" || Array.isArray(body)) {
-    throw new Error("Request body must be an object.");
-  }
-  return body as Record<string, unknown>;
-}
-
+http.route({ path: "/admin/session/login", method: "POST", handler: adminSessionLogin });
+http.route({ path: "/admin/session/verify", method: "POST", handler: adminSessionVerify });
+http.route({ path: "/admin/welcome-tokens", method: "POST", handler: adminWelcomeTokens });
+http.route({ path: "/welcome/token/resolve", method: "POST", handler: welcomeTokenResolve });
+http.route({ path: "/admin/ai/settings", method: "POST", handler: aiSettingsUpsert });
+http.route({ path: "/admin/ai/test", method: "POST", handler: aiSettingsTest });
+http.route({ path: "/admin/ai/translate", method: "POST", handler: aiTranslate });
+http.route({ path: "/admin/platform/status", method: "POST", handler: platformAdminStatus });
+http.route({ path: "/admin/platform/queue", method: "POST", handler: platformAdminQueue });
+http.route({ path: "/platform/worker/sync", method: "POST", handler: platformWorkerSync });
+http.route({ path: "/platform/worker/ack", method: "POST", handler: platformWorkerAck });
 const localeValue = welcomeLocaleValue;
-
-function adminAction(handler: (ctx: ActionCtx, body: Record<string, unknown>) => Promise<unknown>) {
-  return httpAction(async (ctx, request) => {
-    if (!authorizeAdminRequest(request)) return json({ ok: false, error: "Unauthorized" }, 401);
-    if (request.method !== "POST") return json({ ok: false, error: "Method not allowed" }, 405);
-    try {
-      const body = await readJson(request);
-      return json({ ok: true, data: await handler(ctx, body) });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Invalid request";
-      return json({ ok: false, error: message }, 400);
-    }
-  });
-}
 
 http.route({
   path: "/admin/welcome-overview",
@@ -197,24 +172,9 @@ http.route({
   handler: adminAction((ctx) => ctx.runQuery(internal.aiSettings.getOverview, {})),
 });
 
-http.route({
-  path: "/admin/ai-secret",
-  method: "POST",
-  handler: adminAction((ctx) => ctx.runQuery(internal.aiSettings.getSecret, {})),
-});
 
-http.route({
-  path: "/admin/ai-upsert",
-  method: "POST",
-  handler: adminAction((ctx, body) => ctx.runMutation(internal.aiSettings.upsert, {
-    provider: String(body.provider ?? "") as "openai" | "openrouter" | "anthropic" | "gemini",
-    model: String(body.model ?? ""),
-    enabled: body.enabled === true,
-    encryptedApiKey: typeof body.encryptedApiKey === "string" ? body.encryptedApiKey : undefined,
-    keyFingerprint: typeof body.keyFingerprint === "string" ? body.keyFingerprint : undefined,
-    clearKey: body.clearKey === true,
-  })),
-});
+
+
 
 http.route({
   path: "/admin/ai-event",
@@ -224,15 +184,6 @@ http.route({
     provider: typeof body.provider === "string" ? body.provider as "openai" | "openrouter" | "anthropic" | "gemini" : undefined,
     targetCount: typeof body.targetCount === "number" ? body.targetCount : undefined,
     actorEmailHash: String(body.actorEmailHash ?? ""),
-  })),
-});
-
-http.route({
-  path: "/admin/login-attempt",
-  method: "POST",
-  handler: adminAction((ctx, body) => ctx.runMutation(internal.adminSecurity.recordAttempt, {
-    fingerprint: String(body.fingerprint ?? ""),
-    success: body.success === true,
   })),
 });
 

@@ -11,13 +11,13 @@ describe("BYOK AI security and translation boundaries", () => {
     expect(AI_PROVIDERS).toEqual(["openai", "openrouter", "anthropic", "gemini"]);
   });
 
-  it("encrypts API keys at rest and detects ciphertext tampering", () => {
+  it("encrypts API keys at rest and detects ciphertext tampering", async () => {
     const apiKey = "sk-test-private-provider-key";
-    const encrypted = encryptApiKey(apiKey, secret);
+    const encrypted = await encryptApiKey(apiKey, secret);
     expect(encrypted).not.toContain(apiKey);
-    expect(decryptApiKey(encrypted, secret)).toBe(apiKey);
-    expect(fingerprintApiKey(apiKey)).toMatch(/^[a-f0-9]{12}$/);
-    expect(() => decryptApiKey(`${encrypted}x`, secret)).toThrow();
+    expect(await decryptApiKey(encrypted, secret)).toBe(apiKey);
+    expect(await fingerprintApiKey(apiKey)).toMatch(/^[a-f0-9]{12}$/);
+    await expect(decryptApiKey(`${encrypted}x`, secret)).rejects.toThrow();
   });
 
   it("constructs a template-only prompt with no reservation or guest PII fields", () => {

@@ -37,7 +37,7 @@ export default async function Page({
       getPmsBookingData(propertyId ? { propertyId } : {}),
       getPmsCalendar({ propertyId, startDate: range.start, endDate: range.end }),
     ]);
-    try { welcomeLinks = Object.fromEntries(buildReservationWelcomeLinks(booking, catalog).map((link) => [link.reservationId, link.url])); } catch { /* Links remain unavailable until the runtime secret is configured. */ }
+    try { welcomeLinks = Object.fromEntries((await buildReservationWelcomeLinks(booking, catalog)).map((link) => [link.reservationId, link.url])); } catch { /* Links remain unavailable until the runtime secret is configured. */ }
   } catch { backendError = true; }
   const propertyId = catalog.properties.some((property) => property.id === params.property) ? params.property : undefined;
   return (

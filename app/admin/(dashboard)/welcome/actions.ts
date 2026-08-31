@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { hashAdminIdentity, requireAdminSession } from "@/shared/admin";
+import { requireAdminSession } from "@/shared/admin";
 import { upsertWelcome } from "@/shared/convex";
 import { isWelcomeLocale, validateWelcomeContent } from "@/shared/welcome";
 
@@ -30,7 +30,7 @@ export async function updateWelcomeAction(formData: FormData) {
       locale: localeValue,
       content: parsed.value,
       publish: intent === "publish",
-      actorEmailHash: hashAdminIdentity(session.email),
+      actorEmailHash: session.actorEmailHash,
     });
   } catch {
     redirect(`/admin/welcome?error=service&${suffix}`);

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { hashAdminIdentity, requireAdminSession } from "@/shared/admin";
+import { requireAdminSession } from "@/shared/admin";
 import {
   archiveAnnouncementRule,
   ensureAnnouncementDefaults,
@@ -47,7 +47,7 @@ export async function updateAnnouncementSettingsAction(formData: FormData) {
   if (input.prayerEnabled && !property?.location.geo) redirect(adminUrl(propertySlug, undefined, "announcement-geo"));
   try {
     const parsed = validateAnnouncementSettings(input, propertySlug);
-    await upsertAnnouncementSettings({ ...parsed, actorEmailHash: hashAdminIdentity(session.email) });
+    await upsertAnnouncementSettings({ ...parsed, actorEmailHash: session.actorEmailHash });
   } catch {
     redirect(adminUrl(propertySlug, undefined, "announcement-validation"));
   }
@@ -86,7 +86,7 @@ export async function updateGuestVisibilityAction(formData: FormData) {
     await upsertGuestVisibilitySettings({
       propertySlug,
       ...parsed,
-      actorEmailHash: hashAdminIdentity(session.email),
+      actorEmailHash: session.actorEmailHash,
     });
   } catch {
     redirect(adminUrl(propertySlug, undefined, "experience-validation"));
@@ -116,7 +116,7 @@ export async function upsertAnnouncementRuleAction(formData: FormData) {
   try {
     const parsed = validateAnnouncementRule(input, propertySlug);
     const ruleId = String(formData.get("ruleId") ?? "").trim() || undefined;
-    await upsertAnnouncementRule({ ...parsed, ruleId, actorEmailHash: hashAdminIdentity(session.email) });
+    await upsertAnnouncementRule({ ...parsed, ruleId, actorEmailHash: session.actorEmailHash });
   } catch {
     redirect(adminUrl(propertySlug, undefined, "announcement-validation"));
   }
@@ -130,7 +130,7 @@ export async function archiveAnnouncementRuleAction(formData: FormData) {
   const ruleId = String(formData.get("ruleId") ?? "").trim();
   if (!ruleId) redirect(adminUrl(propertySlug, undefined, "announcement-validation"));
   try {
-    await archiveAnnouncementRule({ propertySlug, ruleId, actorEmailHash: hashAdminIdentity(session.email) });
+    await archiveAnnouncementRule({ propertySlug, ruleId, actorEmailHash: session.actorEmailHash });
   } catch {
     redirect(adminUrl(propertySlug, undefined, "announcement-service"));
   }
@@ -142,7 +142,7 @@ export async function ensureAnnouncementDefaultsAction(formData: FormData) {
   const session = await requireAdminSession();
   const propertySlug = safePropertySlug(formData.get("propertySlug"));
   try {
-    await ensureAnnouncementDefaults(propertySlug, hashAdminIdentity(session.email));
+    await ensureAnnouncementDefaults(propertySlug, session.actorEmailHash);
   } catch {
     redirect(adminUrl(propertySlug, undefined, "announcement-service"));
   }

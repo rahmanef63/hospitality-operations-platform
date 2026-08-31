@@ -1,30 +1,48 @@
-import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
 
-function keyFromSecret(secret: string) {
+function base64UrlEncode(bytes: Uint8Array): string {
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function base64UrlDecode(value: string): Uint8Array {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+  return Uint8Array.from(atob(padded), (char) => char.charCodeAt(0));
+}
+
+async function encryptionKey(secret: string, usages: KeyUsage[]) {
   if (secret.length < 32) throw new Error("AI encryption secret must be at least 32 characters.");
-  return createHash("sha256").update(secret).digest();
+  const digest = await crypto.subtle.digest("SHA-256", encoder.encode(secret));
+  return crypto.subtle.importKey("raw", digest, { name: "AES-GCM" }, false, usages);
 }
 
-export function fingerprintApiKey(apiKey: string): string {
-  return createHash("sha256").update(apiKey).digest("hex").slice(0, 12);
+export async function fingerprintApiKey(apiKey: string): Promise<string> {
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", encoder.encode(apiKey)));
+  return Array.from(digest.slice(0, 6), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
-export function encryptApiKey(apiKey: string, secret: string): string {
-  const iv = randomBytes(12);
-  const cipher = createCipheriv("aes-256-gcm", keyFromSecret(secret), iv);
-  cipher.setAAD(Buffer.from("hospitality-ai-byok-v1"));
-  const ciphertext = Buffer.concat([cipher.update(apiKey, "utf8"), cipher.final()]);
-  return ["v1", iv.toString("base64url"), cipher.getAuthTag().toString("base64url"), ciphertext.toString("base64url")].join(".");
+export async function encryptApiKey(apiKey: string, secret: string): Promise<string> {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await encryptionKey(secret, ["encrypt"]);
+  const ciphertext = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv, additionalData: encoder.encode("hospitality-ai-byok-v2") }, key, encoder.encode(apiKey),
+  );
+  return ["v2", base64UrlEncode(iv), base64UrlEncode(new Uint8Array(ciphertext))].join(".");
 }
 
-export function decryptApiKey(payload: string, secret: string): string {
-  const [version, iv, tag, ciphertext, extra] = payload.split(".");
-  if (version !== "v1" || !iv || !tag || !ciphertext || extra) throw new Error("Stored API key is invalid.");
+export async function decryptApiKey(payload: string, secret: string): Promise<string> {
+  const [version, iv, ciphertext, extra] = payload.split(".");
+  if (version !== "v2" || !iv || !ciphertext || extra) throw new Error("Stored API key is invalid.");
   try {
-    const decipher = createDecipheriv("aes-256-gcm", keyFromSecret(secret), Buffer.from(iv, "base64url"));
-    decipher.setAAD(Buffer.from("hospitality-ai-byok-v1"));
-    decipher.setAuthTag(Buffer.from(tag, "base64url"));
-    return Buffer.concat([decipher.update(Buffer.from(ciphertext, "base64url")), decipher.final()]).toString("utf8");
+    const key = await encryptionKey(secret, ["decrypt"]);
+    const plain = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: base64UrlDecode(iv).buffer as ArrayBuffer, additionalData: encoder.encode("hospitality-ai-byok-v2") },
+      key, base64UrlDecode(ciphertext).buffer as ArrayBuffer,
+    );
+    return decoder.decode(plain);
   } catch {
     throw new Error("Stored API key cannot be decrypted.");
   }

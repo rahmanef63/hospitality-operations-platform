@@ -14,7 +14,7 @@ describe("Convex Cloud activation", () => {
       generatedDir: "convex/_generated",
     });
     expect(manifest.auth).toMatchObject({
-      provider: "env-cookie",
+      provider: "convex-cookie",
       session: "signed-http-only-cookie",
     });
   });
@@ -26,9 +26,11 @@ describe("Convex Cloud activation", () => {
     expect(existsSync(path.join(root, "convex/tsconfig.json"))).toBe(true);
     expect(read("convex/welcome.ts")).toContain("internalMutation");
     expect(read("convex/adminSecurity.ts")).toContain("internalMutation");
-    expect(read("convex/http.ts")).toContain("authorizeAdminRequest");
+    expect(read("convex/httpSecurity.ts")).toContain("authorizeAdminRequest");
     expect(read("convex/http.ts")).toContain('path: "/admin/pms"');
-    expect(read("convex/http.ts")).toContain('path: "/admin/ai-secret"');
+    expect(read("convex/http.ts")).toContain('path: "/admin/ai/settings"');
+    expect(read("convex/httpAi.ts")).toContain("HOSPITALITY_AI_ENCRYPTION_KEY");
+    expect(read("convex/http.ts")).not.toContain('path: "/admin/ai-secret"');
     expect(read("convex/http.ts")).toContain('path: "/admin/welcome-reservation-context"');
     expect(read("convex/http.ts")).toContain('path: "/admin/announcement-overview"');
     expect(read("convex/http.ts")).toContain('path: "/admin/announcement-rule-upsert"');
@@ -40,8 +42,14 @@ describe("Convex Cloud activation", () => {
     expect(read("convex/cms.ts")).toContain("internalMutation");
     expect(read("convex/aiSettings.ts")).toContain("internalQuery");
     expect(read("convex/pms/catalog.ts")).toContain("internalMutation");
+    expect(read("convex/platformUpdates.ts")).toContain("internalMutation");
+    expect(read(".github/workflows/platform-update-worker.yml")).toContain("HOSPITALITY_UPDATE_WORKFLOW_TOKEN");
     expect(read("convex/pms/public.ts")).toContain("export const getProperty = query");
-    expect(read("proxy.ts")).toContain("verifyAdminSessionToken");
+    expect(read("convex/lib/admin.ts")).toContain("verifyAdminSessionToken");
+    expect(read("convex/http.ts")).toContain('path: "/admin/session/login"');
+    expect(read("convex/http.ts")).toContain('path: "/admin/session/verify"');
+    expect(read("proxy.ts")).toContain("ADMIN_COOKIE_NAME");
+    expect(read("proxy.ts")).not.toContain("HOSPITALITY_ADMIN_SESSION_SECRET");
   });
 
   it("never exposes admin credentials as public Docker build arguments", () => {

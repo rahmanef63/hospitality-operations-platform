@@ -72,7 +72,7 @@ export default async function Page({ searchParams }: {
       };
     } catch { backendError = true; }
     try {
-      links = buildReservationWelcomeLinks(booking, catalog).filter((link) => link.propertySlug === selectedProperty.slug);
+      links = (await buildReservationWelcomeLinks(booking, catalog)).filter((link) => link.propertySlug === selectedProperty.slug);
     } catch { linkError = true; }
   }
   const prayerPreview = announcementCoordinates ? calculatePrayerMoments({

@@ -2,7 +2,7 @@
 
 import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
-import { hashAdminIdentity, requireAdminSession } from "@/shared/admin";
+import { requireAdminSession } from "@/shared/admin";
 import { defaultCmsDocument } from "@/shared/cms";
 import { ensureCmsDocument, publishCms } from "@/shared/convex/cms";
 
@@ -18,14 +18,14 @@ function invalidatePublishedCms() {
 }
 export async function initializeCmsAction() {
   const session = await requireAdminSession();
-  try { await ensureCmsDocument(defaultCmsDocument(), hashAdminIdentity(session.email)); }
+  try { await ensureCmsDocument(defaultCmsDocument(), session.actorEmailHash); }
   catch { redirect(cmsUrl("/admin/cms", undefined, "service")); }
   revalidatePath("/admin/cms", "layout");
   redirect(cmsUrl("/admin/cms", "initialized"));
 }
 export async function publishCmsAction() {
   const session = await requireAdminSession();
-  try { await publishCms(hashAdminIdentity(session.email)); }
+  try { await publishCms(session.actorEmailHash); }
   catch { redirect(cmsUrl("/admin/cms", undefined, "service")); }
   invalidatePublishedCms(); revalidatePath("/admin/cms", "layout");
   redirect(cmsUrl("/admin/cms", "published"));

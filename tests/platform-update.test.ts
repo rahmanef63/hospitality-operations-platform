@@ -75,6 +75,44 @@ describe("tenant platform update center", () => {
     expect(distribution.tenantProtectedPrefixes).not.toContain(".env");
   });
 
+
+  it("supports a tenant-owned queued update path without Vercel GitHub credentials", () => {
+    const source = fs.readFileSync("shared/platform/github.ts", "utf8");
+    const worker = fs.readFileSync(".github/workflows/platform-update-worker.yml", "utf8");
+    const script = fs.readFileSync("scripts/platform/update-worker.mjs", "utf8");
+    const convex = fs.readFileSync("convex/httpPlatform.ts", "utf8");
+    expect(source).toContain("getPlatformQueueSnapshot");
+    expect(source).toContain("queuePlatformUpdate");
+    expect(worker).toContain('cron: "*/5 * * * *"');
+    expect(worker).toContain("HOSPITALITY_UPDATE_WORKFLOW_TOKEN");
+    expect(worker).toContain("HOSPITALITY_CONVEX_SITE_URL");
+    expect(script).toContain("apply-platform-update.yml");
+    expect(script).toContain("/platform/worker/sync");
+    expect(script).toContain("/platform/worker/ack");
+    expect(convex).toContain("HOSPITALITY_UPDATE_WORKFLOW_TOKEN");
+    expect(worker).not.toContain("HOSPITALITY_UPDATE_GITHUB_TOKEN");
+  });
+
+  it("keeps admin, guest, AI, and worker secrets out of the Next runtime boundary", () => {
+    const roots = ["app", "shared", "proxy.ts"];
+    const forbidden = [
+      "HOSPITALITY_ADMIN_EMAIL", "HOSPITALITY_ADMIN_PASSWORD", "HOSPITALITY_ADMIN_SESSION_SECRET",
+      "HOSPITALITY_CONVEX_ADMIN_SECRET", "HOSPITALITY_GUEST_LINK_SECRET", "HOSPITALITY_AI_ENCRYPTION_KEY",
+      "HOSPITALITY_UPDATE_WORKFLOW_TOKEN",
+    ];
+    const files = roots.flatMap((entry) => {
+      const stat = fs.statSync(entry);
+      if (stat.isFile()) return [entry];
+      const walk = (dir: string): string[] => fs.readdirSync(dir, { withFileTypes: true }).flatMap((item) => {
+        const full = `${dir}/${item.name}`;
+        return item.isDirectory() ? walk(full) : /\.(ts|tsx|js|mjs)$/.test(item.name) ? [full] : [];
+      });
+      return walk(entry);
+    });
+    const nextSource = files.map((file) => fs.readFileSync(file, "utf8")).join("\n");
+    for (const key of forbidden) expect(nextSource).not.toContain(key);
+  });
+
   it("documents deterministic AI-agent and private-control-plane boundaries", () => {
     const onboarding = fs.readFileSync("docs/AI-AGENT-ONBOARDING.md", "utf8");
     const distribution = fs.readFileSync("docs/PLATFORM-DISTRIBUTION.md", "utf8");

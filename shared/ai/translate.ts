@@ -1,4 +1,3 @@
-import "server-only";
 import { WELCOME_GUEST_TOKEN, isWelcomeLocale, validateWelcomeContent, type WelcomeContent, type WelcomeLocale } from "@/shared/welcome";
 import { translationPrompt } from "./prompt";
 import { requestStructuredTranslation } from "./providers/request";

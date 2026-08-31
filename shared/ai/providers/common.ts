@@ -10,7 +10,7 @@ export async function postProviderJson(url: string, headers: Record<string, stri
     signal: AbortSignal.timeout(45_000),
   });
   const text = await response.text();
-  if (Buffer.byteLength(text, "utf8") > MAX_PROVIDER_RESPONSE_BYTES) throw new Error("AI provider response is too large.");
+  if (new TextEncoder().encode(text).byteLength > MAX_PROVIDER_RESPONSE_BYTES) throw new Error("AI provider response is too large.");
   if (!response.ok) throw new Error(`AI provider request failed with status ${response.status}.`);
   try { return JSON.parse(text) as unknown; } catch { throw new Error("AI provider returned invalid JSON."); }
 }

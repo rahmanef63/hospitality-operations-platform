@@ -1,8 +1,6 @@
 import "server-only";
-import { getReservationWelcomeContext } from "@/shared/convex";
+import { resolveReservationWelcomeToken } from "@/shared/convex";
 import { normalizeGuestName, parseWelcomeLocale } from "./config";
-import { getGuestWelcomeSecret } from "./server";
-import { verifyGuestWelcomeToken } from "./token";
 import type { ReservationWelcomeContext, WelcomeLocale } from "./types";
 
 export type ResolvedGuestWelcome = {
@@ -35,9 +33,7 @@ export async function resolveGuestWelcomeRequest(input: {
       propertySlug: safePropertySlug(input.property),
     };
   }
-  const claims = verifyGuestWelcomeToken(token, getGuestWelcomeSecret());
-  if (!claims) return { valid: false, locale: "id" };
-  const context = await getReservationWelcomeContext(claims.reservationId);
+  const context = await resolveReservationWelcomeToken(token);
   if (!context) return { valid: false, locale: "id" };
   return {
     valid: true,

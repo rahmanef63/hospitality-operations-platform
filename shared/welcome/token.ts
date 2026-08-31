@@ -1,55 +1,71 @@
-import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
-
 export type GuestWelcomeClaims = {
-  version: 1;
+  version: 2;
   reservationId: string;
   issuedAt: number;
   expiresAt: number;
 };
 
-function keyFromSecret(secret: string) {
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+
+function base64UrlEncode(bytes: Uint8Array): string {
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function base64UrlDecode(value: string): Uint8Array {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+  const binary = atob(padded);
+  return Uint8Array.from(binary, (char) => char.charCodeAt(0));
+}
+
+async function encryptionKey(secret: string, usages: KeyUsage[]) {
   if (secret.length < 32) throw new Error("Guest link secret must be at least 32 characters.");
-  return createHash("sha256").update(secret).digest();
+  const digest = await crypto.subtle.digest("SHA-256", encoder.encode(secret));
+  return crypto.subtle.importKey("raw", digest, { name: "AES-GCM" }, false, usages);
 }
 
-function encode(value: Buffer) {
-  return value.toString("base64url");
-}
-
-function decode(value: string) {
-  return Buffer.from(value, "base64url");
-}
-
-export function createGuestWelcomeToken(
+export async function createGuestWelcomeToken(
   reservationId: string,
   secret: string,
   expiresAt: number,
   now = Date.now(),
-): string {
+): Promise<string> {
   if (!reservationId || reservationId.length > 160) throw new Error("Reservation ID is invalid.");
   if (!Number.isSafeInteger(expiresAt) || expiresAt <= now) throw new Error("Guest link expiry is invalid.");
-  const claims: GuestWelcomeClaims = { version: 1, reservationId, issuedAt: now, expiresAt };
-  const iv = randomBytes(12);
-  const cipher = createCipheriv("aes-256-gcm", keyFromSecret(secret), iv);
-  cipher.setAAD(Buffer.from("hospitality-guest-welcome-v1"));
-  const ciphertext = Buffer.concat([cipher.update(JSON.stringify(claims), "utf8"), cipher.final()]);
-  return ["v1", encode(iv), encode(cipher.getAuthTag()), encode(ciphertext)].join(".");
+  const claims: GuestWelcomeClaims = { version: 2, reservationId, issuedAt: now, expiresAt };
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await encryptionKey(secret, ["encrypt"]);
+  const ciphertext = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv, additionalData: encoder.encode("hospitality-guest-welcome-v2") },
+    key,
+    encoder.encode(JSON.stringify(claims)),
+  );
+  return ["v2", base64UrlEncode(iv), base64UrlEncode(new Uint8Array(ciphertext))].join(".");
 }
 
-export function verifyGuestWelcomeToken(
+export async function verifyGuestWelcomeToken(
   token: string,
   secret: string,
   now = Date.now(),
-): GuestWelcomeClaims | null {
-  const [version, ivValue, tagValue, ciphertextValue, extra] = token.split(".");
-  if (version !== "v1" || !ivValue || !tagValue || !ciphertextValue || extra) return null;
+): Promise<GuestWelcomeClaims | null> {
+  const [version, ivValue, ciphertextValue, extra] = token.split(".");
+  if (version !== "v2" || !ivValue || !ciphertextValue || extra) return null;
   try {
-    const decipher = createDecipheriv("aes-256-gcm", keyFromSecret(secret), decode(ivValue));
-    decipher.setAAD(Buffer.from("hospitality-guest-welcome-v1"));
-    decipher.setAuthTag(decode(tagValue));
-    const payload = Buffer.concat([decipher.update(decode(ciphertextValue)), decipher.final()]).toString("utf8");
-    const claims = JSON.parse(payload) as GuestWelcomeClaims;
-    if (claims.version !== 1 || typeof claims.reservationId !== "string") return null;
+    const key = await encryptionKey(secret, ["decrypt"]);
+    const payload = await crypto.subtle.decrypt(
+      {
+        name: "AES-GCM",
+        iv: base64UrlDecode(ivValue).buffer as ArrayBuffer,
+        additionalData: encoder.encode("hospitality-guest-welcome-v2"),
+      },
+      key,
+      base64UrlDecode(ciphertextValue).buffer as ArrayBuffer,
+    );
+    const claims = JSON.parse(decoder.decode(payload)) as GuestWelcomeClaims;
+    if (claims.version !== 2 || typeof claims.reservationId !== "string") return null;
     if (!Number.isSafeInteger(claims.issuedAt) || !Number.isSafeInteger(claims.expiresAt)) return null;
     if (claims.issuedAt > now + 60_000 || claims.expiresAt <= now) return null;
     return claims;

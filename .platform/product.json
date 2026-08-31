@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "hospitality-operations-platform",
   "name": "Hospitality Operations Platform",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "upstream": {
     "owner": "rahmanef63",
     "repo": "hospitality-operations-platform",

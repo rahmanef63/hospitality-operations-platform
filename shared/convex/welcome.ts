@@ -10,7 +10,7 @@ import {
   type ReservationWelcomeContext,
   type WelcomeLocale,
 } from "@/shared/welcome";
-import { adminFetch, getConvexClient } from "./core";
+import { adminFetch, getConvexClient, getConvexSiteUrl } from "./core";
 
 function defaultConfig(locale: WelcomeLocale): WelcomeConfigState {
   return { locale, draft: DEFAULT_WELCOME_CONTENT[locale], version: 0 };
@@ -55,17 +55,23 @@ export async function upsertWelcome(input: {
   });
 }
 
-export async function recordAdminLoginAttempt(input: { fingerprint: string; success: boolean }) {
-  return adminFetch<{ allowed: boolean; locked: boolean; retryAfterSeconds: number }>(
-    "/admin/login-attempt",
-    input,
-  );
-}
-
 export async function ensureWelcomeDefaults(actorEmailHash: string) {
   return adminFetch<{ created: number }>("/admin/ensure-welcome-defaults", { actorEmailHash });
 }
 
-export async function getReservationWelcomeContext(reservationId: string): Promise<ReservationWelcomeContext | null> {
-  return adminFetch<ReservationWelcomeContext | null>("/admin/welcome-reservation-context", { reservationId });
+export async function createReservationWelcomeTokens(items: Array<{ reservationId: string; expiresAt: number }>) {
+  return adminFetch<Array<{ reservationId: string; token: string }>>("/admin/welcome-tokens", { items });
+}
+
+export async function resolveReservationWelcomeToken(token: string): Promise<ReservationWelcomeContext | null> {
+  const response = await fetch(`${getConvexSiteUrl()}/welcome/token/resolve`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token }),
+    cache: "no-store",
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!response.ok) return null;
+  const payload = await response.json() as { ok?: boolean; data?: ReservationWelcomeContext };
+  return payload.ok && payload.data ? payload.data : null;
 }

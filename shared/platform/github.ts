@@ -10,6 +10,7 @@ import {
 } from "./config";
 import type { PlatformApplyRun, PlatformCheckState, PlatformUpdatePullRequest, PlatformUpdateStatus } from "./types";
 import { githubCredentialConfigured, githubRuntimeToken } from "./github-auth";
+import { getPlatformQueueSnapshot, queuePlatformUpdate } from "@/shared/convex/platform";
 
 type GithubRepository = { default_branch: string };
 type GithubPull = {
@@ -76,14 +77,45 @@ function baseStatus(overrides: Partial<PlatformUpdateStatus> = {}): PlatformUpda
   };
 }
 
+async function getQueuedPlatformUpdateStatus(): Promise<PlatformUpdateStatus> {
+  try {
+    const snapshot = await getPlatformQueueSnapshot();
+    if (!snapshot) return baseStatus({ state: "unconfigured", message: "Tenant update worker has not synced yet." });
+    const stale = Date.now() - snapshot.workerSyncedAt > 15 * 60 * 1000;
+    if (stale) return baseStatus({
+      repository: snapshot.repository, defaultBranch: snapshot.defaultBranch, configured: false, state: "unconfigured",
+      checkState: snapshot.checkState, message: "Tenant update worker status is stale. Check the scheduled Actions worker.",
+    });
+    const requested = Boolean(snapshot.requestState && snapshot.latestVersion && snapshot.prNumber);
+    const pullRequest = snapshot.prNumber && snapshot.prUrl && snapshot.prTitle && snapshot.headRef && snapshot.headSha ? {
+      number: snapshot.prNumber, url: snapshot.prUrl, title: snapshot.prTitle, headRef: snapshot.headRef,
+      headSha: snapshot.headSha, mergeable: snapshot.mergeable ?? null,
+    } : undefined;
+    const applyRun = snapshot.applyRunStatus ? {
+      status: snapshot.applyRunStatus, conclusion: snapshot.applyRunConclusion, url: snapshot.applyRunUrl,
+    } : undefined;
+    const state = requested && snapshot.state === "ready" ? "applying" : snapshot.state;
+    const message = requested ? "The tenant-owned update worker has queued this tested update."
+      : state === "ready" ? "A tested platform update is ready to apply."
+        : state === "current" ? "This tenant is on the current prepared platform baseline."
+          : state === "applying" ? "The coordinated update workflow is running."
+            : state === "failed" ? "The latest coordinated update run failed and needs review."
+              : state === "blocked" ? "The prepared update is blocked by safety checks."
+                : "The tenant update worker is validating the prepared update.";
+    return baseStatus({
+      repository: snapshot.repository, defaultBranch: snapshot.defaultBranch, configured: true, state,
+      latestVersion: snapshot.latestVersion, pullRequest, applyRun, checkState: snapshot.checkState,
+      majorUpgrade: snapshot.majorUpgrade, canApply: snapshot.state === "ready" && !requested, message,
+    });
+  } catch {
+    return baseStatus({ state: "unconfigured", message: "Tenant update worker status could not be read from Convex." });
+  }
+}
+
 export async function getPlatformUpdateStatus(): Promise<PlatformUpdateStatus> {
   if (PLATFORM_REPOSITORY_MODE === "upstream") return baseStatus();
   const repository = repositoryName();
-  const configured = Boolean(repository && githubCredentialConfigured());
-  if (!configured || !repository) return baseStatus({
-    state: "unconfigured", repository, configured: false,
-    message: "Connect the tenant repository automation credential before using one-click updates.",
-  });
+  if (!repository || !githubCredentialConfigured()) return getQueuedPlatformUpdateStatus();
   try {
     const repositoryMeta = await github<GithubRepository>(repository, "");
     const defaultBranch = repositoryMeta.default_branch || "main";
@@ -116,13 +148,16 @@ export async function getPlatformUpdateStatus(): Promise<PlatformUpdateStatus> {
                 : "The prepared update is still being validated.",
     });
   } catch {
-    return baseStatus({ repository, configured: true, state: "unconfigured", message: "Platform update status could not be read from the tenant repository." });
+    return getQueuedPlatformUpdateStatus();
   }
 }
 
 export async function dispatchPlatformUpdate(prNumber: number, expectedVersion: string, ref: string) {
   const repository = repositoryName();
-  if (!repository || !githubCredentialConfigured()) throw new Error("Platform update automation is not configured");
+  if (!repository || !githubCredentialConfigured()) {
+    await queuePlatformUpdate(prNumber, expectedVersion);
+    return;
+  }
   await github<void>(repository, `/actions/workflows/${PLATFORM_APPLY_WORKFLOW}/dispatches`, {
     method: "POST",
     body: JSON.stringify({ ref, inputs: { pr_number: String(prNumber), expected_version: expectedVersion } }),

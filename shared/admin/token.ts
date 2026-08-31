@@ -1,48 +1,74 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
-
 export type AdminSessionClaims = {
-  version: 1;
+  version: 2;
   email: string;
+  actorEmailHash: string;
   issuedAt: number;
   expiresAt: number;
 };
 
 const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
 
-function sign(payload: string, secret: string): string {
-  return createHmac("sha256", secret).update(payload).digest("base64url");
+function base64UrlEncode(bytes: Uint8Array): string {
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
 
-export function createAdminSessionToken(
+function base64UrlDecode(value: string): Uint8Array {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+  const binary = atob(padded);
+  return Uint8Array.from(binary, (char) => char.charCodeAt(0));
+}
+
+async function hmacKey(secret: string, usages: KeyUsage[]) {
+  if (secret.length < 32) throw new Error("Admin session secret must be at least 32 characters.");
+  return crypto.subtle.importKey(
+    "raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, usages,
+  );
+}
+
+export async function hmacSha256(value: string, secret: string): Promise<string> {
+  const key = await hmacKey(secret, ["sign"]);
+  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(value));
+  return base64UrlEncode(new Uint8Array(signature));
+}
+
+export async function createAdminSessionToken(
   email: string,
+  actorEmailHash: string,
   secret: string,
   now = Date.now(),
-): string {
+): Promise<string> {
   const claims: AdminSessionClaims = {
-    version: 1,
+    version: 2,
     email: email.trim().toLowerCase(),
+    actorEmailHash,
     issuedAt: now,
     expiresAt: now + SESSION_TTL_MS,
   };
-  const payload = Buffer.from(JSON.stringify(claims)).toString("base64url");
-  return `${payload}.${sign(payload, secret)}`;
+  const payload = base64UrlEncode(encoder.encode(JSON.stringify(claims)));
+  return `${payload}.${await hmacSha256(payload, secret)}`;
 }
 
-export function verifyAdminSessionToken(
+export async function verifyAdminSessionToken(
   token: string,
   secret: string,
   now = Date.now(),
-): AdminSessionClaims | null {
+): Promise<AdminSessionClaims | null> {
   const [payload, signature, extra] = token.split(".");
   if (!payload || !signature || extra) return null;
-  const expected = Buffer.from(sign(payload, secret));
-  const received = Buffer.from(signature);
-  if (expected.length !== received.length || !timingSafeEqual(expected, received)) return null;
   try {
-    const claims = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as AdminSessionClaims;
-    if (claims.version !== 1 || !claims.email || claims.expiresAt <= now || claims.issuedAt > now + 60_000) {
-      return null;
-    }
+    const key = await hmacKey(secret, ["verify"]);
+    const valid = await crypto.subtle.verify(
+      "HMAC", key, base64UrlDecode(signature).buffer as ArrayBuffer, encoder.encode(payload),
+    );
+    if (!valid) return null;
+    const claims = JSON.parse(decoder.decode(base64UrlDecode(payload))) as AdminSessionClaims;
+    if (claims.version !== 2 || !claims.email || !claims.actorEmailHash) return null;
+    if (claims.expiresAt <= now || claims.issuedAt > now + 60_000) return null;
     return claims;
   } catch {
     return null;

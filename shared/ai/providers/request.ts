@@ -1,4 +1,3 @@
-import { SITE_URL } from "@/shared/config/site";
 import type { AiProvider } from "../types";
 import { anthropicText, chatCompletionText, geminiText, openAiText, parseJsonText, postProviderJson } from "./common";
 
@@ -9,6 +8,7 @@ export async function requestStructuredTranslation(input: {
   system: string;
   user: string;
   schema: unknown;
+  siteUrl?: string;
 }): Promise<unknown> {
   if (input.provider === "openai") {
     const response = await postProviderJson("https://api.openai.com/v1/responses", {
@@ -24,7 +24,7 @@ export async function requestStructuredTranslation(input: {
   if (input.provider === "openrouter") {
     const response = await postProviderJson("https://openrouter.ai/api/v1/chat/completions", {
       Authorization: `Bearer ${input.apiKey}`,
-      "HTTP-Referer": SITE_URL,
+      ...(input.siteUrl ? { "HTTP-Referer": input.siteUrl } : {}),
       "X-Title": "Hospitality Operations Admin",
     }, {
       model: input.model,

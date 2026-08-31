@@ -2,7 +2,7 @@
 
 import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
-import { hashAdminIdentity, requireAdminSession } from "@/shared/admin";
+import { requireAdminSession } from "@/shared/admin";
 import { pmsAdminRequest } from "@/shared/convex";
 import { formBoolean, formText, optionalFormNumber, optionalFormText } from "@/shared/pms";
 
@@ -97,7 +97,7 @@ export async function pmsAction(formData: FormData) {
   try {
     await pmsAdminRequest(operationValue, {
       ...payloadFromForm(formData, operationValue),
-      actorEmailHash: hashAdminIdentity(session.email),
+      actorEmailHash: session.actorEmailHash,
     });
   } catch {
     redirect(resultUrl(returnTo, "error", "operation"));

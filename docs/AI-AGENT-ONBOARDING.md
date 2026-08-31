@@ -42,7 +42,8 @@ The checkout is an independently owned provider deployment.
 | Public authored content | Tenant CMS draft/published snapshot |
 | Property/unit/amenity truth | Tenant PMS/Convex |
 | Reservations/guests/finance/tasks | Tenant Convex only |
-| Deployment secrets | Tenant Vercel/GitHub/Convex secret stores; runtime `.env*` stays untracked |
+| Private app runtime secrets | Tenant Convex environment; Vercel normally holds public configuration only |
+| Deployment/workflow secrets | Tenant GitHub Actions secrets; runtime `.env*` stays untracked |
 | Installed platform version | Tenant package version plus `.platform/tenant.lock.json` |
 | Environment variable names/examples | Upstream `.env.example` (values remain tenant secrets) |
 | Managed tenant routing | Private updater control plane, never upstream |
@@ -53,7 +54,9 @@ The checkout is an independently owned provider deployment.
 Need to change something?
 ├─ provider copy/media/navigation → CMS first; protected tenant overlay only for reviewed fallback
 ├─ property facts/operations      → PMS/Convex
-├─ provider secret/domain         → deployment environment
+├─ private app secret             → Convex environment
+├─ deployment/workflow secret     → tenant GitHub Actions
+├─ public domain/config           → deployment environment
 ├─ generic reusable behavior      → upstream product PR
 └─ emergency tenant-only core fix → document the intentional drift; expect automated updates to block
 ```
@@ -82,8 +85,10 @@ A managed tenant update is intentionally two-stage:
 ```text
 upstream release
   → private updater prepares tested tenant PR
+  → tenant Actions worker mirrors tested PR/check state into Convex
   → tenant admin sees prepared version in /admin/settings
-  → Update now dispatches tenant-owned apply workflow
+  → Update now queues exact PR/version in Convex
+  → tenant worker dispatches tenant-owned apply workflow with short-lived GITHUB_TOKEN
   → verify exact PR head
   → deploy Convex
   → non-force fast-forward default branch to that exact verified PR head
@@ -91,7 +96,7 @@ upstream release
   → /api/health confirms exact build revision
 ```
 
-The browser never receives GitHub, Convex, or Vercel credentials. Admin actions run server-side and the apply workflow consumes tenant-owned repository secrets.
+The browser never receives GitHub, Convex, or Vercel credentials. Next/Vercel does not need a private GitHub credential in preferred queue mode; authenticated admin actions use an opaque Convex-signed cookie and the tenant worker consumes tenant-owned repository secrets.
 
 If a newer update supersedes an older open platform PR, the updater should close the older PR. If core drift, protected-path changes, or merge conflicts are detected, automation must stop and create a review signal rather than overwriting tenant work.
 
@@ -103,26 +108,30 @@ A tenant that predates the Update Center cannot use `/admin/settings` to install
 
 Tenant repositories own their deployment credentials and data.
 
-Required GitHub repository secret for coordinated updates:
+Required GitHub repository secrets for coordinated updates:
 
 - `CONVEX_DEPLOY_KEY` — production deploy key for that tenant only.
+- `HOSPITALITY_UPDATE_WORKFLOW_TOKEN` — random worker token shared only with the same tenant Convex deployment.
 
 Required repository variables:
 
 - `HOSPITALITY_SITE_URL` — canonical production origin used for exact health verification.
 - `HOSPITALITY_VERCEL_MODE` — `git` when Vercel auto-deploys tenant `main`, or `hook` when a deployment hook is used.
+- `HOSPITALITY_CONVEX_SITE_URL` — tenant `*.convex.site` origin used by the Actions worker.
 - `deploymentActor` — private updater control-plane GitHub login for a real tenant deployment user; the updater exports it as `TENANT_DEPLOYMENT_ACTOR` while preparing the PR.
 
-Conditional secret:
+Required Convex runtime secrets:
+
+- admin email/password/session signing secret;
+- guest-link signing/encryption secret;
+- BYOK AI encryption secret;
+- the matching `HOSPITALITY_UPDATE_WORKFLOW_TOKEN`.
+
+Conditional GitHub secret:
 
 - `VERCEL_DEPLOY_HOOK_URL` — required only for `HOSPITALITY_VERCEL_MODE=hook`.
 
-Server runtime values for `/admin/settings`:
-
-- `HOSPITALITY_UPDATE_GITHUB_TOKEN` — tenant-scoped server-only token used only to read prepared update PR/check state and dispatch the tenant apply workflow.
-- `HOSPITALITY_GITHUB_REPOSITORY` — optional `owner/repo`; Vercel Git system variables are preferred when available.
-
-Never prefix these credentials with `NEXT_PUBLIC_`.
+Optional direct Next dispatch can use a tenant-owned GitHub App or fine-grained token, but preferred queue mode requires neither in Vercel. Never prefix credentials with `NEXT_PUBLIC_`.
 
 ## 7. Failure and recovery rules
 

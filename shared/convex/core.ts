@@ -1,6 +1,6 @@
 import "server-only";
 import { ConvexHttpClient } from "convex/browser";
-import { getAdminRuntimeConfig } from "@/shared/admin";
+import { getAdminSessionToken } from "@/shared/admin/cookie";
 
 let cachedClient: ConvexHttpClient | undefined;
 let cachedUrl: string | undefined;
@@ -24,7 +24,7 @@ export function getConvexClient(): ConvexHttpClient {
   return cachedClient;
 }
 
-function getConvexSiteUrl(): string {
+export function getConvexSiteUrl(): string {
   const url = new URL(requireConvexUrl());
   if (!url.hostname.endsWith(".convex.cloud")) throw new Error("Convex Cloud URL is invalid.");
   url.hostname = url.hostname.replace(/\.convex\.cloud$/, ".convex.site");
@@ -32,13 +32,11 @@ function getConvexSiteUrl(): string {
 }
 
 export async function adminFetch<T>(path: string, body: unknown): Promise<T> {
-  const { convexAdminSecret } = getAdminRuntimeConfig();
+  const token = await getAdminSessionToken();
+  if (!token) throw new Error("Admin session is unavailable.");
   const response = await fetch(`${getConvexSiteUrl()}${path}`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${convexAdminSecret}`,
-      "Content-Type": "application/json",
-    },
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
     body: JSON.stringify(body),
     cache: "no-store",
     signal: AbortSignal.timeout(10_000),

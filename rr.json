@@ -105,7 +105,7 @@
     }
   ],
   "auth": {
-    "provider": "env-cookie",
+    "provider": "convex-cookie",
     "session": "signed-http-only-cookie",
     "loginRateLimit": "convex-cloud"
   },
@@ -119,6 +119,7 @@
       "pms",
       "welcomeReservations",
       "aiSettings",
+      "platformUpdates",
       "announcements",
       "cms"
     ]

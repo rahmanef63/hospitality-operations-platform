@@ -2,12 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { hashAdminIdentity, requireAdminSession } from "@/shared/admin";
-import { fingerprintApiKey, encryptApiKey } from "@/shared/ai/crypto";
+import { requireAdminSession } from "@/shared/admin";
 import { isAiProvider, validateAiModel, validateApiKey } from "@/shared/ai";
-import { getAiEncryptionSecret, loadAiRuntimeSettings } from "@/shared/ai/runtime";
-import { translateWelcomeContent } from "@/shared/ai/translate";
-import { getPmsCatalog, getWelcomeAdminOverview, recordAiEvent, upsertAiSettings, upsertWelcome } from "@/shared/convex";
+import { getPmsCatalog, getWelcomeAdminOverview, recordAiEvent, testAiSettings, translateWithAi, upsertAiSettings, upsertWelcome } from "@/shared/convex";
 import { DEFAULT_WELCOME_CONTENT, defaultWelcomeContent, isWelcomeLocale, type WelcomeLocale } from "@/shared/welcome";
 
 function checked(form: FormData, name: string) {
@@ -26,25 +23,19 @@ export async function saveAiSettingsAction(formData: FormData) {
   try { model = validateAiModel(formData.get("model")); } catch { fail("model"); }
   const apiKeyValue = String(formData.get("apiKey") ?? "").trim();
   const clearKey = checked(formData, "clearKey");
-  let encryptedApiKey: string | undefined;
-  let keyFingerprint: string | undefined;
+  let apiKey: string | undefined;
   if (apiKeyValue) {
-    try {
-      const apiKey = validateApiKey(apiKeyValue);
-      encryptedApiKey = encryptApiKey(apiKey, getAiEncryptionSecret());
-      keyFingerprint = fingerprintApiKey(apiKey);
-    } catch { fail("key"); }
+    try { apiKey = validateApiKey(apiKeyValue); } catch { fail("key"); }
   }
   try {
     await upsertAiSettings({
       provider: providerValue,
       model,
       enabled: checked(formData, "enabled"),
-      encryptedApiKey,
-      keyFingerprint,
+      apiKey,
       clearKey,
     });
-    await recordAiEvent({ action: "save", provider: providerValue, actorEmailHash: hashAdminIdentity(session.email) });
+    await recordAiEvent({ action: "save", provider: providerValue, actorEmailHash: session.actorEmailHash });
   } catch { fail("service"); }
   revalidatePath("/admin/ai");
   redirect("/admin/ai?status=saved");
@@ -53,14 +44,8 @@ export async function saveAiSettingsAction(formData: FormData) {
 export async function testAiSettingsAction() {
   const session = await requireAdminSession();
   try {
-    const settings = await loadAiRuntimeSettings();
-    await translateWelcomeContent({
-      ...settings,
-      sourceLocale: "en",
-      source: DEFAULT_WELCOME_CONTENT.en,
-      targetLocales: ["id"],
-    });
-    await recordAiEvent({ action: "test", provider: settings.provider, targetCount: 1, actorEmailHash: hashAdminIdentity(session.email) });
+    const result = await testAiSettings();
+    await recordAiEvent({ action: "test", provider: result.provider, targetCount: 1, actorEmailHash: session.actorEmailHash });
   } catch { fail("test"); }
   redirect("/admin/ai?status=tested");
 }
@@ -74,7 +59,7 @@ export async function translateWelcomeAction(formData: FormData) {
     .filter((locale): locale is WelcomeLocale => locale !== sourceValue);
   if (!targets.length || targets.length > 19) fail("targets");
   try {
-    const [settings, catalog] = await Promise.all([loadAiRuntimeSettings(), getPmsCatalog()]);
+    const catalog = await getPmsCatalog();
     const property = catalog.properties.find((item) => item.slug === propertySlugValue);
     if (!property) fail("property");
     const overview = await getWelcomeAdminOverview(property.slug);
@@ -84,13 +69,9 @@ export async function translateWelcomeAction(formData: FormData) {
       : property.slug === "primary-property"
         ? DEFAULT_WELCOME_CONTENT[sourceValue]
         : defaultWelcomeContent(sourceValue, property.name);
-    const translations = await translateWelcomeContent({
-      ...settings,
-      sourceLocale: sourceValue,
-      source,
-      targetLocales: targets,
-    });
-    const actorEmailHash = hashAdminIdentity(session.email);
+    const aiResult = await translateWithAi({ sourceLocale: sourceValue, source, targetLocales: targets });
+    const translations = aiResult.translations;
+    const actorEmailHash = session.actorEmailHash;
     await Promise.all(translations.map((translation) => upsertWelcome({
       propertySlug: property.slug,
       locale: translation.locale,
@@ -99,7 +80,7 @@ export async function translateWelcomeAction(formData: FormData) {
       auditAction: "translate",
       actorEmailHash,
     })));
-    await recordAiEvent({ action: "translate", provider: settings.provider, targetCount: translations.length, actorEmailHash });
+    await recordAiEvent({ action: "translate", provider: aiResult.provider, targetCount: translations.length, actorEmailHash });
   } catch { fail("translate"); }
   revalidatePath("/admin/welcome");
   redirect(`/admin/welcome?status=translated&locale=${encodeURIComponent(targets[0]!)}&property=${encodeURIComponent(propertySlugValue)}`);

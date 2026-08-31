@@ -9,7 +9,7 @@ A platform release must be safe for an AI-agent-operated tenant repository:
 1. The canonical upstream remains provider-neutral and publishes a tested SemVer tag.
 2. The private updater control plane prepares a tenant update PR without modifying protected overlays.
 3. The tenant admin can see the installed version and a prepared update from `/admin/settings`.
-4. **Update now** dispatches a tenant-owned workflow; no updater credential is sent to the browser.
+4. **Update now** queues an exact tested update in tenant Convex; the tenant Actions worker dispatches the apply workflow with GitHub's short-lived repository token, so no updater credential is required in the browser or Vercel runtime.
 5. The workflow revalidates the exact PR head, runs the full suite, deploys Convex first, non-force fast-forwards the exact verified head with a real Git push, then waits for the exact Vercel revision.
 6. Public PWA clients activate the new frontend through the existing bounded cache/state cleanup lifecycle.
 7. Major-version changes remain manual unless the release carries an explicit migration contract.
@@ -20,7 +20,7 @@ A platform release must be safe for an AI-agent-operated tenant repository:
 |---|---|---|
 | Documentation consistency | Implemented | README, AGENTS, architecture, distribution docs and AI-agent onboarding agree on private control-plane routing and tenant-owned apply flow. |
 | AI-agent onboarding | Implemented | Agents deterministically distinguish upstream vs tenant mode, protected overlays, release/update ownership, deployment order and recovery. |
-| Admin platform settings | Implemented; tenant credential pending | Managed tenant includes `/admin/settings`, can discover prepared updates, and now supports a tenant-owned GitHub App (`HOSPITALITY_UPDATE_GITHUB_APP_ID` + `HOSPITALITY_UPDATE_GITHUB_APP_PRIVATE_KEY`) using short-lived installation tokens, with `HOSPITALITY_UPDATE_GITHUB_TOKEN` retained only as a fine-grained-token fallback. Actual admin-originated dispatch remains gated until one tenant credential path is configured in Vercel server env. |
+| Admin platform settings | Implemented in `v0.1.12` candidate; live queue proof pending | Preferred mode mirrors private-repo PR/check state through a tenant-owned scheduled Actions worker into Convex. **Update now** queues the exact PR/version in Convex and requires no private GitHub credential in Vercel. Tenant-owned GitHub App / fine-grained-token direct dispatch remains optional fallback. |
 | Tenant apply workflow | Verified through `v0.1.11` | Exact PR/check/base revalidation, full verify, Convex-first deploy, a non-force exact Git push, provider auto-deploy, and exact health-revision verification completed successfully without recovery deployment. |
 | Health revision contract | Implemented | `/api/health` reports platform version and exact build revision. |
 | Superseded update cleanup | Implemented | Newer tested platform PRs close older update PRs; resolved blocked-update issues do not remain actionable. |
@@ -34,13 +34,14 @@ A platform release must be safe for an AI-agent-operated tenant repository:
 | Exact application strategy | Verified end-to-end | GitHub rebase merge was unsuitable for the history-preserving update PR. The tenant workflow performs a real non-force Git push of the exact verified head; linked-provider auto-deployment and final promotion are accepted only after exact health verification. |
 | Tenant repository variables | Configured for pre-cutover proof | The health target points to the tenant-owned linked Vercel validation alias and deployment mode remains `git`; the canonical domain is intentionally unchanged. |
 | Vercel custom domain | Pending cutover | Canonical domain remains on current production runtime until full tenant secrets/backend migration and smoke tests pass. |
-| Vercel runtime secrets | Pending | The linked project was re-audited with tenant-owned Vercel access and still contains only the two public URL variables. Legacy VPS runtime keys are mapped to the generic `HOSPITALITY_*` / `PRIMARY_PROPERTY_*` contract, but private values have not been written because the VPS execution context does not hold a tenant-owned Vercel write credential. |
+| Vercel runtime secrets | Private app secrets intentionally eliminated in `v0.1.12` candidate | Admin credentials/session signing, guest-link crypto, BYOK AI encryption, and update-worker auth now terminate in Convex. The linked Vercel project can intentionally remain public-config-only; the six legacy private values were transferred directly VPS → tenant Convex without printing their values. Candidate install + authenticated Vercel smoke remain required before cutover. |
 | Vercel project consolidation | Pending before cutover | The persistently Git-linked validation project is the proven deployment target; the earlier unlinked validation project must be retired or renamed only after private env migration and final smoke tests. |
 | Canonical-domain cutover | Pending | Attach the canonical domain only after the linked project has complete server-only env, authenticated admin smoke, CMS/PMS smoke, PWA checks, and rollback readiness. |
 | Legacy VPS/Dokploy retirement | Pending after cutover | Keep the current runtime as rollback until the canonical domain has been stable on the tenant-owned Vercel project; then remove obsolete deployment dependencies/documentation. |
 | Dynamic catch-all routing | Deferred until cloud cutover | Design and implement tenant-aware dynamic catch-all endpoints only after Vercel/Convex ownership, env contracts, and canonical routing are stable. |
 | Convex management access | Partially blocked | Existing production deploy key is valid and securely installed as the tenant GitHub Actions secret, but Composio Convex Management API still returns `401 MissingAccessToken`, so ownership/project management remains blocked there. |
-| Production one-click proof | Core workflow verified; admin-button credential pending | `v0.1.11` completed tenant verify → real Convex production deploy → exact non-force Git push → automatic linked Vercel production deployment → exact health verification, with no recovery deployment. The admin server path now supports either a preferred tenant-owned GitHub App or a fine-grained token; the remaining gap is configuring that credential in Vercel and proving the dispatch from `/admin/settings`. |
+| Convex private-runtime ownership | Implemented in `v0.1.12` candidate | Generic admin auth/session verification, guest-link encryption, BYOK AI secret crypto/provider execution, and update-worker auth are Convex-owned. Next/Vercel sees opaque sessions/results only. Tenant production Convex already has the required generic secret names plus the new worker token. |
+| Production one-click proof | Core workflow verified; queue/button proof pending on next release | `v0.1.11` proved Convex-first → exact non-force Git push → linked Vercel → exact health. `v0.1.12` candidate removes the Vercel credential blocker by adding Convex queue + tenant Actions worker. Bootstrap `v0.1.12` must be installed once, then the next compatible release will prove the actual `/admin/settings` button → Convex queue → worker dispatch path. |
 
 ## Verification log
 
@@ -68,6 +69,10 @@ A platform release must be safe for an AI-agent-operated tenant repository:
 - 2026-08-31: The prior incomplete-promotion issue was closed as superseded by the successful `v0.1.11` proof. Canonical-domain cutover was intentionally not performed.
 - 2026-08-31: The linked tenant Vercel project and source VPS runtime were re-audited. Git linkage and exact `v0.1.11` production SHA remain correct; only the two public URL variables exist on Vercel, while the legacy runtime contains the expected admin/property source keys. No private value was printed or written during the audit.
 - 2026-08-31: Upstream admin update authentication gained a preferred tenant-owned GitHub App path: RS256 app JWT → repository installation discovery → short-lived installation token, with the existing fine-grained token path retained as fallback. Full `npm run verify` passed (24 test files / 96 tests plus production build). Tenant credential configuration and admin-button proof remain pending.
+- 2026-08-31: Cross-connector transfer of private VPS values into Vercel remained blocked before write, so the platform was refactored instead of bypassing that boundary. Six generic private app secrets were transferred directly from the legacy VPS runtime into tenant production Convex without printing values.
+- 2026-08-31: Candidate `v0.1.12` moves admin credential/session verification, guest-token cryptography, and BYOK AI key encryption/decryption/provider requests into Convex; the Next/Vercel code path has regression coverage proving it no longer references those private runtime secrets. The previous production cookie-name mismatch was also removed by one cookie SSOT.
+- 2026-08-31: Candidate `v0.1.12` adds tenant-owned queue mode for Update Center: a five-minute GitHub Actions worker uses short-lived `GITHUB_TOKEN`, mirrors non-secret PR/check status to Convex, leases exact admin requests, and dispatches the existing verified apply workflow. A random worker token is configured only in tenant Convex + tenant GitHub Actions; the tenant Convex site origin is configured as a public repository variable.
+- 2026-08-31: Exact `v0.1.12` working tree passed full `npm run verify`: all structural/provider-neutral audits, Next + Convex typecheck, lint, 24 test files / 95 tests, and the production build. Release/real-tenant/hosted-CI gates still remain before tag.
 
 ## Release state
 
@@ -75,6 +80,6 @@ Current released upstream baseline: `v0.1.11`.
 
 Current managed-tenant installed baseline: `v0.1.11`.
 
-Current release candidate: none. The next platform change must bump SemVer and pass the same upstream + real-tenant + hosted-CI + updater gates.
+Current release candidate: `v0.1.12`. Local full verification is green; real-tenant protected-overlay verification, hosted CI, tag/release, updater PR, bootstrap apply, and live Vercel/Convex smoke remain pending.
 
-The Convex-first → exact Git push → linked Vercel auto-deploy → exact-health workflow is verified. Remaining work is deployment ownership/cutover and admin-originated dispatch, not the core update algorithm.
+The Convex-first → exact Git push → linked Vercel auto-deploy → exact-health workflow is verified. The active candidate removes private app secrets from Vercel and introduces tenant-owned queued admin dispatch; next gates are candidate release/bootstrap installation, live auth/CMS/PMS/guest smoke, then a second compatible release to prove the actual admin-button worker path before canonical cutover.
