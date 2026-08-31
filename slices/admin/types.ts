@@ -3,7 +3,7 @@ import type { AnnouncementAdminOverview, PrayerMoment } from "@/shared/announcem
 
 export type AdminFormAction = (formData: FormData) => void | Promise<void>;
 export type AdminLoginPageProps = { error?: string };
-export type AdminPropertyOption = { slug: string; name: string };
+type AdminPropertyOption = { slug: string; name: string };
 
 export type AdminDashboardProps = {
   sessionEmail: string;

@@ -1,4 +1,4 @@
-export type GuestWelcomeClaims = {
+type GuestWelcomeClaims = {
   version: 2;
   reservationId: string;
   issuedAt: number;

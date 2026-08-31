@@ -33,8 +33,3 @@ export function monthBounds(date: string) {
   const nextMonth = month === 12 ? 1 : month + 1;
   return { start, end: isoFromParts(nextYear, nextMonth, 1) };
 }
-
-export function monthCalendarRange(date: string) {
-  const { start, end } = monthBounds(date);
-  return { start, end: addDays(end, 7) };
-}

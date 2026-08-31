@@ -1,6 +1,6 @@
 import { WELCOME_GUEST_TOKEN, WELCOME_LOCALE_META, type WelcomeContent, type WelcomeLocale } from "@/shared/welcome";
 
-export function translationSchema(targetLocales: WelcomeLocale[]) {
+function translationSchema(targetLocales: WelcomeLocale[]) {
   return {
     type: "object",
     additionalProperties: false,

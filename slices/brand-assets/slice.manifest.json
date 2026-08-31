@@ -2,6 +2,12 @@
   "slug": "brand-assets",
   "version": "1.0.0",
   "entry": "index.ts",
-  "exports": ["BrandAssetsPage"],
-  "dependencies": ["shared/brand"]
+  "exports": [
+    "BrandAssetsPage"
+  ],
+  "dependencies": [
+    "shared/brand",
+    "shared/content",
+    "shared/media"
+  ]
 }

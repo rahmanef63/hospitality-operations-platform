@@ -2,5 +2,8 @@
   "slug": "pms",
   "version": "1.0.0",
   "entry": "index.ts",
-  "dependencies": ["shared/admin", "shared/convex", "shared/pms"]
+  "dependencies": [
+    "shared/pms",
+    "shared/welcome"
+  ]
 }

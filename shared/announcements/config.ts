@@ -2,7 +2,7 @@ import { tenantSite } from "@/tenant/site";
 import { defaultPresentationSlides } from "./experience";
 import type { AnnouncementRule, AnnouncementSettings, PrayerMethod } from "./types";
 
-export const DEFAULT_PRAYER_METHOD: PrayerMethod = "singapore";
+const DEFAULT_PRAYER_METHOD: PrayerMethod = "singapore";
 
 export const PRAYER_METHOD_OPTIONS = [
   { value: "singapore", label: "Singapore · Malaysia & Indonesia" },

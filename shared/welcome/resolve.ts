@@ -3,7 +3,7 @@ import { resolveReservationWelcomeToken } from "@/shared/convex";
 import { normalizeGuestName, parseWelcomeLocale } from "./config";
 import type { ReservationWelcomeContext, WelcomeLocale } from "./types";
 
-export type ResolvedGuestWelcome = {
+type ResolvedGuestWelcome = {
   valid: boolean;
   locale: WelcomeLocale;
   guestName?: string;

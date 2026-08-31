@@ -174,7 +174,7 @@ export type PmsTask = {
   completedAt?: number;
 };
 
-export type PmsAuditEvent = {
+type PmsAuditEvent = {
   id: string;
   propertyId?: string;
   resource: string;

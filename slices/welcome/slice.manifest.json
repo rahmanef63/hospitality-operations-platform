@@ -8,10 +8,9 @@
     "WelcomePresentation"
   ],
   "dependencies": [
+    "shared/announcements",
     "shared/brand",
-    "shared/welcome",
     "shared/media",
-    "shared/pwa",
-    "shared/announcements"
+    "shared/welcome"
   ]
 }

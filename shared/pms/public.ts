@@ -6,7 +6,7 @@ export type PublicAmenity = {
   featured: boolean;
 };
 
-export type PublicUnit = {
+type PublicUnit = {
   id: string;
   code: string;
   name: string;

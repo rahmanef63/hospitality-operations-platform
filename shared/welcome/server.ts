@@ -5,7 +5,7 @@ import { addDays } from "@/shared/pms";
 import type { PmsBookingData, PmsCatalog } from "@/shared/pms";
 import type { ReservationWelcomeLink } from "./types";
 
-export function guestWelcomeExpiry(checkOut: string): number {
+function guestWelcomeExpiry(checkOut: string): number {
   const expiresOn = addDays(checkOut, 30);
   return Date.parse(`${expiresOn}T23:59:59.999Z`);
 }

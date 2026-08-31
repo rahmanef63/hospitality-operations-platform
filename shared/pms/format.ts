@@ -23,7 +23,3 @@ export function formatPmsDateTime(value: number) {
     timeZone: "Asia/Jakarta",
   }).format(new Date(value));
 }
-
-export function humanize(value: string) {
-  return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
-}

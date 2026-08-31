@@ -7,7 +7,7 @@ export async function loadCmsOverview() {
   catch { return { configured: false, draft: defaultCmsDocument(), version: 0, events: [] }; }
 }
 
-export async function cmsDraft(actorEmailHash: string): Promise<CmsDocument> {
+async function cmsDraft(actorEmailHash: string): Promise<CmsDocument> {
   const overview = await getCmsAdminOverview();
   if (overview.configured) return overview.draft;
   const initial = defaultCmsDocument();

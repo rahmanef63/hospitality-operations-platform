@@ -10,11 +10,9 @@
     "PlatformSettingsPage"
   ],
   "dependencies": [
-    "shared/admin",
-    "shared/convex",
-    "shared/welcome",
     "shared/ai",
     "shared/announcements",
-    "shared/platform"
+    "shared/platform",
+    "shared/welcome"
   ]
 }

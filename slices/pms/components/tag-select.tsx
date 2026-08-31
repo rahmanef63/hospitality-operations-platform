@@ -15,9 +15,6 @@ const toneClass: Record<PmsTone, string> = {
   green: "border-[#43704f]/25 bg-[#dfe9df] text-[#31533b]",
 };
 
-export function optionToneClass(tone: PmsTone = "neutral") {
-  return toneClass[tone];
-}
 
 export function TagSelect({
   name,

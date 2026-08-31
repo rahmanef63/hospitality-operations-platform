@@ -2,7 +2,7 @@ import "server-only";
 import type { PlatformUpdateStatus } from "@/shared/platform/types";
 import { adminFetch } from "./core";
 
-export type PlatformQueueSnapshot = {
+type PlatformQueueSnapshot = {
   repository: string; defaultBranch: string; installedVersion: string; latestVersion?: string;
   prNumber?: number; prUrl?: string; prTitle?: string; headRef?: string; headSha?: string; mergeable?: boolean;
   checkState: PlatformUpdateStatus["checkState"]; state: Exclude<PlatformUpdateStatus["state"], "upstream" | "unconfigured">;

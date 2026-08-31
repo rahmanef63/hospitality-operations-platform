@@ -246,11 +246,3 @@ export type SiteContent = {
     tagline: string;
   };
 };
-
-export interface ContentRepository {
-  getSiteContent(): Promise<SiteContent>;
-  listProperties(): Promise<PropertyContent[]>;
-  getPropertyBySlug(slug: string): Promise<PropertyContent | null>;
-  listAreaGuides(): Promise<AreaGuideContent[]>;
-  getAreaGuideBySlug(slug: string): Promise<AreaGuideContent | null>;
-}

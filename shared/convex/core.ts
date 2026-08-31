@@ -5,7 +5,7 @@ import { getAdminSessionToken } from "@/shared/admin/cookie";
 let cachedClient: ConvexHttpClient | undefined;
 let cachedUrl: string | undefined;
 
-export function requireConvexUrl(): string {
+function requireConvexUrl(): string {
   const value = process.env.NEXT_PUBLIC_CONVEX_URL?.trim();
   if (!value) throw new Error("NEXT_PUBLIC_CONVEX_URL is not configured.");
   const url = new URL(value);

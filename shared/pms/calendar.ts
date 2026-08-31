@@ -6,7 +6,7 @@ function utcDate(value: string) {
   return new Date(`${value}T00:00:00Z`);
 }
 
-export function validIsoDate(value: string | undefined): value is string {
+function validIsoDate(value: string | undefined): value is string {
   if (!value || !ISO_DATE.test(value)) return false;
   try {
     return utcDate(value).toISOString().slice(0, 10) === value;

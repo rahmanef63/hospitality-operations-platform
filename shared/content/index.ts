@@ -19,7 +19,6 @@ export type {
   PropertySectionId,
   PublicUiConfig,
   SectionComposition,
-  ContentRepository,
   DayRhythm,
   EditorialItem,
   GalleryItem,
