@@ -72,7 +72,8 @@ A platform release must be safe for an AI-agent-operated tenant repository:
 - 2026-08-31: Cross-connector transfer of private VPS values into Vercel remained blocked before write, so the platform was refactored instead of bypassing that boundary. Six generic private app secrets were transferred directly from the legacy VPS runtime into tenant production Convex without printing values.
 - 2026-08-31: Candidate `v0.1.12` moves admin credential/session verification, guest-token cryptography, and BYOK AI key encryption/decryption/provider requests into Convex; the Next/Vercel code path has regression coverage proving it no longer references those private runtime secrets. The previous production cookie-name mismatch was also removed by one cookie SSOT.
 - 2026-08-31: Candidate `v0.1.12` adds tenant-owned queue mode for Update Center: a five-minute GitHub Actions worker uses short-lived `GITHUB_TOKEN`, mirrors non-secret PR/check status to Convex, leases exact admin requests, and dispatches the existing verified apply workflow. A random worker token is configured only in tenant Convex + tenant GitHub Actions; the tenant Convex site origin is configured as a public repository variable.
-- 2026-08-31: Exact `v0.1.12` working tree passed full `npm run verify`: all structural/provider-neutral audits, Next + Convex typecheck, lint, 24 test files / 95 tests, and the production build. Release/real-tenant/hosted-CI gates still remain before tag.
+- 2026-08-31: Exact `v0.1.12` candidate code commit `b3ad426d03250d22ef085336f402cfcc3eb7b681` passed full local verification: all structural/provider-neutral audits, Next + Convex typecheck, lint, 24 test files / 97 tests, production build, and production dependency audit with 0 vulnerabilities. Hosted upstream CI run `33386165569` also passed.
+- 2026-08-31: The real-tenant pre-release gate merged exact candidate `b3ad426…` into a temporary clone of tenant `v0.1.11` without pushing: tenant core drift = 0, upstream protected-path changes = 0, the SHA-256 aggregate of 58 protected overlay files remained identical before/after merge, and the merged tenant passed 24 test files / 97 tests, production build, and dependency audit with 0 vulnerabilities.
 
 ## Release state
 
@@ -80,6 +81,6 @@ Current released upstream baseline: `v0.1.11`.
 
 Current managed-tenant installed baseline: `v0.1.11`.
 
-Current release candidate: `v0.1.12`. Local full verification is green; real-tenant protected-overlay verification, hosted CI, tag/release, updater PR, bootstrap apply, and live Vercel/Convex smoke remain pending.
+Current release candidate: `v0.1.12`. Local full verification, hosted upstream CI, and the real-tenant protected-overlay gate are green. Tag/release, updater PR, bootstrap apply, and live Vercel/Convex smoke remain pending.
 
 The Convex-first → exact Git push → linked Vercel auto-deploy → exact-health workflow is verified. The active candidate removes private app secrets from Vercel and introduces tenant-owned queued admin dispatch; next gates are candidate release/bootstrap installation, live auth/CMS/PMS/guest smoke, then a second compatible release to prove the actual admin-button worker path before canonical cutover.
