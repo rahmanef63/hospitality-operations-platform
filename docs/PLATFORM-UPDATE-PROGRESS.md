@@ -20,8 +20,8 @@ A platform release must be safe for an AI-agent-operated tenant repository:
 |---|---|---|
 | Documentation consistency | Implemented | README, AGENTS, architecture, distribution docs and AI-agent onboarding agree on private control-plane routing and tenant-owned apply flow. |
 | AI-agent onboarding | Implemented | Agents deterministically distinguish upstream vs tenant mode, protected overlays, release/update ownership, deployment order and recovery. |
-| Admin platform settings | Implemented and bootstrapped | Managed tenant includes `/admin/settings`; prepared versions can be surfaced once its server-side GitHub credential is configured. |
-| Tenant apply workflow | Implemented through `v0.1.10`; linked-project proof in `v0.1.11` | Exact PR/check/base revalidation, full verify, Convex-first deploy, a non-force exact Git push, and health-revision verification are encoded in the tenant workflow. |
+| Admin platform settings | Implemented; dispatch credential pending | Managed tenant includes `/admin/settings` and can discover prepared updates. The actual **Update now** server action still requires a tenant-owned `HOSPITALITY_UPDATE_GITHUB_TOKEN` (or future GitHub App equivalent) before admin-originated dispatch is enabled. |
+| Tenant apply workflow | Verified through `v0.1.11` | Exact PR/check/base revalidation, full verify, Convex-first deploy, a non-force exact Git push, provider auto-deploy, and exact health-revision verification completed successfully without recovery deployment. |
 | Health revision contract | Implemented | `/api/health` reports platform version and exact build revision. |
 | Superseded update cleanup | Implemented | Newer tested platform PRs close older update PRs; resolved blocked-update issues do not remain actionable. |
 | Environment contract updateability | Implemented | `.env.example` remains upstream-owned while real `.env*` runtime values remain untracked. |
@@ -29,14 +29,18 @@ A platform release must be safe for an AI-agent-operated tenant repository:
 | Tenant deployment actor | Implemented in `v0.1.7` | Private control plane resolves a real tenant GitHub user; update commits use its GitHub noreply identity. |
 | Vercel native build portability | Verified | Container standalone and Vercel native Next output both build; Node 22 is pinned. |
 | Vercel exact-SHA production build | Verified | Managed tenant exact SHA built and promoted successfully on tenant-owned Vercel without canonical-domain cutover. |
-| Vercel persistent Git integration | Linked validation target verified | A tenant-owned Vercel project now has a persistent GitHub link, production branch `main`, Node 22, and an exact current-revision health check. `v0.1.11` is the no-recovery auto-deploy proof. |
+| Vercel persistent Git integration | Verified end-to-end | A tenant-owned Vercel project has a persistent GitHub link, production branch `main`, Node 22, and automatically created the exact `v0.1.11` production deployment from the tenant workflow push. |
 | Vercel deployment-author policy | Verified | Update commits use the tenant deployment actor and Vercel accepts exact-SHA production builds from that actor. |
-| Exact application strategy | Verified at Git layer; deployment proof pending `v0.1.11` | GitHub rebase merge was unsuitable for the history-preserving update PR. The tenant workflow now performs a real non-force Git push of the exact verified head; linked-provider auto-deployment is verified by exact health rather than assumed from Git state. |
+| Exact application strategy | Verified end-to-end | GitHub rebase merge was unsuitable for the history-preserving update PR. The tenant workflow performs a real non-force Git push of the exact verified head; linked-provider auto-deployment and final promotion are accepted only after exact health verification. |
 | Tenant repository variables | Configured for pre-cutover proof | The health target points to the tenant-owned linked Vercel validation alias and deployment mode remains `git`; the canonical domain is intentionally unchanged. |
 | Vercel custom domain | Pending cutover | Canonical domain remains on current production runtime until full tenant secrets/backend migration and smoke tests pass. |
 | Vercel runtime secrets | Pending | Public URLs are present; admin/update server-only credentials must be migrated/rotated before canonical cutover. |
+| Vercel project consolidation | Pending before cutover | The persistently Git-linked validation project is the proven deployment target; the earlier unlinked validation project must be retired or renamed only after private env migration and final smoke tests. |
+| Canonical-domain cutover | Pending | Attach the canonical domain only after the linked project has complete server-only env, authenticated admin smoke, CMS/PMS smoke, PWA checks, and rollback readiness. |
+| Legacy VPS/Dokploy retirement | Pending after cutover | Keep the current runtime as rollback until the canonical domain has been stable on the tenant-owned Vercel project; then remove obsolete deployment dependencies/documentation. |
+| Dynamic catch-all routing | Deferred until cloud cutover | Design and implement tenant-aware dynamic catch-all endpoints only after Vercel/Convex ownership, env contracts, and canonical routing are stable. |
 | Convex management access | Partially blocked | Existing production deploy key is valid and securely installed as the tenant GitHub Actions secret, but Composio Convex Management API still returns `401 MissingAccessToken`, so ownership/project management remains blocked there. |
-| Production one-click proof | Pipeline proven; linked auto-deploy proof pending `v0.1.11` | `v0.1.9` proved Convex-first apply and exact frontend health but needed an external exact-SHA recovery deployment. `v0.1.10` proved the real Git push but the then-current validation project was not persistently Git-linked. A linked tenant-owned Vercel project is now initialized at the exact installed revision; `v0.1.11` must complete without any recovery deployment. Admin-button dispatch still requires a tenant server-side GitHub credential. |
+| Production one-click proof | Core workflow verified; admin-button dispatch pending | `v0.1.11` completed tenant verify → real Convex production deploy → exact non-force Git push → automatic linked Vercel production deployment → exact health verification, with no recovery deployment. The remaining gap is triggering that verified workflow from `/admin/settings` using a tenant-owned server-side GitHub credential. |
 
 ## Verification log
 
@@ -59,12 +63,16 @@ A platform release must be safe for an AI-agent-operated tenant repository:
 - 2026-08-31: `v0.1.10` replaced REST ref mutation with a real non-force Git push. Convex deploy and Git promotion succeeded, but exact-health verification timed out because the active validation Vercel project had no persistent Git link; no false success was recorded.
 - 2026-08-31: A separate tenant-owned Vercel validation project was created with a persistent GitHub link to the tenant repository, production branch `main`, Node 22, and public Convex/site configuration. Its initial exact `v0.1.10` deployment reached `READY / PROMOTED` and `/api/health` matched the tenant SHA.
 
+- 2026-08-31: `v0.1.11` released successfully and the private updater created a clean managed-tenant PR; tenant CI and Vercel preview passed.
+- 2026-08-31: The `v0.1.11` Apply workflow completed successfully without external recovery: full tenant verify passed, Convex production deployed, the exact verified PR head was pushed non-force to the default branch, the persistently Git-linked Vercel project automatically created a production deployment from that push, and the configured health alias reported the exact tenant SHA.
+- 2026-08-31: The prior incomplete-promotion issue was closed as superseded by the successful `v0.1.11` proof. Canonical-domain cutover was intentionally not performed.
+
 ## Release state
 
-Current released upstream baseline: `v0.1.10`.
+Current released upstream baseline: `v0.1.11`.
 
-Current managed-tenant installed baseline: `v0.1.10`.
+Current managed-tenant installed baseline: `v0.1.11`.
 
-Current release candidate: `v0.1.11` — proof release for automatic production deployment through the persistently Git-linked tenant Vercel project.
+Current release candidate: none. The next platform change must bump SemVer and pass the same upstream + real-tenant + hosted-CI + updater gates.
 
-`v0.1.11` is not complete until upstream full verification, real-tenant temporary merge/full verify, hosted CI, private updater success, tenant PR CI/Vercel preview, and an end-to-end Apply run reaches exact linked-Vercel health without any manual or API recovery deployment.
+The Convex-first → exact Git push → linked Vercel auto-deploy → exact-health workflow is verified. Remaining work is deployment ownership/cutover and admin-originated dispatch, not the core update algorithm.
