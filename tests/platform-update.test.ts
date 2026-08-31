@@ -35,7 +35,7 @@ describe("tenant platform update center", () => {
     const workflow = fs.readFileSync(".github/workflows/apply-platform-update.yml", "utf8");
     const verify = workflow.indexOf("npm run verify");
     const convex = workflow.indexOf("npx convex deploy");
-    const promote = workflow.indexOf("git/refs/heads/$base_branch");
+    const promote = workflow.indexOf("git push --porcelain origin");
     const health = workflow.indexOf("/api/health?revision=$MERGE_SHA");
     expect(verify).toBeGreaterThan(-1);
     expect(convex).toBeGreaterThan(verify);
@@ -45,7 +45,8 @@ describe("tenant platform update center", () => {
     expect(workflow).toContain("npm ci --include=dev --legacy-peer-deps");
     expect(workflow).toContain("Major platform updates require an explicit migration workflow");
     expect(workflow).toContain('head_sha="$(cat "$RUNNER_TEMP/head-sha")"');
-    expect(workflow).toContain('-F force=false');
+    expect(workflow).toContain('git push --porcelain origin');
+    expect(workflow).not.toContain('git push --force');
     expect(workflow).toContain('current_base=');
     expect(workflow).not.toContain('pulls/$PR_NUMBER/merge');
     expect(workflow).not.toContain('commits/${{ steps.resolve.outputs.head_sha }}/check-runs');

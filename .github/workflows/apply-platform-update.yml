@@ -138,9 +138,10 @@ jobs:
           set -euo pipefail
           base_branch="$(cat "$RUNNER_TEMP/base-branch")"
           head_sha="${{ steps.resolve.outputs.head_sha }}"
-          gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/heads/$base_branch" \
-            -f sha="$head_sha" -F force=false > "$RUNNER_TEMP/ref-update.json"
-          updated="$(node -e "const r=require(process.env.RUNNER_TEMP+'/ref-update.json');console.log(r.object?.sha||'')")"
+          # A real non-force git push keeps the same fast-forward safety while emitting
+          # the normal push event consumed by Git-connected deployment providers.
+          git push --porcelain origin "$head_sha:refs/heads/$base_branch" > "$RUNNER_TEMP/push-result.txt"
+          updated="$(git ls-remote origin "refs/heads/$base_branch" | awk '{print $1}')"
           test "$updated" = "$head_sha" || { echo "Default branch did not advance to exact verified head." >&2; exit 1; }
           echo "merge_sha=$head_sha" >> "$GITHUB_OUTPUT"
 
