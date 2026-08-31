@@ -9,6 +9,7 @@ import {
   platformBuildVersion,
 } from "./config";
 import type { PlatformApplyRun, PlatformCheckState, PlatformUpdatePullRequest, PlatformUpdateStatus } from "./types";
+import { githubCredentialConfigured, githubRuntimeToken } from "./github-auth";
 
 type GithubRepository = { default_branch: string };
 type GithubPull = {
@@ -27,11 +28,8 @@ function repositoryName() {
   return owner && repo ? `${owner}/${repo}` : undefined;
 }
 
-function runtimeToken() { return process.env.HOSPITALITY_UPDATE_GITHUB_TOKEN?.trim(); }
-
 async function github<T>(repo: string, path: string, init?: RequestInit): Promise<T> {
-  const token = runtimeToken();
-  if (!token) throw new Error("Platform update GitHub token is not configured");
+  const token = await githubRuntimeToken(repo);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 8_000);
   try {
@@ -81,7 +79,7 @@ function baseStatus(overrides: Partial<PlatformUpdateStatus> = {}): PlatformUpda
 export async function getPlatformUpdateStatus(): Promise<PlatformUpdateStatus> {
   if (PLATFORM_REPOSITORY_MODE === "upstream") return baseStatus();
   const repository = repositoryName();
-  const configured = Boolean(repository && runtimeToken());
+  const configured = Boolean(repository && githubCredentialConfigured());
   if (!configured || !repository) return baseStatus({
     state: "unconfigured", repository, configured: false,
     message: "Connect the tenant repository automation credential before using one-click updates.",
@@ -124,7 +122,7 @@ export async function getPlatformUpdateStatus(): Promise<PlatformUpdateStatus> {
 
 export async function dispatchPlatformUpdate(prNumber: number, expectedVersion: string, ref: string) {
   const repository = repositoryName();
-  if (!repository || !runtimeToken()) throw new Error("Platform update automation is not configured");
+  if (!repository || !githubCredentialConfigured()) throw new Error("Platform update automation is not configured");
   await github<void>(repository, `/actions/workflows/${PLATFORM_APPLY_WORKFLOW}/dispatches`, {
     method: "POST",
     body: JSON.stringify({ ref, inputs: { pr_number: String(prNumber), expected_version: expectedVersion } }),

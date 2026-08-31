@@ -17,9 +17,15 @@ describe("tenant platform update center", () => {
 
   it("keeps update credentials server-only", () => {
     const source = fs.readFileSync("shared/platform/github.ts", "utf8");
+    const auth = fs.readFileSync("shared/platform/github-auth.ts", "utf8");
     expect(source).toContain('import "server-only"');
-    expect(source).toContain("HOSPITALITY_UPDATE_GITHUB_TOKEN");
-    expect(source).not.toContain("NEXT_PUBLIC_HOSPITALITY_UPDATE_GITHUB_TOKEN");
+    expect(auth).toContain('import "server-only"');
+    expect(auth).toContain("HOSPITALITY_UPDATE_GITHUB_TOKEN");
+    expect(auth).toContain("HOSPITALITY_UPDATE_GITHUB_APP_ID");
+    expect(auth).toContain("HOSPITALITY_UPDATE_GITHUB_APP_PRIVATE_KEY");
+    expect(auth).toContain("/installation");
+    expect(auth).toContain("/access_tokens");
+    expect(auth).not.toContain("NEXT_PUBLIC_HOSPITALITY_UPDATE_GITHUB");
   });
 
   it("typechecks Convex with the tenant import boundary", () => {
