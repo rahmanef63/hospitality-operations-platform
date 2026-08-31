@@ -74,13 +74,16 @@ A platform release must be safe for an AI-agent-operated tenant repository:
 - 2026-08-31: Candidate `v0.1.12` adds tenant-owned queue mode for Update Center: a five-minute GitHub Actions worker uses short-lived `GITHUB_TOKEN`, mirrors non-secret PR/check status to Convex, leases exact admin requests, and dispatches the existing verified apply workflow. A random worker token is configured only in tenant Convex + tenant GitHub Actions; the tenant Convex site origin is configured as a public repository variable.
 - 2026-08-31: Exact `v0.1.12` candidate code commit `b3ad426d03250d22ef085336f402cfcc3eb7b681` passed full local verification: all structural/provider-neutral audits, Next + Convex typecheck, lint, 24 test files / 97 tests, production build, and production dependency audit with 0 vulnerabilities. Hosted upstream CI run `33386165569` also passed.
 - 2026-08-31: The real-tenant pre-release gate merged exact candidate `b3ad426…` into a temporary clone of tenant `v0.1.11` without pushing: tenant core drift = 0, upstream protected-path changes = 0, the SHA-256 aggregate of 58 protected overlay files remained identical before/after merge, and the merged tenant passed 24 test files / 97 tests, production build, and dependency audit with 0 vulnerabilities.
+- 2026-08-31: `v0.1.12` was published, the private updater prepared the tenant update, and tenant Apply run `33387169082` completed full verify → Convex deploy → exact non-force Git push → linked Vercel exact-revision verification. Tenant `main` is `2a45ff4b827e5623243c799b055088d37efd049c`.
+- 2026-08-31: The tenant Platform update worker is fully configured with repository variable `HOSPITALITY_CONVEX_SITE_URL` plus secrets `CONVEX_DEPLOY_KEY` and `HOSPITALITY_UPDATE_WORKFLOW_TOKEN`; manual worker run `33387570611` completed successfully using the short-lived repository token path.
+- 2026-08-31: Linked Vercel production `dpl_3kkYRb1gaB1T4gdMJRXDRJt2Chpx` reached `READY / PROMOTED` at exact tenant SHA `2a45ff4b827e…` while retaining only the two public URL env variables. Authenticated smoke reused the existing admin credential without printing it and passed `/admin` plus calendar, reservations, guests, properties, units, amenities, finance, tasks, welcome, AI, CMS/home/properties; public welcome/presentation/brand assets/manifests/service-worker checks also returned `200`.
 
 ## Release state
 
-Current released upstream baseline: `v0.1.11`.
+Current released upstream baseline: `v0.1.12`.
 
-Current managed-tenant installed baseline: `v0.1.11`.
+Current managed-tenant installed baseline: `v0.1.12`.
 
-Current release candidate: `v0.1.12`. Local full verification, hosted upstream CI, and the real-tenant protected-overlay gate are green. Tag/release, updater PR, bootstrap apply, and live Vercel/Convex smoke remain pending.
+Current release candidate: `v0.1.13`. This is intentionally a low-risk SemVer/SSOT proof release whose purpose is to exercise the already-installed `/admin/settings` → Convex queue → tenant Actions worker → exact apply workflow path end-to-end.
 
-The Convex-first → exact Git push → linked Vercel auto-deploy → exact-health workflow is verified. The active candidate removes private app secrets from Vercel and introduces tenant-owned queued admin dispatch; next gates are candidate release/bootstrap installation, live auth/CMS/PMS/guest smoke, then a second compatible release to prove the actual admin-button worker path before canonical cutover.
+The Convex-first → exact Git push → linked Vercel auto-deploy → exact-health workflow is verified. `v0.1.12` also removed private app secrets from Vercel, installed queue mode, reached linked Vercel `READY / PROMOTED` at exact tenant SHA `2a45ff4b827e5623243c799b055088d37efd049c`, and passed authenticated admin/CMS/PMS plus guest/PWA smoke. The next gate is the `v0.1.13` button-originated queue proof before canonical cutover.
