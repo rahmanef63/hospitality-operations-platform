@@ -15,3 +15,6 @@ npm-debug.log*
 # Added by si-coder deploy (secret-leak guard)
 .env.*
 !.env.example
+
+# Local MSO runtime state — never commit
+.mso/
