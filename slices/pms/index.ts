@@ -11,6 +11,7 @@ export { PropertyManager } from "./components/property-manager";
 export { UnitManager } from "./components/unit-manager";
 export { PmsDashboardPage } from "./components/dashboard-page";
 export { PmsShell } from "./components/pms-shell";
+export { PmsLoading } from "./components/pms-loading";
 export { PageHeader } from "./components/page-header";
 export { StatusBanner } from "./components/status-banner";
 export type { PmsFormAction, PmsPageState, PmsShellProps } from "./types";
