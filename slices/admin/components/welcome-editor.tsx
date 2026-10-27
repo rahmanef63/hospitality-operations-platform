@@ -122,7 +122,7 @@ export function WelcomeEditor({ config, propertySlug, propertyName, formAction, 
         <aside dir={meta.direction} className="flex min-h-[32rem] flex-col justify-between bg-charcoal p-6 text-ivory sm:p-9">
           <div>
             <div className="flex items-center justify-between gap-4"><p className="kicker text-warm-sand">Live preview</p><Eye className="size-4 text-ivory/55" aria-hidden="true" /></div>
-            <label className="mt-6 block"><span className="text-[.62rem] font-bold tracking-[.1em] text-ivory/55 uppercase">Nama contoh</span><input value={sampleName} onChange={(event) => setSampleName(event.target.value)} maxLength={WELCOME_LIMITS.guestName} className="mt-2 min-h-11 w-full rounded-[.3rem] border border-ivory/16 bg-ivory/8 px-3 text-sm text-ivory outline-none focus:border-warm-sand" /></label>
+            <label className="mt-6 block"><span className="text-[.62rem] font-bold tracking-[.1em] text-ivory/55 uppercase">Nama contoh</span><input value={sampleName} onChange={(event) => setSampleName(event.target.value)} maxLength={WELCOME_LIMITS.guestName} className="mt-2 min-h-11 w-full rounded-[.3rem] border border-ivory/16 bg-ivory/8 px-3 text-sm text-ivory outline-none focus:border-warm-sand focus:ring-2 focus:ring-warm-sand/40" /></label>
             <p className="mt-12 font-serif text-5xl leading-[.92] tracking-[-.03em]">{preview.headline}</p>
             <p className="mt-7 max-w-md whitespace-pre-line text-sm leading-8 text-ivory/75">{preview.body}</p>
           </div>

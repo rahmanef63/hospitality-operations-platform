@@ -53,7 +53,7 @@ export function AdminDashboard({ overview, links, linkError, properties, selecte
 
         <form method="get" className="flex flex-col gap-3 rounded-[.45rem] border border-charcoal/12 bg-white p-4 sm:flex-row sm:items-end">
           <input type="hidden" name="locale" value={selectedLocale} />
-          <label className="min-w-0 flex-1"><span className="text-xs font-semibold tracking-[.08em] uppercase">Properti</span><select name="property" defaultValue={selectedProperty.slug} className="mt-2 min-h-12 w-full rounded-[.35rem] border border-charcoal/18 bg-white px-3 text-sm outline-none focus:border-olive">{(properties.length ? properties : [selectedProperty]).map((property) => <option key={property.slug} value={property.slug}>{property.name}</option>)}</select></label>
+          <label className="min-w-0 flex-1"><span className="text-xs font-semibold tracking-[.08em] uppercase">Properti</span><select name="property" defaultValue={selectedProperty.slug} className="mt-2 min-h-12 w-full rounded-[.35rem] border border-charcoal/18 bg-white px-3 text-sm outline-none focus:border-olive focus:ring-2 focus:ring-olive/20">{(properties.length ? properties : [selectedProperty]).map((property) => <option key={property.slug} value={property.slug}>{property.name}</option>)}</select></label>
           <button type="submit" className="cta-outline">Ganti properti</button>
         </form>
 

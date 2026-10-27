@@ -33,7 +33,7 @@ export function WelcomeLanguagePicker({ locale, token, guestName, propertySlug, 
         onChange={(event) => change(event.target.value)}
         disabled={pending}
         aria-label={meta.label === "Arabic" ? "اللغة" : "Language"}
-        className="min-h-11 w-full border border-ivory/25 bg-charcoal px-3 text-xs font-semibold text-ivory outline-none focus:border-warm-sand"
+        className="min-h-11 w-full border border-ivory/25 bg-charcoal px-3 text-xs font-semibold text-ivory outline-none focus:border-warm-sand focus:ring-2 focus:ring-warm-sand/40"
       >
         {WELCOME_LOCALE_OPTIONS.map((option) => (
           <option key={option.code} value={option.code} className="bg-charcoal text-ivory">

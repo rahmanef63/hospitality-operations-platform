@@ -182,7 +182,7 @@ export function GuestConcierge({ navigation, config }: GuestConciergeProps) {
                   maxLength={400}
                   autoComplete="off"
                   placeholder={config.inputPlaceholder}
-                  className="min-h-13 min-w-0 bg-transparent px-4 text-sm outline-none"
+                  className="min-h-13 min-w-0 bg-transparent px-4 text-sm outline-none focus:ring-2 focus:ring-olive/25"
                 />
                 <button
                   type="submit"
