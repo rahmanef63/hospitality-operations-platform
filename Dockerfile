@@ -1,10 +1,16 @@
-FROM node:22-alpine AS base
+# glibc base throughout: bun has no musl build and the dependency layer it
+# produces must stay ABI-compatible with the builder and runner stages.
+FROM node:22-slim AS base
 ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app
 
 FROM base AS dependencies
-COPY package.json package-lock.json ./
-RUN npm ci --legacy-peer-deps
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl unzip \
+    && rm -rf /var/lib/apt/lists/*
+RUN curl -fsSL https://bun.sh/install | bash -s "bun-v1.4.2"
+ENV PATH="/root/.bun/bin:${PATH}"
+COPY package.json bun.lock bunfig.toml ./
+RUN bun install --frozen-lockfile
 
 FROM base AS builder
 COPY --from=dependencies /app/node_modules ./node_modules
@@ -41,16 +47,19 @@ ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL \
     PRIMARY_PROPERTY_COUNTRY_NAME=$PRIMARY_PROPERTY_COUNTRY_NAME \
     PRIMARY_PROPERTY_DISPLAY_ADDRESS=$PRIMARY_PROPERTY_DISPLAY_ADDRESS \
     PRIMARY_PROPERTY_MAPS_PROFILE_URL=$PRIMARY_PROPERTY_MAPS_PROFILE_URL
-RUN npm run build
+RUN bun run build
 
-FROM node:22-alpine AS runner
+FROM node:22-slim AS runner
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000 \
     HOSTNAME=0.0.0.0
 WORKDIR /app
-RUN addgroup --system --gid 1001 nodejs \
-  && adduser --system --uid 1001 nextjs
+# groupadd/useradd, not addgroup/adduser: Debian's adduser --system ignores
+# --gid and would put nextjs in nogroup, so --chown=nextjs:nodejs below would
+# grant a group the running user is not in.
+RUN groupadd --system --gid 1001 nodejs \
+  && useradd --system --uid 1001 --gid nodejs --no-create-home nextjs
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static

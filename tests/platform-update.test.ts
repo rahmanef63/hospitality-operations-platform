@@ -34,12 +34,12 @@ describe("tenant platform update center", () => {
     expect(config).toContain('"baseUrl": ".."');
     expect(config).toContain('"@/*": ["./*"]');
     expect(packageJson.scripts["typecheck:convex"]).toContain("convex/tsconfig.json");
-    expect(packageJson.scripts.verify).toContain("npm run typecheck:convex");
+    expect(packageJson.scripts.verify).toContain("bun run typecheck:convex");
   });
 
   it("deploys Convex before exact non-force fast-forward and verifies frontend revision", () => {
     const workflow = fs.readFileSync(".github/workflows/apply-platform-update.yml", "utf8");
-    const verify = workflow.indexOf("npm run verify");
+    const verify = workflow.indexOf("bun run verify");
     const convex = workflow.indexOf("npx convex deploy");
     const promote = workflow.indexOf("git push --porcelain origin");
     const health = workflow.indexOf("/api/health?revision=$MERGE_SHA");
@@ -48,7 +48,7 @@ describe("tenant platform update center", () => {
     expect(promote).toBeGreaterThan(convex);
     expect(health).toBeGreaterThan(promote);
     expect(workflow).toContain("CONVEX_DEPLOY_KEY");
-    expect(workflow).toContain("npm ci --include=dev --legacy-peer-deps");
+    expect(workflow).toContain("bun install --frozen-lockfile");
     expect(workflow).toContain("Major platform updates require an explicit migration workflow");
     expect(workflow).toContain('head_sha="$(cat "$RUNNER_TEMP/head-sha")"');
     expect(workflow).toContain('git push --porcelain origin');

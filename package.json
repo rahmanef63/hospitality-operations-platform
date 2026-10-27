@@ -4,6 +4,7 @@
   "private": true,
   "description": "Location-neutral hospitality website for Hospitality Operations Platform.",
   "type": "module",
+  "packageManager": "bun@1.4.2",
   "engines": {
     "node": "22.x"
   },
@@ -21,8 +22,8 @@
     "audit:brand-copy": "node scripts/validation/audit-brand-copy.mjs",
     "check:stack-pin": "node scripts/validation/check-stack-pin.mjs",
     "env:check": "node scripts/env-check.mjs",
-    "audit": "npm run check:stack-pin && npm run audit:file-size && npm run audit:slices && npm run audit:manifest && npm run audit:rr-rules && npm run audit:brand-copy",
-    "verify": "npm run env:check && npm run audit && npm run typecheck && npm run typecheck:convex && npm run lint && npm run test && npm run build",
+    "audit": "bun run check:stack-pin && bun run audit:file-size && bun run audit:slices && bun run audit:manifest && bun run audit:rr-rules && bun run audit:brand-copy",
+    "verify": "bun run env:check && bun run audit && bun run typecheck && bun run typecheck:convex && bun run lint && bun run test && bun run build",
     "smoke": "node scripts/smoke-test.mjs",
     "audit:manifest": "node scripts/validation/audit-project-manifest.mjs",
     "platform:release:check": "node scripts/platform/check-release.mjs",

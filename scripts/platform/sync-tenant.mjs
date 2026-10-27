@@ -101,13 +101,13 @@ try {
   run("git", ["commit", "-m", `chore(platform): update to ${requestedTag}`], { cwd: target });
 
   const verifyEnv = { ...baseEnv, NEXT_PUBLIC_SITE_URL: "https://tenant.example", NEXT_PUBLIC_CONVEX_URL: "https://example.convex.cloud" };
-  run("npm", ["ci", "--include=dev", "--legacy-peer-deps"], { cwd: target, env: verifyEnv });
-  run("npm", ["run", "verify"], { cwd: target, env: verifyEnv });
+  run("bun", ["install", "--frozen-lockfile"], { cwd: target, env: verifyEnv });
+  run("bun", ["run", "verify"], { cwd: target, env: verifyEnv });
   run("git", ["push", "--force-with-lease", "origin", `HEAD:refs/heads/${updateBranch}`], { cwd: target });
 
   const existing = JSON.parse(capture("gh", ["pr", "list", "--repo", nwo, "--state", "open", "--head", updateBranch, "--base", baseBranch, "--json", "number,url", "--limit", "1"], process.cwd()) || "[]");
   const changes = lines(capture("git", ["log", "--oneline", "--no-merges", `${lock.tag}..${requestedTag}`], target)).slice(0, 30);
-  const body = [`## Hospitality Operations Platform ${requestedTag}`, "", `Automated update from \`${lock.version}\` to \`${nextVersion}\`.`, "", "### Validation", "- Tenant protected overlays were unchanged.", "- No tenant core-code drift was detected.", "- `npm run verify` passed on the merged tenant tree.", "", "### Upstream changes", ...(changes.length ? changes.map((item) => `- ${item}`) : ["- No non-merge commits listed."]), "", "Apply this update from the tenant `/admin/settings` Update now action so Convex deploys before the exact PR is merged and frontend promotion is verified. Runtime data and secrets are not modified by this PR."].join("\n");
+  const body = [`## Hospitality Operations Platform ${requestedTag}`, "", `Automated update from \`${lock.version}\` to \`${nextVersion}\`.`, "", "### Validation", "- Tenant protected overlays were unchanged.", "- No tenant core-code drift was detected.", "- `bun run verify` passed on the merged tenant tree.", "", "### Upstream changes", ...(changes.length ? changes.map((item) => `- ${item}`) : ["- No non-merge commits listed."]), "", "Apply this update from the tenant `/admin/settings` Update now action so Convex deploys before the exact PR is merged and frontend promotion is verified. Runtime data and secrets are not modified by this PR."].join("\n");
   let url;
   if (existing[0]?.number) {
     run("gh", ["pr", "edit", String(existing[0].number), "--repo", nwo, "--title", `chore(platform): update to ${requestedTag}`, "--body", body], { cwd: process.cwd(), stdio: "ignore" });

@@ -69,11 +69,11 @@
 Before commit or deployment run:
 
 ```bash
-npm run audit
-npm run typecheck
-npm run lint
-npm run test
-npm run build
+bun run audit
+bun run typecheck
+bun run lint
+bun run test
+bun run build
 ```
 
 For tenant platform updates, the tenant-owned apply workflow must revalidate the exact prepared PR, deploy Convex first, atomically merge that exact PR head, then wait for `/api/health` to report the exact frontend build revision. Never claim one-click completion when deployment credentials, Vercel promotion, or Convex access are unresolved.

@@ -27,13 +27,15 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ inputs.tag || github.ref_name }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci --include=dev --legacy-peer-deps
-      - run: npm run platform:release:check -- ${{ inputs.tag || github.ref_name }}
-      - run: npm run verify
+      - run: bun install --frozen-lockfile
+      - run: bun run platform:release:check -- ${{ inputs.tag || github.ref_name }}
+      - run: bun run verify
 
   publish:
     needs: verify

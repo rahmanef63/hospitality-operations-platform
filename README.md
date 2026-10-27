@@ -64,9 +64,9 @@ AI agents must read `docs/AI-AGENT-ONBOARDING.md` first. See `docs/PLATFORM-DIST
 ## Local development
 
 ```bash
-npm install --include=dev --legacy-peer-deps
+bun install --frozen-lockfile
 cp .env.example .env.local
-npm run dev
+bun run dev
 ```
 
 Public runtime values:
@@ -127,8 +127,8 @@ The upstream platform ships with no provider property, amenity, rate, guest, res
 ## Quality gates
 
 ```bash
-npm run verify
-npm audit --omit=dev --audit-level=high
+bun run verify
+bun audit --audit-level=high
 ```
 
 The repository enforces strict TypeScript, zero-warning ESLint, in-memory Convex CRUD tests, a 280-line source-file cap, complete slice metadata, committed generated bindings, stack pins, and secret-boundary tests.

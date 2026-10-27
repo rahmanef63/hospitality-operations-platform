@@ -48,7 +48,7 @@ On public routes, a waiting worker is activated automatically. The update sequen
 
 ## Verification
 
-Run `npm run verify` and `npm run smoke`, then check `/presentation` at 1920×1080, 1280×720, and 390×844. Verify keyboard/remote navigation, fullscreen feature detection, service-worker registration, manifest parsing, offline fallback, and an update cycle across two build versions.
+Run `bun run verify` and `bun run smoke`, then check `/presentation` at 1920×1080, 1280×720, and 390×844. Verify keyboard/remote navigation, fullscreen feature detection, service-worker registration, manifest parsing, offline fallback, and an update cycle across two build versions.
 
 ## Presentation audio
 

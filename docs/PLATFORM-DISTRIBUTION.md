@@ -15,7 +15,7 @@ Platform releases use Semantic Versioning and matching GitHub tags such as `v1.4
 - **major** — contract-breaking changes requiring an explicit migration plan;
 - prerelease tags are delivered only to tenants enrolled in a prerelease channel.
 
-`package.json`, `package-lock.json`, and `.platform/product.json` must carry the same version. Run `npm run platform:release:check -- vX.Y.Z` before tagging.
+`package.json`, `bun.lock`, and `.platform/product.json` must carry the same version. Run `bun run platform:release:check -- vX.Y.Z` before tagging.
 
 Patch/minor backend changes must remain compatible with the previous tenant frontend because coordinated application deploys Convex before merging/promoting the frontend. Major releases are not eligible for blind one-click application.
 
@@ -50,7 +50,7 @@ Preparation flow:
 6. For each tenant it checks the installed lock, protected-path changes, and core drift.
 7. It resolves the tenant `deploymentActor` to a GitHub user and configures that user as the update commit author.
 8. It merges the upstream tag into `platform/update-vX.Y.Z` **without writing tenant `main`**.
-9. The complete merged tenant tree runs `npm run verify`.
+9. The complete merged tenant tree runs `bun run verify`.
 10. A clean update PR is opened/replaced; an unsafe update produces a blocked-review signal instead.
 11. Older open platform-update PRs should be closed when a newer tested release supersedes them.
 
@@ -70,7 +70,7 @@ private updater prepares tested PR
   → Update now queues the exact PR/version in Convex
   → worker leases the request and dispatches .github/workflows/apply-platform-update.yml
   → workflow revalidates exact PR head and CI
-  → npm run verify on the exact tenant tree
+  → bun run verify on the exact tenant tree
   → npx convex deploy using tenant CONVEX_DEPLOY_KEY
   → non-force fast-forward default branch to the verified PR head SHA
   → Vercel main-branch deployment (or tenant deploy hook)

@@ -14,16 +14,18 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci --include=dev --legacy-peer-deps
-      - run: npm run audit
-      - run: npm run typecheck
-      - run: npm run lint
-      - run: npm run test
-      - run: npm run build
+      - run: bun install --frozen-lockfile
+      - run: bun run audit
+      - run: bun run typecheck
+      - run: bun run lint
+      - run: bun run test
+      - run: bun run build
         env:
           NEXT_PUBLIC_SITE_URL: https://tenant.example
           NEXT_PUBLIC_CONVEX_URL: https://example.convex.cloud

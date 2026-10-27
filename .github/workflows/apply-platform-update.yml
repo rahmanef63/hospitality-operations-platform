@@ -90,10 +90,12 @@ jobs:
           ref: ${{ steps.resolve.outputs.head_sha }}
           fetch-depth: 0
 
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
 
       - name: Validate version and migration class
         shell: bash
@@ -112,8 +114,8 @@ jobs:
           if(major(base)!==major(next)) throw new Error('Major platform updates require an explicit migration workflow.');
           NODE
 
-      - run: npm ci --include=dev --legacy-peer-deps
-      - run: npm run verify
+      - run: bun install --frozen-lockfile
+      - run: bun run verify
 
       - name: Deploy tenant Convex backend
         shell: bash

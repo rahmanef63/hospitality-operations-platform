@@ -68,10 +68,10 @@ If a change could be expressed through an existing CMS/PMS/config surface, do no
 Upstream agents must use this sequence:
 
 1. Implement generic changes on a branch.
-2. Run `npm run verify`, dependency audit, `git diff --check`, and tenant-boundary audits.
+2. Run `bun run verify`, dependency audit, `git diff --check`, and tenant-boundary audits.
 3. Update the progress/release documentation when the change affects platform contracts.
 4. Merge through reviewed CI.
-5. Bump `.platform/product.json`, `package.json`, and lockfile together with `npm run platform:version -- X.Y.Z`.
+5. Bump `.platform/product.json`, `package.json`, and lockfile together with `bun run platform:version -- X.Y.Z`.
 6. Push the matching `vX.Y.Z` tag only after `main` is exact and clean.
 7. The release workflow publishes generic notes and dispatches the private updater control plane.
 8. Never write directly to a tenant default branch from the upstream release job.
@@ -148,8 +148,8 @@ Optional direct Next dispatch can use a tenant-owned GitHub App or fine-grained 
 For code changes:
 
 ```bash
-npm run verify
-npm audit --omit=dev --audit-level=high
+bun run verify
+bun audit --audit-level=high
 git diff --check
 ```
 
