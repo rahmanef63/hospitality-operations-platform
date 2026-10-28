@@ -1,10 +1,18 @@
 # Hospitality Operations Platform agent rules
 
+## Identity
+
+- Project codename **kamyna-living**. Canonical GitHub SSOT: `rahmanef63/hospitality-operations-platform` (old `kamyna-living` name redirects here). Package `hospitality-operations-platform` v0.1.14.
+- Owner agent: kamyna-living. Report to **Dita**.
+- Laptop coding path only: `~/agent-work/kamyna-living/` (WSL `/home/rahman/agent-work/kamyna-living`). Never edit `~/projects/**`. No Cursor cloud agents.
+- Secrets: env names only (`GH_PAT_RAHMANEF63`, Convex/Dokploy keys). Never print values.
+
 ## Start here
 
 - Read `docs/AI-AGENT-ONBOARDING.md` before repository-wide work. Determine upstream vs tenant mode by the presence of `.platform/tenant.json`.
 - In upstream mode, release/source metadata must remain provider-neutral and managed tenant routing must remain outside this repository.
 - In tenant mode, prefer CMS/PMS/runtime configuration and keep provider source overrides inside protected tenant prefixes.
+- Local MSO notes live in `.mso/KNOWLEDGE.md` (gitignored). Keep them current; do not commit `.mso/`.
 
 ## Non-negotiable
 
@@ -17,11 +25,13 @@
 - Tenant-owned paths declared in `.platform/distribution.json` are immutable from automated upstream sync. Core-code drift outside those paths must block one-click updates instead of being overwritten.
 - Managed update commits must resolve `TENANT_DEPLOYMENT_ACTOR` to a real tenant GitHub user. Preserve that author by non-force fast-forwarding the tenant default branch to the exact verified update head; hosting deployment policy must never depend on an upstream developer seat.
 - Do not deep-import another slice. Import only through its `index.ts` barrel.
+- Local commits are OK. Push / open PR / merge need Rahman's explicit GO.
 
 ## Architecture
 
-- Next.js 16 + React 19 + Tailwind 4 frontend, deployable to Vercel or a compatible container runtime.
-- Convex Cloud is the managed backend for CMS, welcome publishing, and multi-property operations.
+- Next.js 16 + React 19 + Tailwind 4 frontend, deployable to Vercel, Dokploy, or a compatible container runtime.
+- Production host today: Dokploy project **Kamyna Living**, app `kamyna-living` (status done). Health probe `/api/health`.
+- Convex Cloud is the managed backend for CMS, welcome publishing, and multi-property operations. Convex is present in-repo; MSO project connections still need Convex configured.
 - Consumer vertical slices live at `slices/<slug>/`; every slice owns `slice.json`, `slice.manifest.json`, `types.ts`, and `index.ts`.
 - Static public copy remains in `shared/content/config/` and is consumed through the repository boundary.
 - Welcome validation lives in `shared/welcome/`; PMS types and verified seeds live in `shared/pms/`; concierge knowledge lives in `shared/concierge/`; server authentication lives in `shared/admin/`; Next-to-Convex access lives in `shared/convex/`.
@@ -53,8 +63,8 @@
 - The public concierge may answer only from owner-verified property facts and configured official contact/location values. Unknown pricing, availability, capacity, policies, and travel facts must be explicitly handed off rather than inferred.
 - Do not describe the deterministic concierge as a live human or external AI model. Do not persist public chat messages unless the owner explicitly requests a reviewed storage policy.
 - Keep the public desktop header navigation unchanged; expose chat there only through the floating lower-right launcher.
-- Public and admin mobile docks must respect all safe-area insets, keep controls at least 44px, avoid horizontal scrolling, and reserve page-bottom space so content is never obscured.
-- Admin desktop keeps a persistent sidebar with visible module grouping and active-route state.
+- **Mobile: no persistent sidebar.** Use a safe-area bottom tab bar; rightmost **More** opens a bottom-sheet icon grid. Controls ≥44px, no horizontal scroll, reserve page-bottom space.
+- Public and admin mobile docks must respect all safe-area insets. Admin desktop keeps a persistent sidebar with visible module grouping and active-route state.
 
 ## Modularity and UI
 
@@ -66,14 +76,14 @@
 
 ## Verification
 
-Before commit or deployment run:
+Before commit or deployment run the quality gate:
 
 ```bash
-npm run audit
-npm run typecheck
-npm run lint
-npm run test
-npm run build
+npm run verify
+npm audit --omit=dev --audit-level=high
+git diff --check
 ```
+
+`npm run verify` runs audit + typecheck (+ Convex typecheck) + lint + test + build.
 
 For tenant platform updates, the tenant-owned apply workflow must revalidate the exact prepared PR, deploy Convex first, atomically merge that exact PR head, then wait for `/api/health` to report the exact frontend build revision. Never claim one-click completion when deployment credentials, Vercel promotion, or Convex access are unresolved.
