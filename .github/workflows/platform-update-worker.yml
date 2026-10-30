@@ -1,0 +1,33 @@
+name: Platform update worker
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: read
+  actions: write
+
+concurrency:
+  group: platform-update-worker
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    if: github.repository != 'rahmanef63/hospitality-operations-platform'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Sync update status and dispatch queued apply
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HOSPITALITY_CONVEX_SITE_URL: ${{ vars.HOSPITALITY_CONVEX_SITE_URL }}
+          HOSPITALITY_UPDATE_WORKFLOW_TOKEN: ${{ secrets.HOSPITALITY_UPDATE_WORKFLOW_TOKEN }}
+        run: node scripts/platform/update-worker.mjs

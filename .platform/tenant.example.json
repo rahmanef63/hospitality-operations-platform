@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "id": "provider-slug",
+  "displayName": "Provider Name",
+  "upstream": "rahmanef63/hospitality-operations-platform",
+  "channel": "stable",
+  "defaultBranch": "main"
+}

@@ -1,0 +1,18 @@
+{
+  "slug": "admin",
+  "version": "2.1.0",
+  "entry": "index.ts",
+  "exports": [
+    "AdminLoginPage",
+    "AdminDashboard",
+    "AiSettingsPage",
+    "AnnouncementManager",
+    "PlatformSettingsPage"
+  ],
+  "dependencies": [
+    "shared/ai",
+    "shared/announcements",
+    "shared/platform",
+    "shared/welcome"
+  ]
+}

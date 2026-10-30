@@ -1,0 +1,8 @@
+{
+  "slug": "cms",
+  "name": "Hospitality public content management",
+  "version": "1.0.0",
+  "category": "operations",
+  "description": "Draft/publish CMS for public site composition, copy, media selection, guides, and brand-assets content.",
+  "contract": {"inputs": ["CmsAdminOverview", "Server actions"], "outputs": ["CmsShell", "CMS editors"], "portable": true, "hardcodedUrls": []}
+}

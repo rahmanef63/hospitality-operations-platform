@@ -1,0 +1,11 @@
+{
+  "slug": "guides",
+  "version": "1.0.0",
+  "entry": "index.ts",
+  "exports": [
+    "GuidePage"
+  ],
+  "dependencies": [
+    "shared/content"
+  ]
+}
