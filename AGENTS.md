@@ -2,10 +2,9 @@
 
 ## Identity
 
-- Project codename **kamyna-living**. Canonical GitHub SSOT: `rahmanef63/hospitality-operations-platform` (old `kamyna-living` name redirects here). Package `hospitality-operations-platform` v0.1.14.
-- Owner agent: kamyna-living. Report to **Dita**.
-- Laptop coding path only: `~/agent-work/kamyna-living/` (WSL `/home/rahman/agent-work/kamyna-living`). Never edit `~/projects/**`. No Cursor cloud agents.
-- Secrets: env names only (`GH_PAT_RAHMANEF63`, Convex/Dokploy keys). Never print values.
+- Product: **Hospitality Operations Platform**. Canonical GitHub SSOT: `rahmanef63/hospitality-operations-platform`. Package `hospitality-operations-platform` v0.1.14.
+- Work in a dedicated agent worktree; never edit unrelated local project directories. No cloud coding agents.
+- Secrets: reference env/secret names only (GitHub PAT via secrets, Convex/hosting deploy keys). Never print values.
 
 ## Start here
 
@@ -30,7 +29,7 @@
 ## Architecture
 
 - Next.js 16 + React 19 + Tailwind 4 frontend, deployable to Vercel, Dokploy, or a compatible container runtime.
-- Production host today: Dokploy project **Kamyna Living**, app `kamyna-living` (status done). Health probe `/api/health`.
+- Production hosting is tenant-owned (Vercel or a container host). Health probe `/api/health`.
 - Convex Cloud is the managed backend for CMS, welcome publishing, and multi-property operations. Convex is present in-repo; MSO project connections still need Convex configured.
 - Consumer vertical slices live at `slices/<slug>/`; every slice owns `slice.json`, `slice.manifest.json`, `types.ts`, and `index.ts`.
 - Static public copy remains in `shared/content/config/` and is consumed through the repository boundary.
